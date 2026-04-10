@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <title>Gestión de Mesas | Kitchen</title>
     <link rel="stylesheet" th:href="@{/css/mesa.css}">
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
 </head>
-<body>
-<style>
 
-</style>
+<body>
+
 <nav class="menu-bar">
     <ul>
         <li><a href="/home" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Inicio</a></li>
-        <li><a href="/mesa"  class="active" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
+        <li><a href="/mesa" class="active" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
         <li><a href="/pedidos" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
         <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
         <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
@@ -44,8 +44,10 @@
 <div th:if="${mensajeError}" class="mensaje-error" th:text="${mensajeError}"></div>
 
 <h2 style="text-align:center; margin-top:40px;">Mesas existentes</h2>
+
 <div id="listaMesas">
     <div th:each="mesa : ${listar}" class="mesa-card">
+
         <form th:action="@{'/mesa/' + ${mesa.id} + '/generar-factura'}" method="post" style="margin-top:10px;">
             <button type="submit"
                     th:disabled="${mesa.pedidosId == null or #lists.isEmpty(mesa.pedidosId)}"
@@ -55,43 +57,61 @@
         </form>
 
         <h3>Mesa <span th:text="${mesa.num}"></span></h3>
+
         <p><strong>Estado:</strong>
             <span th:if="${mesa.ocupado}" style="color:red;">Ocupada</span>
             <span th:unless="${mesa.ocupado}" style="color:green;">Disponible</span>
         </p>
+
         <p><strong>Mesero:</strong>
             <span th:text="${nombresMeseros[mesa.id]} ?: 'No asignado'"></span>
         </p>
 
         <div th:if="${pedidosPorMesa[mesa.id] != null and !pedidosPorMesa[mesa.id].isEmpty()}">
             <h4>Pedidos:</h4>
+
             <div th:each="pedido : ${pedidosPorMesa[mesa.id]}" class="pedido-card">
+
                 <p><strong>Fecha:</strong>
-                    <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></span></p>
+                    <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></span>
+                </p>
+
                 <p><strong>Total:</strong>
-                    <span th:text="${'$' + #numbers.formatDecimal(pedido.total, 1, 2)}"></span></p>
+                    <span th:text="${'$' + #numbers.formatDecimal(pedido.total, 1, 2)}"></span>
+                </p>
+
                 <p><strong>Mesero:</strong>
-                    <span th:text="${pedido.nombreMesero} ?: 'No asignado'"></span></p>
+                    <span th:text="${pedido.nombreMesero} ?: 'No asignado'"></span>
+                </p>
+
                 <p><strong>Estado:</strong>
-                    <span th:text="${pedido.pagado} ? 'Pagado' : 'Pendiente'"></span></p>
+                    <span th:text="${pedido.pagado} ? 'Pagado' : 'Pendiente'"></span>
+                </p>
 
                 <h5>Platillos:</h5>
+
                 <div th:each="item : ${pedido.items}" class="platillo-item">
                     <p><strong th:text="${item.nombrePlatillo}"></strong></p>
                     <p th:text="${item.descripcionPlatillo}"></p>
                     <p>Cantidad: <span th:text="${item.cantidad}"></span></p>
                     <p>Precio: <span th:text="${'$' + #numbers.formatDecimal(item.precio, 1, 2)}"></span></p>
                 </div>
+
             </div>
         </div>
 
         <div th:if="${pedidosPorMesa[mesa.id] == null or pedidosPorMesa[mesa.id].isEmpty()}">
             <p>No hay pedidos para esta mesa.</p>
         </div>
+
     </div>
 </div>
+
+<!-- Scripts -->
 <script th:src="@{/js/Confirmacion.js}"></script>
 <script th:src="@{/js/filtromesa.js}"></script>
+
+<div th:replace="chat :: chat"></div>
+
 </body>
 </html>
-
