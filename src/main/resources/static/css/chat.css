@@ -1,4 +1,4 @@
-
+/* ===== BOTÓN FLOTANTE DEL CHAT ===== */
 .chat-boton {
     position: fixed;
     bottom: 20px;
@@ -30,6 +30,7 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* ===== CAJA DEL CHAT ===== */
 .chat-box {
     position: fixed;
     bottom: 90px;
@@ -58,6 +59,7 @@
     }
 }
 
+/* ===== HEADER ===== */
 .chat-header {
     background: linear-gradient(135deg, #9ec1d3, #7faec4);
     color: white;
@@ -98,6 +100,7 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
+/* ===== BODY ===== */
 .chat-body {
     flex: 1;
     padding: 15px;
@@ -118,6 +121,7 @@
     border-radius: 10px;
 }
 
+/* ===== MENSAJES ===== */
 .mensaje {
     padding: 10px 14px;
     border-radius: 18px;
@@ -140,12 +144,15 @@
     align-self: flex-end;
 }
 
+/* ===== FOOTER (FIX DEFINITIVO) ===== */
 .chat-footer {
     display: flex;
     border-top: 1px solid #e0e0e0;
     background: white;
     padding: 8px;
     gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .chat-footer input {
@@ -155,12 +162,14 @@
     padding: 10px 15px;
     outline: none;
     font-size: 14px;
+    min-width: 0;
 }
 
 .chat-footer input:focus {
     border-color: #9ec1d3;
 }
 
+/* 🔥 AQUÍ ESTÁ LA CURA REAL */
 .chat-footer button {
     background: #9ec1d3;
     border: none;
@@ -168,8 +177,13 @@
     padding: 10px 16px;
     border-radius: 25px;
     cursor: pointer;
+
+    width: auto !important; /* rompe el width:100% global */
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
+/* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
     .chat-box {
         width: 95%;
