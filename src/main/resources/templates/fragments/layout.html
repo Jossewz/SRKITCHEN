@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- Sidebar Navigation -->
+<div th:fragment="sidebar" class="fixed left-0 top-0 h-screen w-64 sidebar text-white shadow-elevation z-40 flex flex-col transition-all duration-300 lg:flex hidden">
+  
+  <!-- Logo -->
+  <div class="px-6 py-8 border-b border-sky-light/20 flex items-center gap-3">
+    <img th:src="@{/img/logo.png}" alt="SR Kitchen" class="h-12 w-12 object-contain">
+    <div>
+      <h1 class="text-2xl font-jakarta font-bold">SR Kitchen</h1>
+    </div>
+  </div>
+
+  <!-- Navigation Items -->
+  <nav class="flex-1 overflow-y-auto py-8 px-3">
+    <div class="px-4 pb-4 mb-4 border-b border-sky-light/20">
+      <p class="text-xs uppercase tracking-[0.2em] text-sky-light font-semibold">Accesos</p>
+    </div>
+    <ul class="space-y-2">
+      
+      <!-- Home -->
+      <li>
+        <a href="/home" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1"
+           sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+          <span class="material-symbols-outlined text-xl">home</span>
+          <span class="font-jakarta font-medium">Inicio</span>
+        </a>
+      </li>
+
+      <!-- Mesas -->
+      <li>
+        <a href="/mesa" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1"
+           sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+          <span class="material-symbols-outlined text-xl">table_restaurant</span>
+          <span class="font-jakarta font-medium">Mesas</span>
+        </a>
+      </li>
+
+      <!-- Pedidos -->
+      <li>
+        <a href="/pedidos" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1"
+           sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+          <span class="material-symbols-outlined text-xl">shopping_cart</span>
+          <span class="font-jakarta font-medium">Pedidos</span>
+        </a>
+      </li>
+
+      <!-- Facturas -->
+      <li>
+        <a href="/factura" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1"
+           sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+          <span class="material-symbols-outlined text-xl">receipt_long</span>
+          <span class="font-jakarta font-medium">Facturas</span>
+        </a>
+      </li>
+
+      <!-- Meseros (Admin only) -->
+      <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+        <a href="/mesero" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1">
+          <span class="material-symbols-outlined text-xl">person</span>
+          <span class="font-jakarta font-medium">Meseros</span>
+        </a>
+      </li>
+
+      <!-- Platillos (Admin only) -->
+      <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+        <a href="/platillos" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1">
+          <span class="material-symbols-outlined text-xl">restaurant_menu</span>
+          <span class="font-jakarta font-medium">Platillos</span>
+        </a>
+      </li>
+
+      <!-- Datos (Admin only) -->
+      <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+        <a href="/datos" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1">
+          <span class="material-symbols-outlined text-xl">analytics</span>
+          <span class="font-jakarta font-medium">Datos</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- Logout -->
+  <div class="border-t border-sky-light/20 p-4">
+    <form th:action="@{/logout}" method="post" class="w-full">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-sky-light/10 hover:bg-sky-light/30 transition-all duration-200 text-red-200 hover:text-red-100">
+        <span class="material-symbols-outlined text-xl">logout</span>
+        <span class="font-jakarta font-medium">Cerrar Sesión</span>
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<!-- Mobile Sidebar Toggle -->
+<div th:fragment="mobile-menu-toggle" class="lg:hidden fixed top-4 left-4 z-50">
+  <button id="menu-toggle" class="p-2 bg-primary text-white rounded-lg shadow-elevation hover:shadow-lg transition-all">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+</div>
+
+<!-- Header / Top Bar -->
+<header th:fragment="header" class="fixed top-0 left-0 lg:left-64 right-0 h-20 bg-white border-b border-gray-100 shadow-glass z-30 flex items-center px-6 transition-all duration-300">
+  
+  <div class="flex items-center justify-between w-full">
+    <!-- Title -->
+    <div class="flex items-center space-x-4">
+      <h2 id="page-title" class="text-2xl font-jakarta font-bold text-primary">Dashboard</h2>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="flex items-center space-x-4">
+      <!-- User Info -->
+      <div class="flex items-center space-x-2 text-sm" sec:authorize="isAuthenticated()">
+        <span class="material-symbols-outlined text-primary">account_circle</span>
+        <span class="hidden sm:inline text-gray-600" sec:authentication="name">User</span>
+      </div>
+
+      <!-- Notifications (optional) -->
+      <button class="p-2 hover:bg-bg-light rounded-lg transition-all duration-200">
+        <span class="material-symbols-outlined text-primary">notifications</span>
+      </button>
+
+      <!-- Settings (optional) -->
+      <button class="p-2 hover:bg-bg-light rounded-lg transition-all duration-200">
+        <span class="material-symbols-outlined text-primary">settings</span>
+      </button>
+    </div>
+  </div>
+
+</header>
+
+</html>

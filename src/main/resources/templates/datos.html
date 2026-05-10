@@ -1,112 +1,89 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Análisis de Ganancias - Modelo Weka</title>
-    <link rel="stylesheet" th:href="@{/css/datos.css}" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Ganancias | SR Kitchen</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/globals.css}">
 </head>
-<body>
-<nav class="menu-bar">
-    <ul>
-        <li><a href="/home" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Inicio</a></li>
-        <li><a href="/mesa"sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
-        <li><a href="/pedidos" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
-        <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
-        <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
-        <li><a href="/platillos" sec:authorize="hasAuthority('ROLE_ADMIN')">Platillos</a></li>
-        <li><a href="/datos"   class="active"  sec:authorize="hasAnyAuthority('ROLE_ADMIN')">Datos</a></li>
-        <li class="logout-nav">
-            <form th:action="@{/logout}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit">Cerrar Sesión</button>
-            </form>
-        </li>
-    </ul>
-</nav>
-<div class="container">
-    <div class="header">
-        <h1> Dashboard de Análisis de Ganancias</h1>
-        <p>Predicciones inteligentes basadas en Machine Learning</p>
-    </div>
+<body class="lg:ml-64 transition-all duration-300">
 
-    <div class="controls">
-        <button class="btn-primary" id="btnPrediccion">
-             Ejecutar Análisis Predictivo
-        </button>
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Analizando datos y generando predicciones...</p>
+    <!-- Sidebar Navigation -->
+    <div th:replace="fragments/layout :: sidebar"></div>
+    
+    <!-- Mobile Menu Toggle -->
+    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
+    
+    <!-- Top Header -->
+    <div th:replace="fragments/layout :: header"></div>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
+        
+        <!-- Flash Messages -->
+        <div th:replace="fragments/components :: messages"></div>
+
+        <!-- Page Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-jakarta font-bold text-primary mb-2">Dashboard de Análisis</h1>
+            <p class="text-gray-600 font-work">Predicciones inteligentes basadas en Machine Learning con Weka</p>
         </div>
-    </div>
 
-    <div class="result-container">
-        <div id="resultado">
-            <div style="text-align: center; padding: 50px; color: #6c757d;">
-                <h3> Presiona el botón para iniciar el análisis</h3>
-                <p>El sistema analizará los patrones de pago y predecirá el impacto en las ganancias</p>
+        <!-- Hero Card with Analysis Trigger -->
+        <div class="card p-12 text-center mb-12">
+            <div class="mb-6">
+                <span class="material-symbols-outlined text-7xl text-accent/30 block">analytics</span>
+            </div>
+            
+            <h2 class="text-3xl font-jakarta font-bold text-primary mb-4">Análisis Predictivo de Ganancias</h2>
+            <p class="text-gray-600 font-work mb-8 max-w-2xl mx-auto">
+                El sistema analizará los patrones de pago históricos y generará predicciones basadas en Machine Learning para optimizar tus ganancias.
+            </p>
+
+            <button id="btnPrediccion" class="btn-primary px-8 py-4 text-lg inline-flex items-center">
+                <span class="material-symbols-outlined mr-2">smart_toy</span>
+                Ejecutar Análisis Predictivo
+            </button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden mb-12">
+            <div class="card p-8 text-center">
+                <div class="flex justify-center mb-6">
+                    <div class="animate-spin">
+                        <span class="material-symbols-outlined text-6xl text-primary">hourglass_top</span>
+                    </div>
+                </div>
+                <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Procesando Análisis</h3>
+                <p class="text-gray-600 font-work">Analizando datos y generando predicciones...</p>
             </div>
         </div>
-    </div>
 
-    <div class="footer">
-        <p>Sistema de Predicción Weka ML | Powered by Spring Boot & AI</p>
-    </div>
-</div>
+        <!-- Results Container -->
+        <div id="resultado"></div>
 
-<script>
-    document.getElementById("btnPrediccion").addEventListener("click", async () => {
-        const btn = document.getElementById("btnPrediccion");
-        const loading = document.getElementById("loading");
-        const resultado = document.getElementById("resultado");
+    </main>
 
-        // Mostrar loading
-        btn.disabled = true;
-        btn.innerHTML = " Procesando...";
-        loading.style.display = 'block';
-        resultado.innerHTML = '';
+    <!-- Footer -->
+    <div th:replace="fragments/components :: footer"></div>
 
-        try {
-            const response = await fetch("/weka");
+    <!-- Scripts -->
+    <script th:src="@{/js/mobile-menu.js}"></script>
+    <script th:src="@{/js/ui-helpers.js}"></script>
+    <script th:src="@{/js/datos-analysis.js}"></script>
 
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`);
-            }
-
-            const html = await response.text();
-            resultado.innerHTML = html;
-
-        } catch (error) {
-            resultado.innerHTML = `
-                    <div class="error-box">
-                        <h3> Error en la conexión</h3>
-                        <p>No se pudo conectar con el servidor. Error: ${error.message}</p>
-                        <p>Verifica que el servidor esté ejecutándose correctamente.</p>
-                    </div>
-                `;
-        } finally {
-            // Restaurar botón
-            btn.disabled = false;
-            btn.innerHTML = " Ejecutar Nuevo Análisis";
-            loading.style.display = 'none';
-
-            // Scroll suave al resultado
-            resultado.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-
-    // Efectos visuales adicionales
-    document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('btnPrediccion');
-
-        btn.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.05)';
-        });
-
-        btn.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
-</script>
 </body>
 </html>
