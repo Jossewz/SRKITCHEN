@@ -40,6 +40,9 @@ public class ChatbotService {
     @Autowired
     private ProductoRep productoRep;
 
+    @Autowired
+    private RagService ragService;
+
     public String askQuestion(String userQuestion) {
         String context = generateRestaurantContext();
 
@@ -114,7 +117,12 @@ public class ChatbotService {
             productos.stream().map(p -> "- " + p.getName() + " (Stock: " + p.getStock() + " unids, Costo: $" + p.getPrice() + ")")
                 .collect(Collectors.joining("\n"));
 
-        return "---- CONTEXTO ACTUAL DEL RESTAURANTE ----\n"
+        // Conocimiento estático desde docs/info.txt (nombre, horarios, módulos, roles, etc.)
+        String infoGeneral = ragService.loadKnowledge();
+
+        return "---- INFORMACIÓN GENERAL DEL RESTAURANTE (docs/info.txt) ----\n"
+                + infoGeneral + "\n\n"
+                + "---- DATOS EN TIEMPO REAL DEL SISTEMA ----\n"
                 + "Total de Pedidos Realizados (Histórico y actuales): " + pedidos.size() + "\n\n"
                 + "[Estado de Mesas]\n"
                 + "Total de Mesas: " + mesas.size() + "\n"

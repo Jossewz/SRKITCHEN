@@ -31,7 +31,7 @@ public class RagService {
         return groqApiClient.askGroq(finalPrompt);
     }
 
-    private String loadKnowledge() {
+    public String loadKnowledge() {
         try {
 
             ClassPathResource resource =
