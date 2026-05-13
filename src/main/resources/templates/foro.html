@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foro | SR Kitchen</title>
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        nav.menu-bar {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 2rem;
+        }
+
+        nav.menu-bar ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            height: 60px;
+        }
+
+        nav.menu-bar ul li a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        nav.menu-bar ul li a:hover,
+        nav.menu-bar ul li a.active {
+            background: rgba(99,102,241,0.3);
+            color: #fff;
+        }
+
+        nav.menu-bar ul li.logout-nav { margin-left: auto; }
+
+        nav.menu-bar ul li.logout-nav button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        nav.menu-bar ul li.logout-nav button:hover { background: #c0392b; }
+
+        .container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #6366f1, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        /* ── Formulario de nuevo comentario ── */
+        .form-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .form-card h2 {
+            font-size: 1.1rem;
+            color: #a78bfa;
+            margin-bottom: 1rem;
+        }
+
+        .form-card input[type="text"],
+        .form-card textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            margin-bottom: 0.9rem;
+            resize: vertical;
+            transition: border 0.3s;
+        }
+
+        .form-card input[type="text"]:focus,
+        .form-card textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .form-card button {
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: opacity 0.3s, transform 0.2s;
+        }
+
+        .form-card button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* ── Mensaje de éxito ── */
+        .alert-success {
+            background: rgba(39,174,96,0.15);
+            border: 1px solid rgba(39,174,96,0.4);
+            color: #2ecc71;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* ── Lista de comentarios ── */
+        .comentarios-lista { display: flex; flex-direction: column; gap: 1rem; }
+
+        .comentario-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            backdrop-filter: blur(6px);
+            transition: border-color 0.3s, transform 0.2s;
+        }
+
+        .comentario-card:hover {
+            border-color: rgba(99,102,241,0.4);
+            transform: translateY(-2px);
+        }
+
+        .comentario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .comentario-autor {
+            font-weight: 700;
+            color: #a78bfa;
+            font-size: 0.95rem;
+        }
+
+        .comentario-fecha {
+            font-size: 0.78rem;
+            color: #666;
+        }
+
+        .comentario-texto {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 0.93rem;
+        }
+
+        .sin-comentarios {
+            text-align: center;
+            color: #666;
+            padding: 3rem;
+            font-style: italic;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: #a78bfa;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(167,139,250,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barra de navegación -->
+<nav class="menu-bar">
+    <ul>
+        <li><a href="/home" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Inicio</a></li>
+        <li><a href="/mesa" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
+        <li><a href="/pedidos" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
+        <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
+        <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
+        <li><a href="/platillos" sec:authorize="hasAuthority('ROLE_ADMIN')">Platillos</a></li>
+        <li><a href="/datos" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">Datos</a></li>
+        <li><a href="/foro" class="active">Foro</a></li>
+        <li class="logout-nav">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit">Cerrar Sesión</button>
+            </form>
+        </li>
+    </ul>
+</nav>
+
+<div class="container">
+
+    <h1>💬 Foro del Restaurante</h1>
+    <p class="subtitle">Comparte comentarios, sugerencias o novedades con el equipo</p>
+
+    <!-- Mensaje de éxito opcional -->
+    <div class="alert-success" th:if="${message}" th:text="${message}"></div>
+
+    <!-- Formulario de nuevo comentario -->
+    <div class="form-card">
+        <h2>✍️ Nuevo Comentario</h2>
+        <form th:action="@{/foro}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="text"
+                   name="Fnombre"
+                   placeholder="Tu nombre"
+                   required
+                   maxlength="80" />
+            <textarea name="Fcomentario"
+                      placeholder="Escribe tu comentario aquí..."
+                      rows="4"
+                      required
+                      maxlength="500"></textarea>
+            <button type="submit">Publicar Comentario</button>
+        </form>
+    </div>
+
+    <!-- Lista de comentarios -->
+    <p class="section-title">📋 Comentarios publicados</p>
+
+    <div class="comentarios-lista" th:if="${foros != null and !foros.isEmpty()}">
+        <div class="comentario-card" th:each="f : ${foros}">
+            <div class="comentario-header">
+                <span class="comentario-autor" th:text="'👤 ' + ${f.fnombre}">Autor</span>
+                <span class="comentario-fecha"
+                      th:text="${#temporals.format(f.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+            </div>
+            <p class="comentario-texto" th:text="${f.fcomentario}">Comentario</p>
+        </div>
+    </div>
+
+    <div class="sin-comentarios"
+         th:if="${foros == null or foros.isEmpty()}">
+        Aún no hay comentarios. ¡Sé el primero en escribir!
+    </div>
+
+</div>
+
+<!-- Asistente de IA -->
+<div th:replace="chat :: chat"></div>
+
+</body>
+</html>

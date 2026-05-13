@@ -1,0 +1,108 @@
+====================================================
+ SR KITCHEN — BASE DE CONOCIMIENTO DEL RESTAURANTE
+====================================================
+
+NOMBRE DEL RESTAURANTE: SR Kitchen
+TIPO DE NEGOCIO: Sistema de Gestión de Restaurante
+AÑO DE FUNDACIÓN: 2015
+
+----------------------------------------------------
+INFORMACIÓN GENERAL
+----------------------------------------------------
+SR Kitchen es una plataforma digital de gestión integral para restaurantes.
+Ofrece control de mesas, pedidos, meseros, platillos, inventario y facturación.
+El sistema está disponible para administradores y meseros con roles diferenciados.
+
+----------------------------------------------------
+HORARIOS DE ATENCIÓN
+----------------------------------------------------
+Lunes a Viernes: 12:00 - 23:00
+Sábados: 12:00 - 00:00
+Domingos: 12:00 - 22:00
+
+----------------------------------------------------
+CONTACTO
+----------------------------------------------------
+Teléfono: +1 234 567 890
+Correo: info@srkitchen.com
+Dirección: Dirección Principal 123, Ciudad
+
+----------------------------------------------------
+MÓDULOS DEL SISTEMA
+----------------------------------------------------
+1. MESAS: Gestión de mesas del restaurante.
+   - Crear mesas con número identificador.
+   - Ver estado de la mesa: Disponible u Ocupada.
+   - Asignar mesero a cada mesa.
+   - Generar factura y liberar mesa.
+
+2. PEDIDOS: Gestión de órdenes por mesa.
+   - Crear pedidos seleccionando mesa, mesero y platillos.
+   - Especificar cantidad por platillo.
+   - Editar o eliminar pedidos existentes.
+   - Ver historial de pedidos recientes.
+
+3. PLATILLOS: Menú del restaurante.
+   - Crear, editar y eliminar platillos.
+   - Cada platillo tiene nombre, cantidad y precio.
+   - El menú es administrado exclusivamente por el ADMIN.
+
+4. MESEROS: Gestión del personal de servicio.
+   - Registrar meseros con ID, nombre, correo y contraseña.
+   - Asignar roles: ROLE_MESERO o ROLE_ADMIN.
+   - Solo el administrador puede gestionar meseros.
+
+5. FACTURAS: Sistema de facturación.
+   - Las facturas se generan automáticamente al liberar una mesa.
+   - Estados: PENDIENTE o APROBADA.
+   - Incluye detalle de mesa, mesero, fecha, items y total.
+   - Sistema de paginación para historial extenso.
+
+6. INVENTARIO / PRODUCTOS: Control de stock.
+   - Gestión de productos con nombre, stock y precio.
+   - Permite conocer disponibilidad de insumos.
+
+7. DATOS / ANÁLISIS PREDICTIVO: Dashboard de inteligencia de negocio.
+   - Usa Machine Learning (Weka) para predecir impacto en ganancias.
+   - Analiza patrones de pago de los pedidos.
+   - Muestra tendencias: AUMENTO, DECREMENTO o ESTABLE.
+   - Solo disponible para el administrador.
+
+----------------------------------------------------
+ASISTENTE INTELIGENTE (CHATBOT RAG)
+----------------------------------------------------
+El sistema incluye un asistente de inteligencia artificial integrado
+en todas las páginas del sistema.
+El asistente puede responder preguntas sobre:
+- Estado de las mesas (cuántas están ocupadas o libres)
+- Menú actual del restaurante y precios de platillos
+- Platillos más vendidos o menos vendidos
+- Inventario y stock de productos
+- Finanzas: facturas pagadas, pendientes, ingresos totales
+- Información general del restaurante
+
+Para usar el asistente, haz clic en el botón 💬 en la esquina inferior derecha.
+
+----------------------------------------------------
+ROLES Y PERMISOS
+----------------------------------------------------
+ROLE_ADMIN:
+  - Acceso completo a todos los módulos.
+  - Puede gestionar meseros, platillos y ver datos analíticos.
+  - Accede a: Mesa, Pedidos, Facturas, Mesero, Platillos, Datos.
+
+ROLE_MESERO:
+  - Acceso a operaciones del día a día.
+  - Puede gestionar mesas, crear pedidos y ver facturas.
+  - Accede a: Mesa, Pedidos, Facturas.
+
+----------------------------------------------------
+TECNOLOGÍA
+----------------------------------------------------
+Backend: Spring Boot 3.4.3 con Java 21
+Base de datos: MongoDB
+Seguridad: Spring Security con BCrypt
+Frontend: Thymeleaf + HTML/CSS/JavaScript
+IA: Groq API (modelo llama-3.3-70b-versatile)
+ML: Weka 3.8.6
+Contenedores: Docker + Docker Compose
