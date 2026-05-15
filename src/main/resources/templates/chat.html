@@ -1,0 +1,96 @@
+<link rel="stylesheet" th:href="@{/css/chat.css}" xmlns:th="http://www.w3.org/1999/xhtml"/>
+<div th:fragment="chat" xmlns:th="http://www.w3.org/1999/xhtml">
+
+  <!-- BOTÓN -->
+  <div class="chat-boton" onclick="toggleChat()">💬</div>
+
+  <!-- VENTANA -->
+  <div class="chat-box" id="chatBox">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <span>Asistente</span>
+      <span class="close-btn" onclick="toggleChat()">✖</span>
+    </div>
+
+    <!-- MENSAJES -->
+    <div class="chat-body" id="chatBody">
+      <div class="mensaje bot">
+        Hola 👋 ¿En qué puedo ayudarte?
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-footer">
+      <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
+      <button onclick="enviarMensaje()">➤</button>
+    </div>
+
+  </div>
+
+
+  <script>
+    function toggleChat() {
+        const chat = document.getElementById("chatBox");
+        chat.style.display = (chat.style.display === "flex") ? "none" : "flex";
+    }
+
+    function enviarMensaje() {
+        const input = document.getElementById("chatInput");
+        const chatBody = document.getElementById("chatBody");
+
+        const mensaje = input.value.trim();
+        if (mensaje === "") return;
+
+        // Mensaje usuario
+        const userMsg = document.createElement("div");
+        userMsg.className = "mensaje user";
+        userMsg.innerText = mensaje;
+        chatBody.appendChild(userMsg);
+
+        input.value = "";
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        // Mensaje temporal del bot
+        const botMsg = document.createElement("div");
+        botMsg.className = "mensaje bot";
+        botMsg.innerText = "Pensando...";
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        // 🔥 LLAMADA AL BACKEND
+        fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: mensaje
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Error en servidor");
+            return response.text();
+        })
+        .then(data => {
+            botMsg.innerText = data;
+            chatBody.scrollTop = chatBody.scrollHeight;
+        })
+        .catch(error => {
+            botMsg.innerText = "Error al conectar 😢";
+            console.error(error);
+        });
+    }
+
+    // 🔥 ENVIAR CON ENTER
+    document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("chatInput");
+
+        input.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                enviarMensaje();
+            }
+        });
+    });
+  </script>
+
+</div>

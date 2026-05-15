@@ -30,6 +30,7 @@ public class Security {
      * Custom entry point that returns 401 for API requests (paths starting with /api/)
      * and falls back to redirect to form login for non-API requests (Thymeleaf web).
      */
+
     private AuthenticationEntryPoint apiAwareEntryPoint() {
         return new AuthenticationEntryPoint() {
             @Override
