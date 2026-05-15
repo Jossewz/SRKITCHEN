@@ -2,63 +2,198 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio | SR Kitchen</title>
-    <link rel="stylesheet" th:href="@{/css/home.css}">
-    <link rel="stylesheet" th:href="@{/css/chat.css}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/globals.css}">
 </head>
-<body>
+<body class="lg:ml-64 transition-all duration-300">
+    
+    <!-- Sidebar Navigation -->
+    <div th:replace="fragments/layout :: sidebar"></div>
+    
+    <!-- Mobile Menu Toggle -->
+    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
+    
+    <!-- Top Header -->
+    <div th:replace="fragments/layout :: header"></div>
+    
+    <!-- Main Content -->
+    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
+        
+        <!-- Flash Messages -->
+        <div th:replace="fragments/components :: messages"></div>
+        
+        <!-- Welcome Hero -->
+        <section class="mb-12">
+            <div class="glass rounded-2xl p-12 text-center mb-8">
+                <div class="mb-6">
+                    
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-jakarta font-bold text-primary mb-4">
+                    Bienvenido a SR Kitchen
+                </h1>
+                <p class="text-lg text-gray-600 font-work max-w-2xl mx-auto">
+                    Sistema integral de gestión de restaurante. Administra mesas, pedidos, facturas y personal de forma eficiente.
+                </p>
+            </div>
+        </section>
 
-<!-- 🎆 Partículas animadas y scroll del menú -->
-<script>
-    // Navbar scroll efecto
-    window.addEventListener('scroll', () => {
-      const navbar = document.querySelector('.menu-bar');
-      if (window.scrollY > 100) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    });
+        <!-- Quick Stats Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            
+            <!-- Total Mesas -->
+            <div class="card p-6 hover:scale-105 hover:shadow-elevation">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 font-work text-sm mb-1">Total de Mesas</p>
+                        <p class="text-3xl font-jakarta font-bold text-primary">-</p>
+                    </div>
+                    <span class="material-symbols-outlined text-5xl text-accent/30">table_restaurant</span>
+                </div>
+            </div>
 
-    // Partículas dinámicas
-    function createParticles() {
-      const container = document.createElement('div');
-      container.className = 'particles';
-      document.body.appendChild(container);
-      for (let i = 0; i < 25; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.top = Math.random() * 100 + 'vh';
-        p.style.animationDelay = Math.random() * 8 + 's';
-        p.style.animationDuration = (Math.random() * 5 + 10) + 's';
-        container.appendChild(p);
-      }
-    }
-    createParticles();
-</script>
+            <!-- Pedidos Hoy -->
+            <div class="card p-6 hover:scale-105 hover:shadow-elevation">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 font-work text-sm mb-1">Pedidos Hoy</p>
+                        <p class="text-3xl font-jakarta font-bold text-primary">-</p>
+                    </div>
+                    <span class="material-symbols-outlined text-5xl text-accent/30">receipt_long</span>
+                </div>
+            </div>
 
-<!-- 🧭 Barra de navegación -->
-<nav class="menu-bar">
-    <ul>
-        <li><a href="/mesa" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
-        <li><a href="/pedidos" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
-        <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
-        <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
-        <li><a href="/platillos" sec:authorize="hasAuthority('ROLE_ADMIN')">Platillos</a></li>
-        <li><a href="/datos" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">Datos</a></li>
-        <li class="logout-nav">
-            <form th:action="@{/logout}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit">Cerrar Sesión</button>
-            </form>
-        </li>
-    </ul>
-</nav>
+            <!-- Ingresos Hoy -->
+            <div class="card p-6 hover:scale-105 hover:shadow-elevation">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 font-work text-sm mb-1">Ingresos Hoy</p>
+                        <p class="text-3xl font-jakarta font-bold text-primary">$0</p>
+                    </div>
+                    <span class="material-symbols-outlined text-5xl text-accent/30">attach_money</span>
+                </div>
+            </div>
 
+            <!-- Personal Activo -->
+            <div class="card p-6 hover:scale-105 hover:shadow-elevation">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 font-work text-sm mb-1">Meseros Activos</p>
+                        <p class="text-3xl font-jakarta font-bold text-primary">-</p>
+                    </div>
+                    <span class="material-symbols-outlined text-5xl text-accent/30">person</span>
+                </div>
+            </div>
 
-<div class="content">
-    <h1>Bienvenido a <strong>SR Kitchen</strong></h1>
+        </section>
 
-</div>
-<div th:replace="chat :: chat"></div>
+        <!-- Quick Access Cards - Bento Grid -->
+        <section>
+            <h2 class="text-2xl font-jakarta font-bold text-primary mb-6">Acceso Rápido</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Mesas Card -->
+                <a href="/mesa" class="card-interactive p-8 flex flex-col items-start justify-between min-h-40 group" 
+                   sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+                    <div>
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4 group-hover:scale-110 transition-transform">table_restaurant</span>
+                        <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Gestión de Mesas</h3>
+                        <p class="text-gray-600 text-sm font-work">Crea y administra las mesas del restaurante</p>
+                    </div>
+                    <div class="mt-4 text-primary group-hover:translate-x-2 transition-transform">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                </a>
+
+                <!-- Pedidos Card -->
+                <a href="/pedidos" class="card-interactive p-8 flex flex-col items-start justify-between min-h-40 group"
+                   sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+                    <div>
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4 group-hover:scale-110 transition-transform">shopping_cart</span>
+                        <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Gestión de Pedidos</h3>
+                        <p class="text-gray-600 text-sm font-work">Crea y gestiona los pedidos de los clientes</p>
+                    </div>
+                    <div class="mt-4 text-primary group-hover:translate-x-2 transition-transform">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                </a>
+
+                <!-- Facturas Card -->
+                <a href="/factura" class="card-interactive p-8 flex flex-col items-start justify-between min-h-40 group"
+                   sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+                    <div>
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4 group-hover:scale-110 transition-transform">receipt_long</span>
+                        <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Facturas</h3>
+                        <p class="text-gray-600 text-sm font-work">Revisa y gestiona todas las facturas</p>
+                    </div>
+                    <div class="mt-4 text-primary group-hover:translate-x-2 transition-transform">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                </a>
+
+                <!-- Platillos Card (Admin) -->
+                <a href="/platillos" class="card-interactive p-8 flex flex-col items-start justify-between min-h-40 group"
+                   sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    <div>
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4 group-hover:scale-110 transition-transform">restaurant_menu</span>
+                        <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Gestión de Platillos</h3>
+                        <p class="text-gray-600 text-sm font-work">Administra el menú de tu restaurante</p>
+                    </div>
+                    <div class="mt-4 text-primary group-hover:translate-x-2 transition-transform">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                </a>
+
+                <!-- Meseros Card (Admin) -->
+                <a href="/mesero" class="card-interactive p-8 flex flex-col items-start justify-between min-h-40 group"
+                   sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    <div>
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4 group-hover:scale-110 transition-transform">person</span>
+                        <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Gestión de Meseros</h3>
+                        <p class="text-gray-600 text-sm font-work">Administra el personal del restaurante</p>
+                    </div>
+                    <div class="mt-4 text-primary group-hover:translate-x-2 transition-transform">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                </a>
+
+                <!-- Datos Card (Admin) -->
+                <a href="/datos" class="card-interactive p-8 flex flex-col items-start justify-between min-h-40 group"
+                   sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    <div>
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4 group-hover:scale-110 transition-transform">analytics</span>
+                        <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Datos y Reportes</h3>
+                        <p class="text-gray-600 text-sm font-work">Accede a análisis y reportes del negocio</p>
+                    </div>
+                    <div class="mt-4 text-primary group-hover:translate-x-2 transition-transform">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="fragments/components :: footer"></div>
+    
+    <!-- Scripts -->
+    <script th:src="@{/js/mobile-menu.js}"></script>
 
 </body>
 </html>
