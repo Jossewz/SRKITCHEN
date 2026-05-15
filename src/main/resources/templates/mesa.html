@@ -2,184 +2,114 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Mesas | SR Kitchen</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Global Styles -->
-    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <title>Gestión de Mesas | Kitchen</title>
+    <link rel="stylesheet" th:href="@{/css/mesa.css}">
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
 </head>
-<body class="lg:ml-64 transition-all duration-300">
-    
-    <!-- Sidebar Navigation -->
-    <div th:replace="fragments/layout :: sidebar"></div>
-    
-    <!-- Mobile Menu Toggle -->
-    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
-    
-    <!-- Top Header -->
-    <div th:replace="fragments/layout :: header"></div>
-    
-    <!-- Main Content -->
-    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
-        
-        <!-- Flash Messages -->
-        <div th:replace="fragments/components :: messages"></div>
-        
-        <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h1 class="text-4xl font-jakarta font-bold text-primary mb-2">Gestión de Mesas</h1>
-                    <p class="text-gray-600 font-work">Administra las mesas de tu restaurante</p>
-                </div>
-                <button onclick="openModal('createMesaModal')" class="btn-primary">
-                    <span class="material-symbols-outlined inline-block mr-2">add</span>
-                    Nueva Mesa
-                </button>
-            </div>
 
-            <!-- Search Bar -->
-            <div class="relative">
-                <span class="material-symbols-outlined absolute left-4 top-3 text-gray-400">search</span>
-                <input type="text" id="searchInput" placeholder="Buscar mesa por número o estado..."
-                       class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-            </div>
-        </div>
+<body>
 
-        <!-- Create Mesa Modal -->
-        <div id="createMesaModal" data-modal-id="createMesaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" data-modal-overlay>
-            <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-elevation">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-jakarta font-bold text-primary">Nueva Mesa</h2>
-                    <button onclick="closeModal('createMesaModal')" class="p-2 hover:bg-bg-light rounded-lg transition-all" data-modal-close>
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
+<nav class="menu-bar">
+    <ul>
+        <li><a href="/home" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Inicio</a></li>
+        <li><a href="/mesa" class="active" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
+        <li><a href="/pedidos" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
+        <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
+        <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
+        <li><a href="/platillos" sec:authorize="hasAuthority('ROLE_ADMIN')">Platillos</a></li>
+        <li><a href="/datos" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">Datos</a></li>
+        <li class="logout-nav">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit">Cerrar Sesión</button>
+            </form>
+        </li>
+    </ul>
+</nav>
 
-                <form th:action="@{/mesa/crear}" method="post" th:object="${nuevaMesa}" class="space-y-4">
-                    <div>
-                        <label for="numMesa" class="block text-sm font-jakarta font-semibold text-gray-700 mb-2">
-                            Número de Mesa
-                        </label>
-                        <input type="number" id="numMesa" th:field="*{num}" min="1" required
-                               class="input-focus w-full">
-                    </div>
-                    <button type="submit" class="btn-primary w-full">
-                        <span class="material-symbols-outlined inline-block mr-2">check</span>
-                        Crear Mesa
-                    </button>
-                </form>
-            </div>
-        </div>
+<h1>Gestión de Mesas</h1>
 
-        <!-- Mesas Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mesasContainer">
-            
-            <div th:each="mesa : ${listar}" class="mesa-card card p-6 flex flex-col" data-mesa-num="${mesa.num}" data-mesa-estado="${mesa.ocupado ? 'Ocupada' : 'Disponible'}">
-                
-                <!-- Header -->
-                <div class="flex items-start justify-between mb-4">
-                    <div>
-                        <h3 class="text-3xl font-jakarta font-bold text-primary">Mesa <span th:text="${mesa.num}"></span></h3>
-                        <p class="text-sm text-gray-600 mt-1">ID: <span th:text="${mesa.id.substring(0,8)}"></span></p>
-                    </div>
-                    <span th:if="${mesa.ocupado}" class="chip-danger">
-                        <span class="material-symbols-outlined text-sm mr-1">event_busy</span>
-                        Ocupada
-                    </span>
-                    <span th:unless="${mesa.ocupado}" class="chip-success">
-                        <span class="material-symbols-outlined text-sm mr-1">check_circle</span>
-                        Disponible
-                    </span>
-                </div>
+<input type="text" id="barraBusqueda" placeholder="Buscar mesas por número o estado..." onkeyup="filtrarMesas()" />
 
-                <!-- Mesero Asignado -->
-                <div class="mb-4 pb-4 border-b border-gray-100">
-                    <p class="text-xs text-gray-600 font-work mb-1">MESERO ASIGNADO</p>
-                    <p class="font-jakarta font-semibold text-gray-800" th:text="${nombresMeseros[mesa.id]} ?: 'Sin asignar'"></p>
-                </div>
+<div class="mesa-card">
+    <h2>Crear nueva mesa</h2>
+    <form th:action="@{/mesa/crear}" method="post" th:object="${nuevaMesa}">
+        <label>Número de mesa:</label>
+        <input type="number" th:field="*{num}" min="1" required />
+        <button type="submit">Crear Mesa</button>
+    </form>
+</div>
 
-                <!-- Pedidos Section -->
-                <div th:if="${pedidosPorMesa[mesa.id] != null and !pedidosPorMesa[mesa.id].isEmpty()}" class="flex-1 mb-4 pb-4 border-b border-gray-100">
-                    <p class="text-xs text-gray-600 font-work mb-3">PEDIDOS ACTIVOS</p>
-                    
-                    <div th:each="pedido : ${pedidosPorMesa[mesa.id]}" class="bg-bg-light rounded-lg p-3 mb-2">
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="font-jakarta font-bold text-gray-800">#<span th:text="${pedido.id.substring(0,6)}"></span></p>
-                            <span class="text-sm font-work text-gray-600">
-                                <span class="material-symbols-outlined inline-block text-base align-middle">schedule</span>
-                                <span th:text="${#temporals.format(pedido.fecha, 'HH:mm')}"></span>
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-600 font-work mb-1">Total: <strong class="text-primary">$<span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></span></strong></p>
-                        <p class="text-xs text-gray-500 font-work">Items: <span th:text="${pedido.items.size()}"></span></p>
-                    </div>
-                </div>
+<div th:if="${mensajeExito}" class="mensaje-exito" th:text="${mensajeExito}"></div>
+<div th:if="${mensajeError}" class="mensaje-error" th:text="${mensajeError}"></div>
 
-                <div th:if="${pedidosPorMesa[mesa.id] == null or pedidosPorMesa[mesa.id].isEmpty()}" class="flex-1 mb-4 pb-4 border-b border-gray-100">
-                    <p class="text-sm text-gray-500 text-center py-4 font-work">No hay pedidos</p>
-                </div>
+<h2 style="text-align:center; margin-top:40px;">Mesas existentes</h2>
 
-                <!-- Actions -->
-                <div class="flex gap-2">
-                    <form th:action="@{'/mesa/' + ${mesa.id} + '/generar-factura'}" method="post" class="flex-1"
-                          th:if="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}">
-                        <button type="submit" class="w-full btn-primary text-sm py-2" 
-                                onclick="return confirm('¿Generar factura y liberar mesa?');">
-                            <span class="material-symbols-outlined inline-block mr-1">check</span>
-                            Facturar
-                        </button>
-                    </form>
+<div id="listaMesas">
+    <div th:each="mesa : ${listar}" class="mesa-card">
 
-                    <button th:unless="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}"
-                            disabled class="flex-1 px-4 py-2 bg-gray-200 text-gray-400 rounded-xl font-jakarta font-semibold cursor-not-allowed text-sm">
-                        <span class="material-symbols-outlined inline-block mr-1">lock</span>
-                        Facturar
-                    </button>
-
-                    <button onclick="openModal('editMesaModal_${mesa.id}')" class="btn-secondary text-sm py-2 px-4">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Empty State -->
-        <div th:if="${listar == null or listar.isEmpty()}" class="text-center py-16">
-            <span class="material-symbols-outlined text-7xl text-gray-300 mb-4 block">table_restaurant</span>
-            <h3 class="text-xl font-jakarta font-bold text-gray-400 mb-2">No hay mesas</h3>
-            <p class="text-gray-500 font-work mb-4">Crea tu primera mesa para comenzar</p>
-            <button onclick="openModal('createMesaModal')" class="btn-primary">
-                <span class="material-symbols-outlined inline-block mr-2">add</span>
-                Crear Mesa
+        <form th:action="@{'/mesa/' + ${mesa.id} + '/generar-factura'}" method="post" style="margin-top:10px;">
+            <button type="submit"
+                    th:disabled="${mesa.pedidosId == null or #lists.isEmpty(mesa.pedidosId)}"
+                    onclick="return confirm('¿Seguro que deseas generar la factura y liberar esta mesa?');">
+                Generar Factura y Liberar Mesa
             </button>
+        </form>
+
+        <h3>Mesa <span th:text="${mesa.num}"></span></h3>
+
+        <p><strong>Estado:</strong>
+            <span th:if="${mesa.ocupado}" style="color:red;">Ocupada</span>
+            <span th:unless="${mesa.ocupado}" style="color:green;">Disponible</span>
+        </p>
+
+        <p><strong>Mesero:</strong>
+            <span th:text="${nombresMeseros[mesa.id]} ?: 'No asignado'"></span>
+        </p>
+
+        <div th:if="${pedidosPorMesa[mesa.id] != null and !pedidosPorMesa[mesa.id].isEmpty()}">
+            <h4>Pedidos:</h4>
+
+            <div th:each="pedido : ${pedidosPorMesa[mesa.id]}" class="pedido-card">
+
+                <p><strong>Fecha:</strong>
+                    <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></span>
+                </p>
+
+                <p><strong>Total:</strong>
+                    <span th:text="${'$' + #numbers.formatDecimal(pedido.total, 1, 2)}"></span>
+                </p>
+
+                <p><strong>Mesero:</strong>
+                    <span th:text="${pedido.nombreMesero} ?: 'No asignado'"></span>
+                </p>
+
+                <p><strong>Estado:</strong>
+                    <span th:text="${pedido.pagado} ? 'Pagado' : 'Pendiente'"></span>
+                </p>
+
+                <h5>Platillos:</h5>
+
+                <div th:each="item : ${pedido.items}" class="platillo-item">
+                    <p><strong th:text="${item.nombrePlatillo}"></strong></p>
+                    <p th:text="${item.descripcionPlatillo}"></p>
+                    <p>Cantidad: <span th:text="${item.cantidad}"></span></p>
+                    <p>Precio: <span th:text="${'$' + #numbers.formatDecimal(item.precio, 1, 2)}"></span></p>
+                </div>
+
+            </div>
         </div>
 
-    </main>
-    
-    <!-- Footer -->
-    <div th:replace="fragments/components :: footer"></div>
-    
-    <!-- Scripts -->
-    <script th:src="@{/js/mobile-menu.js}"></script>
-    <script th:src="@{/js/ui-helpers.js}"></script>
-    <script th:src="@{/js/mesa-table.js}"></script>
+        <div th:if="${pedidosPorMesa[mesa.id] == null or pedidosPorMesa[mesa.id].isEmpty()}">
+            <p>No hay pedidos para esta mesa.</p>
+        </div>
 
-</body>
-</html>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/Confirmacion.js}"></script>
+<script th:src="@{/js/filtromesa.js}"></script>
 
 <div th:replace="chat :: chat"></div>
 

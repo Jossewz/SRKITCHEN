@@ -15,9 +15,4 @@ public class LogisController {
     public String showHomePage() {
         return "start";
     }
-
-    @GetMapping("/start")
-    public String showStartAlias() {
-        return "start";
-    }
 }
