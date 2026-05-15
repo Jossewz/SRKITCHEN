@@ -5,6 +5,7 @@
     <title>Gestión de Pedidos | Kitchen</title>
     <link rel="stylesheet" th:href="@{/css/pedido.css}">
     <link rel="stylesheet" th:href="@{/css/platillo-confirmacion.css}">
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
 
 </head>
 
@@ -105,6 +106,8 @@
 <script th:src="@{/js/pedidojs.js}"></script>
 
 <script th:src="@{/js/confirmacionpedido.js}"></script>
+<div th:replace="chat :: chat"></div>
+
 </body>
 </html>
 
