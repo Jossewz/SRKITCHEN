@@ -2,41 +2,42 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <!-- Footer -->
-<footer th:fragment="footer" class="bg-primary text-white py-8 px-6 mt-20">
+<footer th:fragment="footer" class="bg-white text-gray-900 border-t border-gray-200 py-8 px-6 mt-20">
   
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
     
     <!-- Brand -->
     <div>
       <h3 class="text-xl font-jakarta font-bold mb-2">🍳 SR Kitchen</h3>
-      <p class="text-sky-light/80 text-sm">Sistema de gestión de restaurante moderno y eficiente.</p>
+      <p class="text-gray-600 text-sm">Sistema de gestión de restaurante moderno y eficiente.</p>
     </div>
 
     <!-- Links -->
     <div>
       <h4 class="font-jakarta font-semibold mb-3">Enlaces</h4>
-      <ul class="space-y-2 text-sm text-sky-light/80">
-        <li><a href="/home" class="hover:text-white transition-colors">Inicio</a></li>
-        <li><a href="/mesa" class="hover:text-white transition-colors">Mesas</a></li>
-        <li><a href="/pedidos" class="hover:text-white transition-colors">Pedidos</a></li>
+      <ul class="space-y-2 text-sm text-gray-600">
+        <li><a href="/home" class="hover:text-primary transition-colors">Inicio</a></li>
+        <li><a href="/mesa" class="hover:text-primary transition-colors">Mesas</a></li>
+        <li><a href="/pedidos" class="hover:text-primary transition-colors">Pedidos</a></li>
       </ul>
     </div>
 
     <!-- Info -->
     <div>
       <h4 class="font-jakarta font-semibold mb-3">Información</h4>
-      <p class="text-sky-light/80 text-sm">© 2024 SR Kitchen. Todos los derechos reservados.</p>
+      <p class="text-gray-600 text-sm">© 2024 SR Kitchen. Todos los derechos reservados.</p>
     </div>
 
   </div>
 
   <!-- Divider -->
-  <div class="max-w-7xl mx-auto border-t border-sky-light/20 mt-8 pt-8 text-center">
-    <p class="text-sky-light/60 text-xs">Desarrollado con ❤️ para mejorar tu experiencia.</p>
+  <div class="max-w-7xl mx-auto border-t border-gray-200 mt-8 pt-8 text-center">
+    <p class="text-gray-500 text-xs">Desarrollado con ❤️ para mejorar tu experiencia.</p>
   </div>
 
+  <!-- Chatbot Global -->
+  <div th:replace="~{chat :: chat}"></div>
 </footer>
-
 <!-- Messages Fragment -->
 <div th:fragment="messages" class="fixed top-24 right-6 z-50 space-y-3 w-80 max-w-full">
   
