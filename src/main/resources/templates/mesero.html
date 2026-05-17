@@ -103,63 +103,42 @@
             </div>
         </div>
 
-        <!-- Meseros Table -->
-        <div class="card overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-primary text-white">
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">badge</span>
-                                ID
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">person</span>
-                                Nombre
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">mail</span>
-                                Correo
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">security</span>
-                                Rol
-                            </th>
-                            <th class="px-6 py-4 text-center font-jakarta font-semibold">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr th:each="m : ${meseros}" class="hover:bg-bg-light transition-colors">
-                            <td class="px-6 py-4 font-jakarta font-semibold text-primary" th:text="${m.id_mesero}"></td>
-                            <td class="px-6 py-4 font-work text-gray-700" th:text="${m.name}"></td>
-                            <td class="px-6 py-4 font-work text-gray-600 text-sm" th:text="${m.mail}"></td>
-                            <td class="px-6 py-4">
-                                <span class="chip-info text-sm">
-                                    <span class="material-symbols-outlined text-xs mr-1">badge</span>
-                                    <span th:text="${m.role}"></span>
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <button class="btn-secondary text-sm py-2 px-3">
-                                    <span class="material-symbols-outlined inline-block text-base">edit</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Empty State -->
-            <div th:if="${meseros == null or meseros.isEmpty()}" class="text-center py-16 px-6">
-                <span class="material-symbols-outlined text-6xl text-gray-300 mb-4 block">person</span>
-                <h3 class="font-jakarta font-bold text-gray-400 text-lg mb-2">No hay meseros registrados</h3>
-                <p class="text-gray-500 font-work mb-4">Registra tu primer mesero para comenzar</p>
-                <button onclick="openModal('createMeseroModal')" class="btn-primary">
-                    <span class="material-symbols-outlined inline-block mr-2">person_add</span>
-                    Registrar Mesero
+        <!-- Meseros Grid -->
+        <div th:if="${meseros != null and !meseros.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="m : ${meseros}" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 p-6 flex flex-col justify-between group">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-4xl text-blue-900 group-hover:scale-110 transition-transform">person</span>
+                        <span class="chip-info text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-700 rounded-full flex items-center">
+                            <span class="material-symbols-outlined text-[14px] mr-1">badge</span>
+                            <span th:text="${m.role}"></span>
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-jakarta font-bold text-gray-800 mb-1" th:text="${m.name}"></h3>
+                    <p class="text-sm text-gray-500 font-work mb-4 flex items-center">
+                        <span class="material-symbols-outlined text-[16px] mr-1">mail</span>
+                        <span th:text="${m.mail}"></span>
+                    </p>
+                    <div class="pt-4 border-t border-gray-100 mb-4">
+                        <p class="text-xs text-gray-400 font-work">ID: <span th:text="${m.id_mesero}"></span></p>
+                    </div>
+                </div>
+                <button class="w-full btn-secondary text-sm py-2 px-4 flex items-center justify-center">
+                    <span class="material-symbols-outlined mr-2">edit</span>
+                    Editar Mesero
                 </button>
             </div>
+        </div>
 
+        <!-- Empty State -->
+        <div th:if="${meseros == null or meseros.isEmpty()}" class="text-center py-16 px-6 bg-white rounded-xl border border-gray-200 shadow-sm mt-6">
+            <span class="material-symbols-outlined text-6xl text-gray-300 mb-4 block">person</span>
+            <h3 class="font-jakarta font-bold text-gray-400 text-lg mb-2">No hay meseros registrados</h3>
+            <p class="text-gray-500 font-work mb-4">Registra tu primer mesero para comenzar</p>
+            <button onclick="openModal('createMeseroModal')" class="btn-primary">
+                <span class="material-symbols-outlined inline-block mr-2">person_add</span>
+                Registrar Mesero
+            </button>
         </div>
 
     </main>

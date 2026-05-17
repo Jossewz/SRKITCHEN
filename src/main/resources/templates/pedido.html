@@ -44,7 +44,7 @@
         </div>
 
         <!-- Create Order Form -->
-        <div class="card p-8 mb-12">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-md p-8 mb-12">
             <h2 class="text-2xl font-jakarta font-bold text-primary mb-6">Crear Nuevo Pedido</h2>
 
             <form th:action="@{/pedidos}" method="post" th:object="${pedido}" id="orderForm" class="space-y-6">
@@ -99,7 +99,7 @@
 
                     <!-- Platillos Grid -->
                     <div id="platillosContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div th:each="platillo : ${platillos}" class="platillo-item card p-4 cursor-pointer transition-all hover:shadow-elevation hover:scale-102" 
+                        <div th:each="platillo : ${platillos}" class="platillo-item bg-white rounded-xl border border-gray-200 shadow-md p-4 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 group" 
                              data-platillo-name="${platillo.name}">
                             
                             <div class="flex items-start space-x-3">
@@ -156,12 +156,12 @@
 
             <div th:if="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                <div th:each="pedido : ${pedidosRecientes}" class="card p-6">
+                <div th:each="pedido : ${pedidosRecientes}" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 p-6 group">
                     
                     <!-- Header -->
                     <div class="flex items-start justify-between mb-4 pb-4 border-b border-gray-100">
                         <div>
-                            <h3 class="font-jakarta font-bold text-primary text-lg">Pedido #<span th:text="${pedido.id.substring(0,8)}"></span></h3>
+                            <h3 class="font-jakarta font-bold text-primary text-lg">Pedido #<span th:text="${pedido.id != null and pedido.id.length() >= 8 ? pedido.id.substring(0,8) : pedido.id}"></span></h3>
                             <p class="text-xs text-gray-500 mt-1">
                                 <span class="material-symbols-outlined text-sm align-middle mr-1">schedule</span>
                                 <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></span>
@@ -209,7 +209,7 @@
             </div>
 
             <!-- Empty State -->
-            <div th:if="${pedidosRecientes == null or pedidosRecientes.isEmpty()}" class="text-center py-12 card p-8">
+            <div th:if="${pedidosRecientes == null or pedidosRecientes.isEmpty()}" class="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm p-8">
                 <span class="material-symbols-outlined text-6xl text-gray-300 mb-4 block">receipt_long</span>
                 <h3 class="font-jakarta font-bold text-gray-400 text-lg mb-2">No hay pedidos recientes</h3>
                 <p class="text-gray-500 font-work">Crea tu primer pedido para comenzar</p>

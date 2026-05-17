@@ -31,17 +31,17 @@
         </p>
 
         <!-- SOLO mostrar Registrar Pago si está PENDIENTE -->
-        <div th:if="${factura.estado.name() == 'PENDIENTE'}" style="margin-top: 15px;">
+        <div th:if="${factura.estado != null and factura.estado.name() == 'PENDIENTE'}" style="margin-top: 15px;">
             <a th:href="@{/pagos/nuevo/{id}(id=${factura.id})}" class="btn btn-success">💳 Registrar Pago</a>
         </div>
 
         <!-- SOLO mostrar Imprimir si está APROBADA -->
-        <div th:if="${factura.estado.name() == 'APROBADA'}" style="margin-top: 20px;">
+        <div th:if="${factura.estado != null and factura.estado.name() == 'APROBADA'}" style="margin-top: 20px;">
             <button onclick="imprimirTicket()" class="btn btn-primary">🧾 Imprimir Factura</button>
         </div>
 
         <!-- Mensaje si ya está pagada -->
-        <div th:if="${factura.estado.name() == 'APROBADA'}" style="margin-top: 10px;">
+        <div th:if="${factura.estado != null and factura.estado.name() == 'APROBADA'}" style="margin-top: 10px;">
             <p style="color: #28a745; font-weight: bold;">✅ Esta factura ya ha sido pagada y aprobada</p>
         </div>
     </div>

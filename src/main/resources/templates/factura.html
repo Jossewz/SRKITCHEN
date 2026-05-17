@@ -42,60 +42,64 @@
             <p class="text-gray-600 font-work">Gestiona y visualiza todas las facturas generadas</p>
         </div>
 
-        <!-- Facturas Table -->
-        <div class="card overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-primary text-white">
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">table_restaurant</span>
-                                Mesa
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">person</span>
-                                Mesero
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">schedule</span>
-                                Fecha
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">
-                                <span class="material-symbols-outlined inline-block mr-2 text-base">attach_money</span>
-                                Total
-                            </th>
-                            <th class="px-6 py-4 text-left font-jakarta font-semibold">Estado</th>
-                            <th class="px-6 py-4 text-center font-jakarta font-semibold">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr th:each="f : ${facturas}" class="hover:bg-bg-light transition-colors">
-                            <td class="px-6 py-4 font-jakarta font-semibold text-primary" th:text="${'Mesa ' + f.mesaNum}"></td>
-                            <td class="px-6 py-4 font-work text-gray-700" th:text="${f.meseroName}"></td>
-                            <td class="px-6 py-4 font-work text-gray-600 text-sm" th:text="${#temporals.format(f.fecha, 'dd/MM/yyyy HH:mm')}"></td>
-                            <td class="px-6 py-4 font-jakarta font-bold text-primary" th:text="${'$' + #numbers.formatDecimal(f.total, 1, 2)}"></td>
-                            <td class="px-6 py-4">
-                                <span th:if="${f.estado.name() == 'PENDIENTE'}" class="chip-warning">
-                                    <span class="material-symbols-outlined text-xs mr-1">schedule</span>
-                                    Pendiente
-                                </span>
-                                <span th:if="${f.estado.name() == 'APROBADA'}" class="chip-success">
-                                    <span class="material-symbols-outlined text-xs mr-1">check_circle</span>
-                                    Pagada
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <button type="button" class="btn-secondary text-sm py-2 px-3"
-                                        onclick="openDetailModal(this)"
-                                        th:data-id="${f.id}"
-                                        th:data-url="@{/factura/detalle/}">
-                                    <span class="material-symbols-outlined inline-block text-base">visibility</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Facturas Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="f : ${facturas}" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 p-6 flex flex-col justify-between group">
+                <div>
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center text-blue-900 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-4xl mr-2">receipt_long</span>
+                            <div>
+                                <h3 class="text-xl font-jakarta font-bold" th:text="${'Mesa ' + f.mesaNum}"></h3>
+                            </div>
+                        </div>
+                        
+                        <span th:if="${f.estado != null and f.estado.name() == 'PENDIENTE'}" class="chip-warning text-xs px-2 py-1 flex items-center">
+                            <span class="material-symbols-outlined text-[14px] mr-1">schedule</span>
+                            Pendiente
+                        </span>
+                        <span th:if="${f.estado != null and f.estado.name() == 'APROBADA'}" class="chip-success text-xs px-2 py-1 flex items-center">
+                            <span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>
+                            Pagada
+                        </span>
+                    </div>
+
+                    <!-- Detalles -->
+                    <div class="space-y-2 mb-4">
+                        <p class="text-sm text-gray-600 font-work flex items-center">
+                            <span class="material-symbols-outlined text-[16px] mr-2 text-gray-400">person</span>
+                            <span class="font-medium">Mesero:</span> &nbsp;<span th:text="${f.meseroName}"></span>
+                        </p>
+                        <p class="text-sm text-gray-600 font-work flex items-center">
+                            <span class="material-symbols-outlined text-[16px] mr-2 text-gray-400">schedule</span>
+                            <span class="font-medium">Fecha:</span> &nbsp;<span th:text="${#temporals.format(f.fecha, 'dd/MM/yyyy HH:mm')}"></span>
+                        </p>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="pt-4 border-t border-gray-100 mb-6">
+                        <p class="text-xs text-gray-500 font-work mb-1">TOTAL FACTURA</p>
+                        <p class="text-3xl font-jakarta font-bold text-primary" th:text="${'$' + #numbers.formatDecimal(f.total, 1, 2)}"></p>
+                    </div>
+                </div>
+
+                <!-- Acción -->
+                <button type="button" class="w-full btn-secondary text-sm py-2 px-4 flex items-center justify-center"
+                        onclick="openDetailModal(this)"
+                        th:data-id="${f.id}"
+                        th:data-url="@{/factura/detalle/}">
+                    <span class="material-symbols-outlined mr-2">visibility</span>
+                    Ver Detalle
+                </button>
             </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${facturas == null or facturas.isEmpty()}" class="text-center py-16 px-6 bg-white rounded-xl border border-gray-200 shadow-sm mt-6">
+            <span class="material-symbols-outlined text-6xl text-gray-300 mb-4 block">receipt_long</span>
+            <h3 class="font-jakarta font-bold text-gray-400 text-lg mb-2">No hay facturas</h3>
+            <p class="text-gray-500 font-work">Las facturas generadas aparecerán aquí</p>
         </div>
 
         <!-- Pagination -->

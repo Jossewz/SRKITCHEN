@@ -86,13 +86,13 @@
         <!-- Mesas Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mesasContainer">
             
-            <div th:each="mesa : ${listar}" class="mesa-card card p-6 flex flex-col" data-mesa-num="${mesa.num}" data-mesa-estado="${mesa.ocupado ? 'Ocupada' : 'Disponible'}">
+            <div th:each="mesa : ${listar}" class="mesa-card bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 p-6 flex flex-col group" data-mesa-num="${mesa.num}" data-mesa-estado="${mesa.ocupado ? 'Ocupada' : 'Disponible'}">
                 
                 <!-- Header -->
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <h3 class="text-3xl font-jakarta font-bold text-primary">Mesa <span th:text="${mesa.num}"></span></h3>
-                        <p class="text-sm text-gray-600 mt-1">ID: <span th:text="${mesa.id.substring(0,8)}"></span></p>
+                        <p class="text-sm text-gray-600 mt-1">ID: <span th:text="${mesa.id != null and mesa.id.length() >= 8 ? mesa.id.substring(0,8) : mesa.id}"></span></p>
                     </div>
                     <span th:if="${mesa.ocupado}" class="chip-danger">
                         <span class="material-symbols-outlined text-sm mr-1">event_busy</span>
@@ -116,7 +116,7 @@
                     
                     <div th:each="pedido : ${pedidosPorMesa[mesa.id]}" class="bg-bg-light rounded-lg p-3 mb-2">
                         <div class="flex items-center justify-between mb-2">
-                            <p class="font-jakarta font-bold text-gray-800">#<span th:text="${pedido.id.substring(0,6)}"></span></p>
+                            <p class="font-jakarta font-bold text-gray-800">#<span th:text="${pedido.id != null and pedido.id.length() >= 6 ? pedido.id.substring(0,6) : pedido.id}"></span></p>
                             <span class="text-sm font-work text-gray-600">
                                 <span class="material-symbols-outlined inline-block text-base align-middle">schedule</span>
                                 <span th:text="${#temporals.format(pedido.fecha, 'HH:mm')}"></span>

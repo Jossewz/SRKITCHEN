@@ -103,14 +103,14 @@
         <!-- Platillos Grid -->
         <div th:if="${platillos != null and !platillos.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="platillosGrid">
             
-            <div th:each="platillo : ${platillos}" class="card-interactive p-6 group" data-platillo-name="${platillo.name}">
+            <div th:each="platillo : ${platillos}" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 p-6 cursor-pointer group" data-platillo-name="${platillo.name}">
                 
                 <!-- Header with Icon -->
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex-1">
                         <h3 class="text-2xl font-jakarta font-bold text-primary line-clamp-2 group-hover:text-accent transition-colors" 
                             th:text="${platillo.name}"></h3>
-                        <p class="text-sm text-gray-600 font-work mt-1">ID: <span th:text="${platillo.id.substring(0,8)}"></span></p>
+                        <p class="text-sm text-gray-600 font-work mt-1">ID: <span th:text="${platillo.id != null and platillo.id.length() >= 8 ? platillo.id.substring(0,8) : platillo.id}"></span></p>
                     </div>
                     <span class="material-symbols-outlined text-5xl text-accent/20 group-hover:text-accent/40 transition-colors">restaurant_menu</span>
                 </div>
