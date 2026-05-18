@@ -627,8 +627,8 @@ public class ChatbotService {
                         double ingresos = 0;
                         int pagadas = 0, pendientes = 0;
                         for (Factura f : facturas) {
-                                if (f.isPagada()) {
-                                        ingresos += f.getTotal();
+                                if (Boolean.TRUE.equals(f.isPagada())) {
+                                        ingresos += f.getTotal() != null ? f.getTotal() : 0.0;
                                         pagadas++;
                                 } else
                                         pendientes++;

@@ -53,7 +53,7 @@ public class LogisController {
         List<Factura> facturas = facturaRep.findAll();
         double ingresosHoy = facturas.stream()
                 .filter(f -> f.getFecha() != null && !f.getFecha().isBefore(startOfDay) && f.getFecha().isBefore(endOfDay))
-                .mapToDouble(Factura::getTotal)
+                .mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0)
                 .sum();
                 
         // Meseros Activos

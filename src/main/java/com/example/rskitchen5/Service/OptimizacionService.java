@@ -92,8 +92,8 @@ public class OptimizacionService {
             if (p.getItems() == null) continue;
             for (ItemPedido item : p.getItems()) {
                 String cat = item.getCant() == null ? "" : item.getCant().toLowerCase();
-                int uni = item.getUnidades();
-                double precio = item.getPrice();
+                int uni = item.getUnidades() != null ? item.getUnidades() : 0;
+                double precio = item.getPrice() != null ? item.getPrice() : 0.0;
 
                 if (cat.contains("fuerte")) {
                     x1 += uni;

@@ -22,9 +22,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRep.findByMail(mail)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con mail: " + mail));
 
-        String authority = user.getRol().toUpperCase().startsWith("ROLE_")
-                ? user.getRol().toUpperCase()
-                : "ROLE_" + user.getRol().toUpperCase();
+        if (user.getMail() == null || user.getMail().trim().isEmpty() || user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new UsernameNotFoundException("Usuario con datos incompletos en la base de datos");
+        }
+
+        String roleStr = user.getRol() != null ? user.getRol().toUpperCase() : "USER";
+        String authority = roleStr.startsWith("ROLE_")
+                ? roleStr
+                : "ROLE_" + roleStr;
 
         return new org.springframework.security.core.userdetails.User(
                 user.getMail(),

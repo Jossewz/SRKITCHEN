@@ -7,8 +7,8 @@ public class PedidoDetalleDTO {
 
     private String id;
     private LocalDateTime fecha;
-    private double total;
-    private boolean pagado;
+    private Double total;
+    private Boolean pagado;
     private String nombreMesero;
     private List<ItemPedidoDetalleDTO> items;
 
@@ -36,19 +36,19 @@ public class PedidoDetalleDTO {
         this.items = items;
     }
 
-    public double getTotal() {
+    public Double getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(Double total) {
         this.total = total;
     }
 
-    public boolean isPagado() {
+    public Boolean isPagado() {
         return pagado;
     }
 
-    public void setPagado(boolean pagado) {
+    public void setPagado(Boolean pagado) {
         this.pagado = pagado;
     }
 

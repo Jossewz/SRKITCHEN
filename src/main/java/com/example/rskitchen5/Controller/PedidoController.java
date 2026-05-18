@@ -308,7 +308,7 @@ public class PedidoController {
             return 0.0;
         }
         return items.stream()
-                .mapToDouble(item -> item.getPrice() * item.getUnidades())
+                .mapToDouble(item -> (item.getPrice() != null ? item.getPrice() : 0.0) * (item.getUnidades() != null ? item.getUnidades() : 0))
                 .sum();
     }
 

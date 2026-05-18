@@ -13,7 +13,7 @@ public class Pedido {
     @Id
     private String id;
 
-    private int mesaNum;
+    private Integer mesaNum;
     private String meseroName;
     private String mesaId;
     private String meseroId;
@@ -22,8 +22,8 @@ public class Pedido {
     private LocalDateTime fecha; // Usar Date en lugar de LocalDateTime
 
     private List<ItemPedido> items;
-    private double total;
-    private boolean pagado;
+    private Double total;
+    private Boolean pagado;
 
     // Constructor y getters/setters...
 
@@ -31,7 +31,7 @@ public class Pedido {
 
     }
 
-    public Pedido(LocalDateTime fecha, String id, List<ItemPedido> items, int mesaNum, String mesaId, String meseroId, boolean pagado, double total, String meseroName) {
+    public Pedido(LocalDateTime fecha, String id, List<ItemPedido> items, Integer mesaNum, String mesaId, String meseroId, Boolean pagado, Double total, String meseroName) {
         this.fecha = fecha;
         this.id = id;
         this.items = items;
@@ -75,11 +75,11 @@ public class Pedido {
         this.mesaId = mesaId;
     }
 
-    public int getMesaNum() {
+    public Integer getMesaNum() {
         return mesaNum;
     }
 
-    public void setMesaNum(int mesaNum) {
+    public void setMesaNum(Integer mesaNum) {
         this.mesaNum = mesaNum;
     }
 
@@ -99,19 +99,19 @@ public class Pedido {
         this.meseroName = meseroName;
     }
 
-    public boolean isPagado() {
+    public Boolean isPagado() {
         return pagado;
     }
 
-    public void setPagado(boolean pagado) {
+    public void setPagado(Boolean pagado) {
         this.pagado = pagado;
     }
 
-    public double getTotal() {
+    public Double getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(Double total) {
         this.total = total;
     }
 }

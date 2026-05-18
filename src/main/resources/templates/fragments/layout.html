@@ -126,10 +126,13 @@
         <span class="hidden sm:inline text-gray-600" sec:authentication="name">User</span>
       </div>
 
-      <!-- Notifications (optional) -->
-      <button class="p-2 hover:bg-bg-light rounded-lg transition-all duration-200">
-        <span class="material-symbols-outlined text-primary">notifications</span>
-      </button>
+      <!-- Power BI Datos (Admin) -->
+      <a href="https://app.powerbi.com/view?r=eyJrIjoiZGVhODExZDQtOWEyMi00ODdlLWIzMDQtMWM5Yjc2ZmY4MDZiIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+         target="_blank" rel="noopener noreferrer"
+         sec:authorize="hasAuthority('ROLE_ADMIN')"
+         class="p-2 hover:bg-bg-light rounded-lg transition-all duration-200 flex items-center" title="Ver Datos en Power BI">
+        <span class="material-symbols-outlined text-primary">analytics</span>
+      </a>
 
       <!-- Settings (optional) -->
       <button class="p-2 hover:bg-bg-light rounded-lg transition-all duration-200">

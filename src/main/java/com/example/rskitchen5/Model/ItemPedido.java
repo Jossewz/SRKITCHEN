@@ -3,14 +3,14 @@ package com.example.rskitchen5.Model;
 public class ItemPedido {
     private String  productId;
     private String name;
-    private double price;
+    private Double price;
     private String cant;
-    private int unidades;
+    private Integer unidades;
 
     public ItemPedido() {
     }
 
-    public ItemPedido(String name, String cant, double price, int unidades, String productId) {
+    public ItemPedido(String name, String cant, Double price, Integer unidades, String productId) {
         this.name = name;
         this.cant = cant;
         this.price = price;
@@ -34,11 +34,11 @@ public class ItemPedido {
         this.cant = cant;
     }
 
-    public int getUnidades() {
+    public Integer getUnidades() {
         return unidades;
     }
 
-    public void setUnidades(int unidades) {
+    public void setUnidades(Integer unidades) {
         this.unidades = unidades;
     }
 
@@ -50,11 +50,11 @@ public class ItemPedido {
         this.productId = productId;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

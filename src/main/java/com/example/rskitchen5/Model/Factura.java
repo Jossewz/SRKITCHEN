@@ -15,15 +15,16 @@ public class Factura {
     private String meseroName;
     private LocalDateTime fecha;
     private List<ItemPedido> items;
-    private double total;
-    private boolean pagada;
+    private Double total;
+    private Boolean pagada;
     private EstadoFacturaDTO estado;
 
     public Factura() {
         this.estado = EstadoFacturaDTO.PENDIENTE;
     }
 
-    public Factura(EstadoFacturaDTO estado, LocalDateTime fecha, String id, List<ItemPedido> items, String mesaNum, String meseroName, boolean pagada, String pedidoId, double total) {
+    public Factura(EstadoFacturaDTO estado, LocalDateTime fecha, String id, List<ItemPedido> items, String mesaNum,
+            String meseroName, Boolean pagada, String pedidoId, Double total) {
         this.estado = estado;
         this.fecha = fecha;
         this.id = id;
@@ -83,11 +84,11 @@ public class Factura {
         this.meseroName = meseroName;
     }
 
-    public boolean isPagada() {
+    public Boolean isPagada() {
         return pagada;
     }
 
-    public void setPagada(boolean pagada) {
+    public void setPagada(Boolean pagada) {
         this.pagada = pagada;
     }
 
@@ -99,11 +100,11 @@ public class Factura {
         this.pedidoId = pedidoId;
     }
 
-    public double getTotal() {
+    public Double getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(Double total) {
         this.total = total;
     }
 }
