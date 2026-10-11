@@ -7,7 +7,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
+import org.springframework.context.annotation.Profile;
+
 @Component
+@Profile("cli")
 public class InteractiveTerminalRunner implements CommandLineRunner {
 
     @Autowired

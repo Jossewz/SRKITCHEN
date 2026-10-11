@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/pedidos")
+@Transactional
 public class PedidoController {
 
     @Autowired
@@ -319,7 +321,7 @@ public class PedidoController {
 
         pedidoExistente.setMesaId(mesa.getId());
         pedidoExistente.setMesaNum(mesa.getNum());
-        pedidoExistente.setMeseroId(mesero.getId());
+        pedidoExistente.setMeseroId(String.valueOf(mesero.getId()));
         pedidoExistente.setMeseroName(mesero.getName());
         pedidoExistente.setFecha(LocalDateTime.now());
 
@@ -349,7 +351,7 @@ public class PedidoController {
         pedidoExistente.setItems(items);
         pedidoExistente.setTotal(calcularTotal(items));
         pedidoRep.save(pedidoExistente);
-        actualizarEstadoMesa(mesa, pedidoExistente.getId(), mesero.getId());
+        actualizarEstadoMesa(mesa, pedidoExistente.getId(), String.valueOf(mesero.getId()));
         return "redirect:/pedidos?exito=Pedido+editado+correctamente";
     }
 
@@ -358,7 +360,7 @@ public class PedidoController {
         Pedido nuevoPedido = new Pedido();
         nuevoPedido.setMesaId(mesa.getId());
         nuevoPedido.setMesaNum(mesa.getNum());
-        nuevoPedido.setMeseroId(mesero.getId());
+        nuevoPedido.setMeseroId(String.valueOf(mesero.getId()));
         nuevoPedido.setMeseroName(mesero.getName());
         nuevoPedido.setFecha(LocalDateTime.now());
 
@@ -388,7 +390,7 @@ public class PedidoController {
         nuevoPedido.setItems(items);
         nuevoPedido.setTotal(calcularTotal(items));
         Pedido pedidoGuardado = pedidoRep.save(nuevoPedido);
-        actualizarEstadoMesa(mesa, pedidoGuardado.getId(), mesero.getId());
+        actualizarEstadoMesa(mesa, pedidoGuardado.getId(), String.valueOf(mesero.getId()));
         return "redirect:/pedidos?exito=Pedido+creado+correctamente";
     }
 

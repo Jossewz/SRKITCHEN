@@ -36,7 +36,7 @@ public class MeseroController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/guardar")
     public String guardarMesero(@ModelAttribute Mesero mesero, Model model) {
-        mesero.setRole("MESERO");
+        mesero.setRol("ROLE_MESERO");
         mesero.setPassword(passwordEncoder.encode(mesero.getPassword()));
         usuarioRep.save(mesero);
         model.addAttribute("mensajeExito", "Mesero registrado correctamente.");

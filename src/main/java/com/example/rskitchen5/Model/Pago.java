@@ -1,31 +1,53 @@
 package com.example.rskitchen5.Model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Document(collection = "pagos")
+@Entity
+@Table(name = "pagos")
 public class Pago {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String facturaId;
-    private String metodo; //metodo de pago
-    private double monto; // a pagar
+    private String metodo;
+    private double monto;
     private LocalDateTime fecha;
     private boolean imprimirCopia;
 
     public Pago() {
+        this.fecha = LocalDateTime.now();
     }
 
-    public Pago(String facturaId, LocalDateTime fecha, String id, boolean imprimirCopia, String metodo, double monto) {
+    public Pago(String facturaId, LocalDateTime fecha, Long id, boolean imprimirCopia, String metodo, double monto) {
         this.facturaId = facturaId;
-        this.fecha = fecha;
+        this.fecha = fecha != null ? fecha : LocalDateTime.now();
         this.id = id;
         this.imprimirCopia = imprimirCopia;
         this.metodo = metodo;
         this.monto = monto;
+    }
+
+    public String getId() {
+        return id != null ? String.valueOf(id) : null;
+    }
+
+    public void setId(String id) {
+        if (id != null && !id.trim().isEmpty()) {
+            try {
+                this.id = Long.parseLong(id);
+            } catch (NumberFormatException ignored) {}
+        }
+    }
+
+    public Long getIdLong() {
+        return id;
+    }
+
+    public void setIdLong(Long id) {
+        this.id = id;
     }
 
     public String getFacturaId() {
@@ -42,14 +64,6 @@ public class Pago {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public boolean isImprimirCopia() {

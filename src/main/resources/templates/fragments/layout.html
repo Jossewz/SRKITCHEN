@@ -77,12 +77,31 @@
         </a>
       </li>
 
+      <!-- Productos (Admin only) -->
+      <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+        <a href="/producto" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1">
+          <span class="material-symbols-outlined text-xl">inventory_2</span>
+          <span class="font-jakarta font-medium">Productos</span>
+        </a>
+      </li>
+
       <!-- Datos (Admin only) -->
       <li sec:authorize="hasAuthority('ROLE_ADMIN')">
         <a href="/datos" 
            class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1">
           <span class="material-symbols-outlined text-xl">analytics</span>
           <span class="font-jakarta font-medium">Datos</span>
+        </a>
+      </li>
+
+      <!-- Foro -->
+      <li>
+        <a href="/foro" 
+           class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sky-light/20 hover:translate-x-1"
+           sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
+          <span class="material-symbols-outlined text-xl">forum</span>
+          <span class="font-jakarta font-medium">Buzón / Foro</span>
         </a>
       </li>
 

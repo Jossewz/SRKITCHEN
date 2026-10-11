@@ -31,8 +31,8 @@ public class GroqApiClient {
     }
 
     public String askGroq(String prompt) {
-        if (apiKey.equals("AQUI_PONER_TU_API_KEY") || apiKey.isEmpty()) {
-            return "Error: API Key de Groq no configurada. Edita el archivo application.properties.";
+        if (apiKey == null || apiKey.isEmpty() || apiKey.equalsIgnoreCase("aqui") || apiKey.equalsIgnoreCase("AQUI_PONER_TU_API_KEY")) {
+            return "Nota: La API Key de Groq no está configurada. Configure la variable de entorno GROQ_API_KEY en application.properties para habilitar respuestas avanzadas de IA.";
         }
 
         GroqMessage userMessage = new GroqMessage("user", prompt);

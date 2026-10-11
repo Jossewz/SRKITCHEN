@@ -1,13 +1,14 @@
 package com.example.rskitchen5.Model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-@Document(collection = "productos")
+@Entity
+@Table(name = "productos")
 public class Producto {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private String cant;
@@ -17,7 +18,7 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(String cant, String id, String name, double price, int stock) {
+    public Producto(String cant, Long id, String name, double price, int stock) {
         this.cant = cant;
         this.id = id;
         this.name = name;
@@ -25,19 +26,23 @@ public class Producto {
         this.stock = stock;
     }
 
-    public String getCant() {
-        return cant;
-    }
-
-    public void setCant(String cant) {
-        this.cant = cant;
-    }
-
     public String getId() {
-        return id;
+        return id != null ? String.valueOf(id) : null;
     }
 
     public void setId(String id) {
+        if (id != null && !id.trim().isEmpty()) {
+            try {
+                this.id = Long.parseLong(id);
+            } catch (NumberFormatException ignored) {}
+        }
+    }
+
+    public Long getIdLong() {
+        return id;
+    }
+
+    public void setIdLong(Long id) {
         this.id = id;
     }
 
@@ -47,6 +52,14 @@ public class Producto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCant() {
+        return cant;
+    }
+
+    public void setCant(String cant) {
+        this.cant = cant;
     }
 
     public double getPrice() {
@@ -63,5 +76,13 @@ public class Producto {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public void setStock(String stockStr) {
+        if (stockStr != null && !stockStr.trim().isEmpty()) {
+            try {
+                this.stock = Integer.parseInt(stockStr.trim());
+            } catch (NumberFormatException ignored) {}
+        }
     }
 }

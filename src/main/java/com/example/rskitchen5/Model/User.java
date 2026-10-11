@@ -1,23 +1,35 @@
 package com.example.rskitchen5.Model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 
-@Document(collection = "usuarios")
+@Entity
+@Table(name = "usuarios")
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    private String id_mesero;
+
+    @Column(nullable = false)
     private String name;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false, unique = true)
     private String mail;
+
+    @Column(nullable = false)
     private String rol;
 
     public User() {
     }
 
-    public User(String  id, String mail, String name, String password, String rol) {
+    public User(Long id, String mail, String name, String password, String rol) {
         this.id = id;
         this.mail = mail;
         this.name = name;
@@ -25,12 +37,20 @@ public class User {
         this.rol = rol;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getId_mesero() {
+        return id_mesero != null ? id_mesero : (id != null ? String.valueOf(id) : null);
+    }
+
+    public void setId_mesero(String id_mesero) {
+        this.id_mesero = id_mesero;
     }
 
     public String getMail() {
@@ -62,6 +82,14 @@ public class User {
     }
 
     public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public String getRole() {
+        return rol;
+    }
+
+    public void setRole(String rol) {
         this.rol = rol;
     }
 }

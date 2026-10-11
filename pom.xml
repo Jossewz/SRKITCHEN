@@ -16,7 +16,7 @@
     <artifactId>rskitchen5</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>rskitchen5</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Sistema de gestión para restaurantes RS Kitchen</description>
 
     <properties>
         <java.version>21</java.version>
@@ -29,10 +29,16 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- MongoDB -->
+        <!-- Spring Data JPA & PostgreSQL -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Seguridad -->
@@ -59,13 +65,6 @@
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
 
-        <!-- Weka -->
-        <dependency>
-            <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-stable</artifactId>
-            <version>3.8.6</version>
-        </dependency>
-
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,14 +78,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <!-- Repositorio oficial de Weka -->
-    <repositories>
-        <repository>
-            <id>weka-repo</id>
-            <url>https://maven.cs.waikato.ac.nz/repository/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>

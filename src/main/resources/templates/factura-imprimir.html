@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Imprimir Factura | SR Kitchen</title>
+    <link rel="stylesheet" th:href="@{/css/facturaimp.css}">
+</head>
+<body>
+    <h1>SR KITCHEN</h1>
+    <h2>Comprobante de Factura</h2>
+
+    <div class="info" th:if="${factura != null}">
+        <p><strong>Factura #:</strong> <span th:text="${factura.id}">1</span></p>
+        <p><strong>Mesa:</strong> <span th:text="${factura.mesaNum}">1</span></p>
+        <p><strong>Mesero:</strong> <span th:text="${factura.meseroName}">Carlos</span></p>
+        <p><strong>Fecha:</strong> <span th:text="${#temporals.format(factura.fecha, 'dd/MM/yyyy HH:mm')}">10/10/2026</span></p>
+        <p><strong>Estado:</strong> <span th:text="${factura.estado}">APROBADA</span></p>
+    </div>
+
+    <table th:if="${factura != null and factura.items != null}">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${factura.items}">
+                <td th:text="${item.name}">Hamburguesa</td>
+                <td th:text="${item.unidades}">1</td>
+                <td th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 'POINT', 2, 'COMMA')}">$25,000.00</td>
+                <td th:text="'$' + ${#numbers.formatDecimal(item.price * item.unidades, 1, 'POINT', 2, 'COMMA')}">$25,000.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total" th:if="${factura != null}">
+        Total: $<span th:text="${#numbers.formatDecimal(factura.total, 1, 'POINT', 2, 'COMMA')}">25,000.00</span>
+    </div>
+
+    <div class="acciones">
+        <button onclick="window.print()">🖨️ Imprimir Factura</button>
+        <button onclick="window.history.back()" style="background-color: #6c757d;">Volver</button>
+    </div>
+</body>
+</html>

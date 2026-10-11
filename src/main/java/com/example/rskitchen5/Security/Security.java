@@ -73,9 +73,9 @@ public class Security {
                                 "/api/**"
                         ).permitAll()
                         // protected routes
-                        .requestMatchers("/mesa/**", "/pedido/**", "/factura/**")
+                        .requestMatchers("/mesa/**", "/pedido/**", "/pedidos/**", "/factura/**", "/pagos/**")
                         .hasAnyAuthority("ROLE_ADMIN", "ROLE_MESERO")
-                        .requestMatchers("/admin/**")
+                        .requestMatchers("/admin/**", "/mesero/**", "/platillos/**", "/producto/**")
                         .hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )

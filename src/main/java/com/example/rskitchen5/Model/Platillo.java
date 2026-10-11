@@ -1,28 +1,51 @@
 package com.example.rskitchen5.Model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-import java.util.List;
-
-@Document(collection = "platillos")
+@Entity
+@Table(name = "platillos")
 public class Platillo {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private double price;
+
     private String cant;
 
     public Platillo() {
     }
 
-    public Platillo(String cant, String description, String id, List<String> ingredients, String name, double price) {
+    public Platillo(String cant, String description, Long id, String name, double price) {
         this.cant = cant;
         this.id = id;
         this.name = name;
         this.price = price;
+    }
+
+    public String getId() {
+        return id != null ? String.valueOf(id) : null;
+    }
+
+    public void setId(String id) {
+        if (id != null && !id.trim().isEmpty()) {
+            try {
+                this.id = Long.parseLong(id);
+            } catch (NumberFormatException ignored) {}
+        }
+    }
+
+    public Long getIdLong() {
+        return id;
+    }
+
+    public void setIdLong(Long id) {
+        this.id = id;
     }
 
     public String getCant() {
@@ -31,14 +54,6 @@ public class Platillo {
 
     public void setCant(String cant) {
         this.cant = cant;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public double getPrice() {
