@@ -62,6 +62,7 @@ public class Security {
                         // Public/static and API endpoints (adjust as needed)
                         .requestMatchers(
                                 "/",
+                                "/landing",
                                 "/login",
                                 "/css/**",
                                 "/js/**",
