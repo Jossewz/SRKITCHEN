@@ -1,89 +1,79 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'datos', 'Optimización Operativa')}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análisis de Ganancias | SR Kitchen</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Global Styles -->
-    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <title>Analítica y Optimización – SR Kitchen</title>
 </head>
-<body class="lg:ml-64 transition-all duration-300">
 
-    <!-- Sidebar Navigation -->
-    <div th:replace="fragments/layout :: sidebar"></div>
+<body>
+
+<th:block th:fragment="content">
     
-    <!-- Mobile Menu Toggle -->
-    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
-    
-    <!-- Top Header -->
-    <div th:replace="fragments/layout :: header"></div>
+    <div class="space-y-8">
 
-    <!-- Main Content -->
-    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
-        
-        <!-- Flash Messages -->
-        <div th:replace="fragments/components :: messages"></div>
-
-        <!-- Page Header -->
-        <div class="mb-12">
-            <h1 class="text-4xl font-jakarta font-bold text-primary mb-2">Dashboard de Análisis</h1>
-            <p class="text-gray-600 font-work">Predicciones inteligentes basadas en Machine Learning con Weka</p>
-        </div>
-
-        <!-- Hero Card with Analysis Trigger -->
-        <div class="card p-12 text-center mb-12">
-            <div class="mb-6">
-                <span class="material-symbols-outlined text-7xl text-accent/30 block">analytics</span>
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA
+             ══════════════════════════════════════════════════════════ -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <div>
+                <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Optimización Operativa y Modelos</h1>
+                <p class="text-xs sm:text-sm text-slate-500">Programación lineal, predicción de rentabilidad y rotación de cocina</p>
             </div>
             
-            <h2 class="text-3xl font-jakarta font-bold text-primary mb-4">Análisis Predictivo de Ganancias</h2>
-            <p class="text-gray-600 font-work mb-8 max-w-2xl mx-auto">
-                El sistema analizará los patrones de pago históricos y generará predicciones basadas en Machine Learning para optimizar tus ganancias.
+            <a href="https://app.powerbi.com/view?r=eyJrIjoiZGVhODExZDQtOWEyMi00ODdlLWIzMDQtMWM5Yjc2ZmY4MDZiIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer shrink-0">
+                <i data-lucide="bar-chart-2" class="size-4 text-[#0c6780]"></i>
+                <span>Ver Power BI Embebido</span>
+            </a>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             2. HERO CARD PARA DISPARAR EL ANÁLISIS MATEMÁTICO
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-8 sm:p-10 shadow-sm text-center relative overflow-hidden">
+            <div class="size-16 rounded-2xl bg-[#0c6780]/10 text-[#0c6780] flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="brain-circuit" class="size-8 stroke-[1.75]"></i>
+            </div>
+            
+            <h2 class="text-xl sm:text-2xl font-extrabold font-jakarta text-slate-800 mb-2">
+                Resolución del Modelo de Rentabilidad Máxima
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mb-6">
+                El motor analiza las comandas reales de la base de datos relacional y calcula la combinación óptima de producción entre platos fuertes y platos sencillos con restricciones de insumos.
             </p>
 
-            <button id="btnPrediccion" class="btn-primary px-8 py-4 text-lg inline-flex items-center">
-                <span class="material-symbols-outlined mr-2">smart_toy</span>
-                Ejecutar Análisis Predictivo
+            <button id="btnPrediccion" 
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-sm shadow-md transition-all hover:scale-102 cursor-pointer">
+                <i data-lucide="play" class="size-4.5 fill-current"></i>
+                <span>Ejecutar Modelo de Optimización</span>
             </button>
         </div>
 
-        <!-- Loading Spinner -->
-        <div id="loading" class="hidden mb-12">
-            <div class="card p-8 text-center">
-                <div class="flex justify-center mb-6">
-                    <div class="animate-spin">
-                        <span class="material-symbols-outlined text-6xl text-primary">hourglass_top</span>
-                    </div>
-                </div>
-                <h3 class="text-xl font-jakarta font-bold text-primary mb-2">Procesando Análisis</h3>
-                <p class="text-gray-600 font-work">Analizando datos y generando predicciones...</p>
-            </div>
+        <!-- ══════════════════════════════════════════════════════════
+             3. SPINNER DE CARGA
+             ══════════════════════════════════════════════════════════ -->
+        <div id="loading" class="hidden p-10 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+            <div class="size-12 rounded-full border-4 border-slate-200 border-t-[#0c6780] animate-spin mx-auto mb-3"></div>
+            <h3 class="text-sm font-bold text-slate-800">Resolviendo Sistema de Ecuaciones...</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Consultando PostgreSQL y optimizando función objetivo Simplex.</p>
         </div>
 
-        <!-- Results Container -->
-        <div id="resultado"></div>
+        <!-- ══════════════════════════════════════════════════════════
+             4. CONTENEDOR DE RESULTADOS DINÁMICOS
+             ══════════════════════════════════════════════════════════ -->
+        <div id="resultado" class="space-y-6"></div>
 
-    </main>
+    </div>
 
-    <!-- Footer -->
-    <div th:replace="fragments/components :: footer"></div>
-
-    <!-- Scripts -->
-    <script th:src="@{/js/mobile-menu.js}"></script>
-    <script th:src="@{/js/ui-helpers.js}"></script>
+    <!-- Script de análisis matemático -->
     <script th:src="@{/js/datos-analysis.js}"></script>
+
+</th:block>
 
 </body>
 </html>

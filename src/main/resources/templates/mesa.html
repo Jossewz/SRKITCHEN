@@ -1,182 +1,280 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'mesas', 'Gestión de Salón')}">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Mesas | SR Kitchen</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Global Styles -->
-    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <title>Mesas – SR Kitchen</title>
 </head>
-<body class="lg:ml-64 transition-all duration-300">
+
+<body>
+
+<th:block th:fragment="content">
     
-    <!-- Sidebar Navigation -->
-    <div th:replace="fragments/layout :: sidebar"></div>
-    
-    <!-- Mobile Menu Toggle -->
-    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
-    
-    <!-- Top Header -->
-    <div th:replace="fragments/layout :: header"></div>
-    
-    <!-- Main Content -->
-    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
-        
-        <!-- Flash Messages -->
-        <div th:replace="fragments/components :: messages"></div>
-        
-        <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h1 class="text-4xl font-jakarta font-bold text-primary mb-2">Gestión de Mesas</h1>
-                    <p class="text-gray-600 font-work">Administra las mesas de tu restaurante</p>
-                </div>
-                <button onclick="openModal('createMesaModal')" class="btn-primary">
-                    <span class="material-symbols-outlined inline-block mr-2">add</span>
-                    Nueva Mesa
+    <div class="space-y-6"
+         x-data="{
+             search: '',
+             filterStatus: 'all',
+             showCreateModal: false,
+             matches(mesaNum, isOcupado) {
+                 const q = this.search.trim().toLowerCase();
+                 const matchesNum = !q || mesaNum.toString().toLowerCase().includes(q);
+                 const matchesStatus = (this.filterStatus === 'all') ||
+                                       (this.filterStatus === 'disponible' && !isOcupado) ||
+                                       (this.filterStatus === 'ocupada' && isOcupado);
+                 return matchesNum && matchesStatus;
+             }
+         }">
+
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA & ACCIÓN PRINCIPAL
+             ══════════════════════════════════════════════════════════ -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+            <div>
+                <h1 class="text-2xl font-black font-jakarta text-slate-900 tracking-tight">Salón y Mesas</h1>
+                <p class="text-xs sm:text-sm text-slate-600 font-medium">Supervisa la ocupación del salón y genera cierres de comanda instantáneos</p>
+            </div>
+            
+            <button type="button"
+                    @click="showCreateModal = true"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs sm:text-sm shadow transition-all cursor-pointer shrink-0"
+                    style="background-color: #0c6780; color: #ffffff;">
+                <i data-lucide="plus" class="w-4 h-4 stroke-[2.5] text-white"></i>
+                <span class="text-white font-bold">Nueva Mesa</span>
+            </button>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             2. BARRA DE FILTROS & BÚSQUEDA EN TIEMPO REAL
+             ══════════════════════════════════════════════════════════ -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
+            
+            <!-- Input de Búsqueda -->
+            <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text"
+                       x-model="search"
+                       placeholder="Buscar por número de mesa..."
+                       class="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                <button type="button"
+                        x-show="search.length > 0"
+                        @click="search = ''"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 p-1">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
 
-            <!-- Search Bar -->
-            <div class="relative">
-                <span class="material-symbols-outlined absolute left-4 top-3 text-gray-400">search</span>
-                <input type="text" id="searchInput" placeholder="Buscar mesa por número o estado..."
-                       class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <!-- Chips de Filtro Rápido -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 shrink-0">
+                <button type="button"
+                        @click="filterStatus = 'all'"
+                        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0"
+                        :class="filterStatus === 'all' ? 'bg-[#0c6780] text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                    Todas
+                </button>
+                <button type="button"
+                        @click="filterStatus = 'disponible'"
+                        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
+                        :class="filterStatus === 'disponible' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    Disponibles
+                </button>
+                <button type="button"
+                        @click="filterStatus = 'ocupada'"
+                        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
+                        :class="filterStatus === 'ocupada' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    Ocupadas
+                </button>
             </div>
+
         </div>
 
-        <!-- Create Mesa Modal -->
-        <div id="createMesaModal" data-modal-id="createMesaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" data-modal-overlay>
-            <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-elevation">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-jakarta font-bold text-primary">Nueva Mesa</h2>
-                    <button onclick="closeModal('createMesaModal')" class="p-2 hover:bg-bg-light rounded-lg transition-all" data-modal-close>
-                        <span class="material-symbols-outlined">close</span>
+        <!-- ══════════════════════════════════════════════════════════
+             3. GRID DE MESAS
+             ══════════════════════════════════════════════════════════ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="mesasContainer">
+            
+            <div th:each="mesa : ${listar}"
+                 th:data-mesa-num="${mesa.num}"
+                 th:data-mesa-ocupado="${mesa.ocupado}"
+                 x-show="matches($el.dataset.mesaNum, $el.dataset.mesaOcupado === 'true')"
+                 x-transition
+                 class="bg-white rounded-xl border border-slate-200 shadow-xs hover:border-[#0c6780]/50 hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden">
+                
+                <!-- Encabezado de la Mesa -->
+                <div class="p-5 pb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base shadow-xs shrink-0"
+                                 th:classappend="${mesa.ocupado} ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'">
+                                <i th:if="${mesa.ocupado}" data-lucide="utensils" class="w-5 h-5 stroke-[2]"></i>
+                                <i th:unless="${mesa.ocupado}" data-lucide="check" class="w-5 h-5 stroke-[2.5]"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold font-jakarta text-slate-900 leading-tight">
+                                    Mesa <span th:text="${mesa.num}">1</span>
+                                </h3>
+                                <p class="text-[11px] text-slate-500 font-mono">
+                                    Ref: <span th:text="${mesa.id != null and mesa.id.length() >= 8 ? mesa.id.substring(0,8) : mesa.id}">#</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Badge de Estado -->
+                        <span th:if="${mesa.ocupado}"
+                              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            Ocupada
+                        </span>
+                        <span th:unless="${mesa.ocupado}"
+                              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Disponible
+                        </span>
+                    </div>
+
+                    <!-- Mesero Asignado -->
+                    <div class="flex items-center gap-2 py-2 px-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 mb-3">
+                        <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <span class="font-medium">Mesero:</span>
+                        <strong class="font-semibold text-slate-900 truncate" 
+                                th:text="${nombresMeseros[mesa.id] ?: 'Sin asignar'}">Sin asignar</strong>
+                    </div>
+
+                    <!-- Comandas y Pedidos Activos -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <span>Comandas en mesa</span>
+                            <span th:if="${pedidosPorMesa[mesa.id] != null}"
+                                  th:text="${pedidosPorMesa[mesa.id].size() + ' activa(s)'}">0</span>
+                        </div>
+
+                        <div th:if="${pedidosPorMesa[mesa.id] != null and !pedidosPorMesa[mesa.id].isEmpty()}" class="space-y-2">
+                            <div th:each="pedido : ${pedidosPorMesa[mesa.id]}"
+                                 class="p-2.5 rounded-lg bg-sky-50/70 border border-sky-100 flex items-center justify-between text-xs">
+                                <div>
+                                    <div class="flex items-center gap-1.5 font-bold text-slate-900">
+                                        <span>Pedido</span>
+                                        <span class="font-mono text-[#0c6780]" th:text="'#' + (${pedido.id != null and pedido.id.length() >= 6 ? pedido.id.substring(0,6) : pedido.id})">#</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500" 
+                                          th:text="${pedido.fecha != null ? #temporals.format(pedido.fecha, 'HH:mm') : '--:--'}"></span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-bold text-[#0c6780]" 
+                                          th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+                                    <div class="text-[10px] text-slate-500" th:text="${pedido.items.size()} + ' platillos'"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${pedidosPorMesa[mesa.id] == null or pedidosPorMesa[mesa.id].isEmpty()}" 
+                             class="py-3 text-center rounded-lg bg-slate-50 border border-dashed border-slate-300 text-xs text-slate-500">
+                            Mesa libre sin comandas pendientes
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Acciones Inferior -->
+                <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center gap-2">
+                    <!-- Si tiene pedidos: Botón de Facturar -->
+                    <form th:if="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}"
+                          th:action="@{'/mesa/' + ${mesa.id} + '/generar-factura'}" 
+                          method="post" 
+                          class="flex-1 m-0">
+                        <button type="submit" 
+                                onclick="return confirm('¿Confirmas generar la factura y desocupar esta mesa?');"
+                                class="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#0c6780] hover:bg-[#095166] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                                style="background-color: #0c6780; color: #ffffff;">
+                            <i data-lucide="receipt" class="w-4 h-4 text-white"></i>
+                            <span class="text-white font-bold">Facturar y Liberar</span>
+                        </button>
+                    </form>
+
+                    <!-- Si está disponible: Botón de tomar comanda -->
+                    <a th:unless="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}"
+                       th:href="@{/pedidos}"
+                       class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-[#0c6780]"></i>
+                        <span>Tomar Comanda</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             4. MODAL ALPINO: NUEVA MESA
+             ══════════════════════════════════════════════════════════ -->
+        <div x-show="showCreateModal" 
+             x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+             @keydown.escape.window="showCreateModal = false">
+            
+            <div @click.outside="showCreateModal = false"
+                 x-show="showCreateModal"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+                
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-[#0c6780]/10 text-[#0c6780] flex items-center justify-center">
+                            <i data-lucide="layout-grid" class="w-5 h-5 stroke-[2]"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-900">Registrar Mesa</h2>
+                            <p class="text-xs text-slate-500">Ingresa el número de salón</p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            @click="showCreateModal = false"
+                            class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+                        <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
 
                 <form th:action="@{/mesa/crear}" method="post" th:object="${nuevaMesa}" class="space-y-4">
                     <div>
-                        <label for="numMesa" class="block text-sm font-jakarta font-semibold text-gray-700 mb-2">
+                        <label for="numMesa" class="block text-xs font-bold text-slate-800 mb-1.5">
                             Número de Mesa
                         </label>
-                        <input type="number" id="numMesa" th:field="*{num}" min="1" required
-                               class="input-focus w-full">
+                        <input type="number" 
+                               id="numMesa" 
+                               th:field="*{num}" 
+                               min="1" 
+                               required
+                               placeholder="Ej. 1, 2, 3..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
                     </div>
-                    <button type="submit" class="btn-primary w-full">
-                        <span class="material-symbols-outlined inline-block mr-2">check</span>
-                        Crear Mesa
-                    </button>
-                </form>
-            </div>
-        </div>
 
-        <!-- Mesas Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mesasContainer">
-            
-            <div th:each="mesa : ${listar}" class="mesa-card bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 p-6 flex flex-col group" data-mesa-num="${mesa.num}" data-mesa-estado="${mesa.ocupado ? 'Ocupada' : 'Disponible'}">
-                
-                <!-- Header -->
-                <div class="flex items-start justify-between mb-4">
-                    <div>
-                        <h3 class="text-3xl font-jakarta font-bold text-primary">Mesa <span th:text="${mesa.num}"></span></h3>
-                        <p class="text-sm text-gray-600 mt-1">ID: <span th:text="${mesa.id != null and mesa.id.length() >= 8 ? mesa.id.substring(0,8) : mesa.id}"></span></p>
-                    </div>
-                    <span th:if="${mesa.ocupado}" class="chip-danger">
-                        <span class="material-symbols-outlined text-sm mr-1">event_busy</span>
-                        Ocupada
-                    </span>
-                    <span th:unless="${mesa.ocupado}" class="chip-success">
-                        <span class="material-symbols-outlined text-sm mr-1">check_circle</span>
-                        Disponible
-                    </span>
-                </div>
-
-                <!-- Mesero Asignado -->
-                <div class="mb-4 pb-4 border-b border-gray-100">
-                    <p class="text-xs text-gray-600 font-work mb-1">MESERO ASIGNADO</p>
-                    <p class="font-jakarta font-semibold text-gray-800" th:text="${nombresMeseros[mesa.id]} ?: 'Sin asignar'"></p>
-                </div>
-
-                <!-- Pedidos Section -->
-                <div th:if="${pedidosPorMesa[mesa.id] != null and !pedidosPorMesa[mesa.id].isEmpty()}" class="flex-1 mb-4 pb-4 border-b border-gray-100">
-                    <p class="text-xs text-gray-600 font-work mb-3">PEDIDOS ACTIVOS</p>
-                    
-                    <div th:each="pedido : ${pedidosPorMesa[mesa.id]}" class="bg-bg-light rounded-lg p-3 mb-2">
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="font-jakarta font-bold text-gray-800">#<span th:text="${pedido.id != null and pedido.id.length() >= 6 ? pedido.id.substring(0,6) : pedido.id}"></span></p>
-                            <span class="text-sm font-work text-gray-600">
-                                <span class="material-symbols-outlined inline-block text-base align-middle">schedule</span>
-                                <span th:text="${#temporals.format(pedido.fecha, 'HH:mm')}"></span>
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-600 font-work mb-1">Total: <strong class="text-primary">$<span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></span></strong></p>
-                        <p class="text-xs text-gray-500 font-work">Items: <span th:text="${pedido.items.size()}"></span></p>
-                    </div>
-                </div>
-
-                <div th:if="${pedidosPorMesa[mesa.id] == null or pedidosPorMesa[mesa.id].isEmpty()}" class="flex-1 mb-4 pb-4 border-b border-gray-100">
-                    <p class="text-sm text-gray-500 text-center py-4 font-work">No hay pedidos</p>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex gap-2">
-                    <form th:action="@{'/mesa/' + ${mesa.id} + '/generar-factura'}" method="post" class="flex-1"
-                          th:if="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}">
-                        <button type="submit" class="w-full btn-primary text-sm py-2" 
-                                onclick="return confirm('¿Generar factura y liberar mesa?');">
-                            <span class="material-symbols-outlined inline-block mr-1">check</span>
-                            Facturar
+                    <div class="flex items-center justify-end gap-2 pt-2">
+                        <button type="button" 
+                                @click="showCreateModal = false"
+                                class="px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+                            Cancelar
                         </button>
-                    </form>
-
-                    <button th:unless="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}"
-                            disabled class="flex-1 px-4 py-2 bg-gray-200 text-gray-400 rounded-xl font-jakarta font-semibold cursor-not-allowed text-sm">
-                        <span class="material-symbols-outlined inline-block mr-1">lock</span>
-                        Facturar
-                    </button>
-
-                    <button onclick="openModal('editMesaModal_${mesa.id}')" class="btn-secondary text-sm py-2 px-4">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                </div>
+                        <button type="submit"
+                                class="px-4 py-2 rounded-lg bg-[#0c6780] hover:bg-[#095166] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                                style="background-color: #0c6780; color: #ffffff;">
+                            Guardar Mesa
+                        </button>
+                    </div>
+                </form>
 
             </div>
-
         </div>
 
-        <!-- Empty State -->
-        <div th:if="${listar == null or listar.isEmpty()}" class="text-center py-16">
-            <span class="material-symbols-outlined text-7xl text-gray-300 mb-4 block">table_restaurant</span>
-            <h3 class="text-xl font-jakarta font-bold text-gray-400 mb-2">No hay mesas</h3>
-            <p class="text-gray-500 font-work mb-4">Crea tu primera mesa para comenzar</p>
-            <button onclick="openModal('createMesaModal')" class="btn-primary">
-                <span class="material-symbols-outlined inline-block mr-2">add</span>
-                Crear Mesa
-            </button>
-        </div>
+    </div>
 
-    </main>
-    
-    <!-- Footer -->
-    <div th:replace="fragments/components :: footer"></div>
-    
-    <!-- Scripts -->
-    <script th:src="@{/js/mobile-menu.js}"></script>
-    <script th:src="@{/js/ui-helpers.js}"></script>
-    <script th:src="@{/js/mesa-table.js}"></script>
+</th:block>
 
 </body>
 </html>

@@ -1,199 +1,378 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'home', 'Panel de Control')}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio | SR Kitchen</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Global Styles -->
-    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <title>Centro de Mando – SR Kitchen</title>
 </head>
-<body class="lg:ml-64 transition-all duration-300">
+
+<body>
+
+<th:block th:fragment="content">
     
-    <!-- Sidebar Navigation -->
-    <div th:replace="fragments/layout :: sidebar"></div>
-    
-    <!-- Mobile Menu Toggle -->
-    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
-    
-    <!-- Top Header -->
-    <div th:replace="fragments/layout :: header"></div>
-    
-    <!-- Main Content -->
-    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
-        
-        <!-- Flash Messages -->
-        <div th:replace="fragments/components :: messages"></div>
-        
-        <!-- Welcome Hero -->
-        <section class="mb-12">
-            <div class="glass rounded-2xl p-12 text-center mb-8">
-                <div class="mb-6">
-                    
+    <div class="space-y-6">
+
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA OPERATIVA & ACCIONES RÁPIDAS
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-gradient-to-r from-[#0c6780] via-[#095166] to-slate-900 text-white rounded-xl p-6 sm:p-8 shadow-md border border-[#0c6780]/40 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-sky-200 border border-white/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Turno en Vivo &bull; Salón y Cocina Conectados</span>
                 </div>
-                <h1 class="text-4xl lg:text-5xl font-jakarta font-bold text-primary mb-4">
-                    Bienvenido a SR Kitchen
+                <h1 class="text-2xl sm:text-3xl font-extrabold font-jakarta tracking-tight text-white leading-tight">
+                    Centro de Mando del Restaurante
                 </h1>
-                <p class="text-lg text-gray-600 font-work max-w-2xl mx-auto">
-                    Sistema integral de gestión de restaurante. Administra mesas, pedidos, facturas y personal de forma eficiente.
+                <p class="text-slate-200 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
+                    Monitoreo en tiempo real de ocupación de mesas, flujo de comandas y estado de caja.
                 </p>
             </div>
-        </section>
 
-        <!-- Quick Stats Grid -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Botones de Acción Rápida -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <a href="/pedidos"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white text-[#0c6780] hover:bg-sky-50 font-bold text-xs sm:text-sm shadow transition-all cursor-pointer">
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-[#0c6780]"></i>
+                    <span>Nueva Comanda</span>
+                </a>
+                <a href="/mesa"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm border border-white/20 backdrop-blur-sm transition-all cursor-pointer">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    <span>Gestionar Mesas</span>
+                </a>
+                <a href="/factura"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm border border-white/20 backdrop-blur-sm transition-all cursor-pointer">
+                    <i data-lucide="receipt" class="w-4 h-4"></i>
+                    <span>Caja</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             2. INDICADORES CLAVE (KPIS OPERATIVOS)
+             ══════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Indicadores del Turno">
             
-            <!-- Total Mesas -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl p-6 hover:scale-105">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 font-work text-sm mb-1">Total de Mesas</p>
-                        <p class="text-3xl font-jakarta font-bold text-blue-900" th:text="${totalMesas}">-</p>
+            <!-- KPI 1: Mesas -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs hover:border-[#0c6780]/40 transition-all">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Ocupación de Salón</span>
+                    <div class="w-9 h-9 rounded-lg bg-sky-50 text-[#0c6780] flex items-center justify-center border border-sky-100">
+                        <i data-lucide="layout-grid" class="w-5 h-5 stroke-[2]"></i>
                     </div>
-                    <span class="material-symbols-outlined text-5xl text-blue-300">table_restaurant</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl sm:text-3xl font-extrabold font-jakarta text-slate-900" 
+                          th:text="${(mesasOcupadas ?: 0) + ' / ' + (totalMesas ?: 0)}">0 / 0</span>
+                    <span class="text-xs font-semibold text-slate-500">mesas</span>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-emerald-700 font-semibold" th:text="${(mesasLibres ?: 0) + ' libres'}">0 libres</span>
+                    <a href="/mesa" class="text-[#0c6780] font-bold hover:underline flex items-center gap-1">
+                        Ver salón <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
             </div>
 
-            <!-- Pedidos Hoy -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl p-6 hover:scale-105">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 font-work text-sm mb-1">Pedidos Hoy</p>
-                        <p class="text-3xl font-jakarta font-bold text-blue-900" th:text="${pedidosHoy}">-</p>
+            <!-- KPI 2: Comandas Activas -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs hover:border-[#0c6780]/40 transition-all">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Comandas en Curso</span>
+                    <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100">
+                        <i data-lucide="utensils" class="w-5 h-5 stroke-[2]"></i>
                     </div>
-                    <span class="material-symbols-outlined text-5xl text-blue-300">receipt_long</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl sm:text-3xl font-extrabold font-jakarta text-slate-900" 
+                          th:text="${pedidosActivos != null ? #lists.size(pedidosActivos) : 0}">0</span>
+                    <span class="text-xs font-semibold text-slate-500">pendientes</span>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium" th:text="${(pedidosHoy ?: 0) + ' pedidos hoy'}">0 hoy</span>
+                    <a href="/pedidos" class="text-[#0c6780] font-bold hover:underline flex items-center gap-1">
+                        Ver cola <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
             </div>
 
-            <!-- Ingresos Hoy -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl p-6 hover:scale-105">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 font-work text-sm mb-1">Ingresos Hoy</p>
-                        <p class="text-3xl font-jakarta font-bold text-blue-900" th:text="${'$' + ingresosHoy}">$0</p>
+            <!-- KPI 3: Facturación Hoy -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs hover:border-[#0c6780]/40 transition-all">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Ventas Facturadas</span>
+                    <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
+                        <i data-lucide="dollar-sign" class="w-5 h-5 stroke-[2]"></i>
                     </div>
-                    <span class="material-symbols-outlined text-5xl text-blue-300">attach_money</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-xs font-bold text-slate-500">$</span>
+                    <span class="text-2xl sm:text-3xl font-extrabold font-jakarta text-slate-900"
+                          th:text="${#numbers.formatDecimal(ingresosHoy ?: 0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium">Caja en regla</span>
+                    <a href="/factura" class="text-[#0c6780] font-bold hover:underline flex items-center gap-1">
+                        Historial <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
             </div>
 
-            <!-- Personal Activo -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl p-6 hover:scale-105">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 font-work text-sm mb-1">Meseros Activos</p>
-                        <p class="text-3xl font-jakarta font-bold text-blue-900" th:text="${meserosActivos}">-</p>
+            <!-- KPI 4: Personal en Turno -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs hover:border-[#0c6780]/40 transition-all">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Equipo en Servicio</span>
+                    <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center border border-indigo-100">
+                        <i data-lucide="users" class="w-5 h-5 stroke-[2]"></i>
                     </div>
-                    <span class="material-symbols-outlined text-5xl text-blue-300">person</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl sm:text-3xl font-extrabold font-jakarta text-slate-900" 
+                          th:text="${meserosActivos ?: 0}">0</span>
+                    <span class="text-xs font-semibold text-slate-500">meseros</span>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium">Turno activo</span>
+                    <a href="/mesero" class="text-[#0c6780] font-bold hover:underline flex items-center gap-1">
+                        Personal <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
             </div>
 
         </section>
 
-        <!-- Quick Access Cards - Bento Grid -->
-        <section>
-            <h2 class="text-2xl font-jakarta font-bold text-primary mb-6">Acceso Rápido</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Mesas Card -->
-                <a href="/mesa" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer p-8 flex flex-col items-start justify-between min-h-40 group" 
-                   sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
-                    <div>
-                        <span class="material-symbols-outlined text-5xl text-blue-900 mb-4 group-hover:scale-110 transition-transform">table_restaurant</span>
-                        <h3 class="text-xl font-jakarta font-bold text-blue-900 mb-2">Gestión de Mesas</h3>
-                        <p class="text-gray-600 text-sm font-work">Crea y administra las mesas del restaurante</p>
-                    </div>
-                    <div class="mt-4 text-blue-900 group-hover:translate-x-2 transition-transform">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                </a>
+        <!-- ══════════════════════════════════════════════════════════
+             3. DISTRIBUCIÓN OPERATIVA PRINCIPAL
+             ══════════════════════════════════════════════════════════ -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                <!-- Pedidos Card -->
-                <a href="/pedidos" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer p-8 flex flex-col items-start justify-between min-h-40 group"
-                   sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
-                    <div>
-                        <span class="material-symbols-outlined text-5xl text-blue-900 mb-4 group-hover:scale-110 transition-transform">shopping_cart</span>
-                        <h3 class="text-xl font-jakarta font-bold text-blue-900 mb-2">Gestión de Pedidos</h3>
-                        <p class="text-gray-600 text-sm font-work">Crea y gestiona los pedidos de los clientes</p>
+            <!-- COLUMNA IZQUIERDA (7 COLS): MAPA DE SALÓN EN VIVO -->
+            <div class="lg:col-span-7 bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-900">Salón en Vivo</h2>
+                            <p class="text-xs text-slate-500">Distribución de mesas y estado de ocupación actual</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-semibold">
+                            <span class="inline-flex items-center gap-1.5 text-emerald-700">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Libre
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-amber-700">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Ocupada
+                            </span>
+                        </div>
                     </div>
-                    <div class="mt-4 text-blue-900 group-hover:translate-x-2 transition-transform">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                </a>
 
-                <!-- Facturas Card -->
-                <a href="/factura" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer p-8 flex flex-col items-start justify-between min-h-40 group"
-                   sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">
-                    <div>
-                        <span class="material-symbols-outlined text-5xl text-blue-900 mb-4 group-hover:scale-110 transition-transform">receipt_long</span>
-                        <h3 class="text-xl font-jakarta font-bold text-blue-900 mb-2">Facturas</h3>
-                        <p class="text-gray-600 text-sm font-work">Revisa y gestiona todas las facturas</p>
-                    </div>
-                    <div class="mt-4 text-blue-900 group-hover:translate-x-2 transition-transform">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                </a>
+                    <!-- Cuadrícula de Mesas -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+                        <div th:each="mesa : ${mesas}"
+                             class="p-4 rounded-lg border transition-all duration-200 flex flex-col justify-between"
+                             th:classappend="${mesa.ocupado} ? 'bg-amber-50/50 border-amber-300' : 'bg-slate-50 border-slate-200 hover:border-[#0c6780]'">
+                            
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="font-bold text-sm font-jakarta text-slate-900" th:text="${'Mesa #' + mesa.num}">Mesa #1</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider"
+                                      th:classappend="${mesa.ocupado} ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'"
+                                      th:text="${mesa.ocupado ? 'Ocupada' : 'Libre'}">Libre</span>
+                            </div>
 
-                <!-- Platillos Card (Admin) -->
-                <a href="/platillos" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer p-8 flex flex-col items-start justify-between min-h-40 group"
-                   sec:authorize="hasAuthority('ROLE_ADMIN')">
-                    <div>
-                        <span class="material-symbols-outlined text-5xl text-blue-900 mb-4 group-hover:scale-110 transition-transform">restaurant_menu</span>
-                        <h3 class="text-xl font-jakarta font-bold text-blue-900 mb-2">Gestión de Platillos</h3>
-                        <p class="text-gray-600 text-sm font-work">Administra el menú de tu restaurante</p>
-                    </div>
-                    <div class="mt-4 text-blue-900 group-hover:translate-x-2 transition-transform">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                </a>
+                            <div class="text-xs text-slate-600 mb-3 space-y-1">
+                                <div class="flex items-center gap-1.5 text-slate-500">
+                                    <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                                    <span th:text="${mesa.ocupado ? 'Comensales atendidos' : 'Mesa lista'}">Mesa lista</span>
+                                </div>
+                            </div>
 
-                <!-- Meseros Card (Admin) -->
-                <a href="/mesero" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer p-8 flex flex-col items-start justify-between min-h-40 group"
-                   sec:authorize="hasAuthority('ROLE_ADMIN')">
-                    <div>
-                        <span class="material-symbols-outlined text-5xl text-blue-900 mb-4 group-hover:scale-110 transition-transform">person</span>
-                        <h3 class="text-xl font-jakarta font-bold text-blue-900 mb-2">Gestión de Meseros</h3>
-                        <p class="text-gray-600 text-sm font-work">Administra el personal del restaurante</p>
-                    </div>
-                    <div class="mt-4 text-blue-900 group-hover:translate-x-2 transition-transform">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                </a>
+                            <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                                <a th:if="${!mesa.ocupado}"
+                                   th:href="@{/pedidos(mesaId=${mesa.id})}"
+                                   class="w-full text-center py-1.5 px-2 rounded-md bg-[#0c6780] hover:bg-[#095166] text-white text-xs font-bold transition-colors">
+                                    Asignar Comanda
+                                </a>
+                                <a th:if="${mesa.ocupado}"
+                                   th:href="@{/pedidos}"
+                                   class="w-full text-center py-1.5 px-2 rounded-md bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors">
+                                    Ver Pedidos
+                                </a>
+                            </div>
 
-                <!-- Datos Card (Admin) -->
-                <a href="/datos" class="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer p-8 flex flex-col items-start justify-between min-h-40 group"
-                   sec:authorize="hasAuthority('ROLE_ADMIN')">
-                    <div>
-                        <span class="material-symbols-outlined text-5xl text-blue-900 mb-4 group-hover:scale-110 transition-transform">analytics</span>
-                        <h3 class="text-xl font-jakarta font-bold text-blue-900 mb-2">Datos y Reportes</h3>
-                        <p class="text-gray-600 text-sm font-work">Accede a análisis y reportes del negocio</p>
+                        </div>
                     </div>
-                    <div class="mt-4 text-blue-900 group-hover:translate-x-2 transition-transform">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                </a>
+                </div>
 
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-500">Total de mesas configuradas: <strong class="text-slate-800" th:text="${totalMesas ?: 0}">0</strong></span>
+                    <a href="/mesa" class="text-[#0c6780] font-bold hover:underline flex items-center gap-1">
+                        Configurar distribución física <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
             </div>
-        </section>
 
-    </main>
-    
-    <!-- Footer -->
-    <div th:replace="fragments/components :: footer"></div>
-    
-    <!-- Scripts -->
-    <script th:src="@{/js/mobile-menu.js}"></script>
+            <!-- COLUMNA DERECHA (5 COLS): COLA DE COMANDAS ACTIVAS -->
+            <div class="lg:col-span-5 bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-900">Comandas en Curso</h2>
+                            <p class="text-xs text-slate-500">Pedidos activos en cocina y pendientes de cobro</p>
+                        </div>
+                        <a href="/pedidos" class="text-xs font-bold text-[#0c6780] hover:underline flex items-center gap-1">
+                            Ver todos <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                        </a>
+                    </div>
+
+                    <!-- Lista de Comandas -->
+                    <div class="space-y-3">
+                        <div th:if="${pedidosActivos == null or #lists.isEmpty(pedidosActivos)}"
+                             class="py-12 text-center text-slate-400 space-y-2">
+                            <i data-lucide="check-circle" class="w-10 h-10 mx-auto text-emerald-500 stroke-[1.5]"></i>
+                            <p class="text-sm font-semibold text-slate-700">No hay pedidos pendientes</p>
+                            <p class="text-xs text-slate-400">Todas las mesas están libres o con cuentas saldadas.</p>
+                        </div>
+
+                        <div th:each="pedido : ${pedidosActivos}"
+                             class="p-3.5 rounded-lg border border-slate-200 hover:border-[#0c6780]/60 bg-slate-50/50 flex items-center justify-between transition-all">
+                            
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-md bg-[#0c6780]/10 text-[#0c6780] text-xs font-bold"
+                                          th:text="${'Mesa #' + pedido.mesaNum}">Mesa #1</span>
+                                    <span class="text-xs font-bold text-slate-800" th:text="${'Comanda #' + pedido.id}">#101</span>
+                                </div>
+                                <div class="text-[11px] text-slate-500 flex items-center gap-2">
+                                    <span th:text="${pedido.meseroName ?: 'Mesero asignado'}">Mesero</span>
+                                    <span>&bull;</span>
+                                    <span th:text="${#lists.size(pedido.items) + ' platillos'}">0 platillos</span>
+                                </div>
+                            </div>
+
+                            <div class="text-right space-y-1">
+                                <div class="text-sm font-bold text-slate-900 font-jakarta"
+                                     th:text="${'$' + #numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">$0.00</div>
+                                <a th:href="@{/pago/{id}(id=${pedido.id})}"
+                                   class="inline-block px-2.5 py-1 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold transition-colors">
+                                    Cobrar
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-500">Flujo ágil de cocina</span>
+                    <a href="/pedidos" class="text-[#0c6780] font-bold hover:underline flex items-center gap-1">
+                        Registrar nuevo pedido <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             4. SECCIÓN INFERIOR: STOCK CRÍTICO & HERRAMIENTAS
+             ══════════════════════════════════════════════════════════ -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- ALERTAS DE STOCK (7 COLS) -->
+            <div class="lg:col-span-7 bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center border border-rose-100">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 stroke-[2]"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-900">Alertas de Stock e Insumos</h2>
+                            <p class="text-xs text-slate-500">Materias primas con existencia baja (5 o menos unidades)</p>
+                        </div>
+                    </div>
+                    <a href="/producto" class="text-xs font-bold text-[#0c6780] hover:underline flex items-center gap-1">
+                        Ver inventario <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+
+                <div class="space-y-2.5">
+                    <div th:if="${productosCriticos == null or #lists.isEmpty(productosCriticos)}"
+                         class="py-6 text-center text-slate-400">
+                        <p class="text-xs font-medium text-emerald-700 flex items-center justify-center gap-1.5">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Todos los insumos e ingredientes se encuentran en niveles adecuados de stock.</span>
+                        </p>
+                    </div>
+
+                    <div th:each="prod : ${productosCriticos}"
+                         class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-md bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
+                                <i data-lucide="package" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <strong class="text-slate-900 font-bold block" th:text="${prod.name}">Insumo</strong>
+                                <span class="text-slate-500 text-[11px]" th:text="${prod.cant ?: 'Unidades'}">Cantidad</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 font-bold text-[11px]"
+                                  th:text="${'Stock: ' + prod.stock}">Stock: 0</span>
+                            <a href="/producto" class="text-[#0c6780] font-bold hover:underline">Reabastecer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALÍTICA Y RECURSOS (5 COLS) -->
+            <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-slate-800 to-[#0c6780] text-white rounded-xl p-5 sm:p-6 shadow-md border border-slate-800 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-300 flex items-center justify-center border border-sky-400/30">
+                            <i data-lucide="bar-chart-2" class="w-4 h-4 stroke-[2]"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-white">Inteligencia y Analítica</h2>
+                            <span class="text-xs text-sky-200 font-normal">Reportes en Vivo Power BI & Groq IA</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                        Analiza la rotación de platillos, ticket promedio y optimización matemática de rentabilidad con modelos lineales.
+                    </p>
+
+                    <div class="space-y-2">
+                        <a href="https://app.powerbi.com/view?r=eyJrIjoiZGVhODExZDQtOWEyMi00ODdlLWIzMDQtMWM5Yjc2ZmY4MDZiIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+                           target="_blank" rel="noopener noreferrer"
+                           class="w-full flex items-center justify-between p-3 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white transition-all cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-sky-300"></i>
+                                <span>Abrir Dashboard Ejecutivo en Power BI</span>
+                            </span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-sky-300"></i>
+                        </a>
+
+                        <a href="/datos" sec:authorize="hasAuthority('ROLE_ADMIN')"
+                           class="w-full flex items-center justify-between p-3 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white transition-all cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5 text-sky-300"></i>
+                                <span>Modelos de Optimización Matemática</span>
+                            </span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-sky-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-white/10 text-[11px] text-sky-200/80 flex items-center justify-between">
+                    <span>Base de datos: PostgreSQL 16</span>
+                    <span class="text-emerald-400 font-bold">&bull; Operativo</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</th:block>
 
 </body>
 </html>

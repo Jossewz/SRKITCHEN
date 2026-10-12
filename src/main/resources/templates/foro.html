@@ -1,114 +1,119 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'foro', 'Buzón y Foro')}">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buzón y Foro de Sugerencias | SR Kitchen</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Global Styles -->
-    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <title>Buzón y Foro – SR Kitchen</title>
 </head>
-<body class="lg:ml-64 transition-all duration-300 bg-gray-50 font-work">
 
-    <!-- Sidebar Navigation -->
-    <div th:replace="fragments/layout :: sidebar"></div>
+<body>
+
+<th:block th:fragment="content">
     
-    <!-- Mobile Menu Toggle -->
-    <div th:replace="fragments/layout :: mobile-menu-toggle"></div>
-    
-    <!-- Top Header -->
-    <div th:replace="fragments/layout :: header"></div>
+    <div class="max-w-4xl mx-auto space-y-8">
 
-    <!-- Main Content -->
-    <main class="pt-24 pb-20 px-4 lg:px-8 max-w-5xl mx-auto">
-        
-        <!-- Flash Messages -->
-        <div th:replace="fragments/components :: messages"></div>
-
-        <div th:if="${message}" class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 flex items-center">
-            <span class="material-symbols-outlined mr-2">check_circle</span>
-            <span th:text="${message}"></span>
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA
+             ══════════════════════════════════════════════════════════ -->
+        <div class="pb-2 border-b border-slate-200/80">
+            <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Buzón Interno y Sugerencias</h1>
+            <p class="text-xs sm:text-sm text-slate-500">Espacio de comunicación y propuestas operativas para el equipo de cocina y salón</p>
         </div>
 
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl lg:text-4xl font-jakarta font-bold text-gray-900 mb-2">Buzón de Sugerencias y Foro</h1>
-            <p class="text-gray-500 font-work">Espacio colaborativo de feedback y comunicación del restaurante</p>
-        </div>
+        <!-- ══════════════════════════════════════════════════════════
+             2. FORMULARIO PARA DEJAR COMENTARIO
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="size-10 rounded-2xl bg-sky-50 text-[#0c6780] flex items-center justify-center">
+                    <i data-lucide="message-square-plus" class="size-5 stroke-[2]"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold font-jakarta text-slate-800">Publicar una Nota o Propuesta</h2>
+                    <p class="text-xs text-slate-400">Comparte novedades sobre el servicio, cocina o sugerencias</p>
+                </div>
+            </div>
 
-        <!-- Formulario Nuevo Comentario -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-10">
-            <h2 class="text-xl font-bold font-jakarta text-gray-900 mb-4 flex items-center">
-                <span class="material-symbols-outlined text-orange-600 mr-2">rate_review</span>
-                Dejar un Comentario o Sugerencia
-            </h2>
-            
             <form th:action="@{/foro}" method="post" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tu Nombre</label>
-                    <input type="text" name="Fnombre" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Ingresa tu nombre..." />
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Tu Nombre o Identificador <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="Fnombre" 
+                           required 
+                           placeholder="Ej. Carlos (Mesero) o Chef Juan"
+                           class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Comentario o Sugerencia</label>
-                    <textarea name="Fcomentario" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Describe tu mensaje, propuesta o novedad..."></textarea>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Mensaje o Sugerencia <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="Fcomentario" 
+                              rows="3" 
+                              required 
+                              placeholder="Describe la propuesta, reporte de abastecimiento o comentario..."
+                              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all"></textarea>
                 </div>
 
-                <div class="flex justify-end">
-                    <button type="submit" class="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold shadow-md transition-colors inline-flex items-center">
-                        <span class="material-symbols-outlined mr-2 text-sm">send</span>
-                        Publicar Comentario
+                <div class="flex justify-end pt-2">
+                    <button type="submit" 
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+                        <i data-lucide="send" class="size-3.5"></i>
+                        <span>Publicar en el Buzón</span>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Lista de Comentarios -->
-        <div>
-            <h2 class="text-2xl font-bold font-jakarta text-gray-900 mb-6 flex items-center">
-                <span class="material-symbols-outlined text-gray-700 mr-2">forum</span>
-                Mensajes Recientes
+        <!-- ══════════════════════════════════════════════════════════
+             3. LISTADO DE MENSAJES DEL FORO
+             ══════════════════════════════════════════════════════════ -->
+        <div class="space-y-4">
+            <h2 class="text-base font-bold font-jakarta text-slate-800 flex items-center gap-2">
+                <i data-lucide="messages-square" class="size-4 text-slate-400"></i>
+                <span>Mensajes Publicados</span>
             </h2>
 
-            <div th:if="${foros.empty}" class="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
-                <span class="material-symbols-outlined text-5xl mb-2 text-gray-300">chat_bubble_outline</span>
-                <p class="text-lg font-medium">Aún no hay comentarios en el foro</p>
-                <p class="text-sm">¡Sé el primero en compartir tu opinión!</p>
+            <div th:if="${foros == null or foros.empty}" 
+                 class="p-12 text-center rounded-xl bg-white border border-slate-200/80 shadow-xs">
+                <div class="size-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="message-square" class="size-7 stroke-[1.5]"></i>
+                </div>
+                <h3 class="text-sm font-bold text-slate-700">Aún no hay comentarios en el buzón</h3>
+                <p class="text-xs text-slate-400 mt-1">Sé el primero en dejar una propuesta o reporte para el equipo.</p>
             </div>
 
-            <div class="space-y-4" th:unless="${foros.empty}">
-                <div th:each="f : ${foros}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div th:unless="${foros == null or foros.empty}" class="space-y-3">
+                <div th:each="f : ${foros}" 
+                     class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition-all duration-150">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm">
-                                <span th:text="${#strings.substring(f.fnombre, 0, 1)}">U</span>
+                            <div class="size-9 rounded-xl bg-slate-100 text-[#0c6780] flex items-center justify-center font-bold text-xs">
+                                <span th:text="${f.fnombre != null and !f.fnombre.isEmpty() ? #strings.substring(f.fnombre, 0, 1).toUpperCase() : 'U'}">U</span>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-900" th:text="${f.fnombre}"></h3>
-                                <span class="text-xs text-gray-400" th:if="${f.fecha != null}" th:text="${#dates.format(f.fecha, 'dd/MM/yyyy HH:mm')}"></span>
+                                <h3 class="text-xs font-bold text-slate-800" th:text="${f.fnombre}">Nombre</h3>
+                                <span class="text-[10px] text-slate-400" 
+                                      th:if="${f.fecha != null}" 
+                                      th:text="${#temporals.format(f.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span>
                             </div>
                         </div>
+                        <i data-lucide="message-circle" class="size-4 text-slate-300"></i>
                     </div>
-                    <p class="text-gray-700 leading-relaxed pl-13" th:text="${f.fcomentario}"></p>
+
+                    <p class="text-xs text-slate-600 leading-relaxed font-normal pl-12" 
+                       th:text="${f.fcomentario}">Comentario del personal</p>
                 </div>
             </div>
         </div>
 
-    </main>
+    </div>
 
-    <!-- Footer -->
-    <div th:replace="fragments/components :: footer"></div>
+</th:block>
 
 </body>
 </html>

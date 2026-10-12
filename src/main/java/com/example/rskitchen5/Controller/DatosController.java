@@ -2,6 +2,7 @@ package com.example.rskitchen5.Controller;
 
 import com.example.rskitchen5.Service.OptimizacionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class DatosController {
         return "datos";
     }
 
-    @GetMapping("/api/realtime")
+    @GetMapping(value = "/api/realtime", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getRealtime() {
         try {
@@ -40,7 +41,7 @@ public class DatosController {
         }
     }
 
-    @GetMapping("/api/optimo")
+    @GetMapping(value = "/api/optimo", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getOptimo() {
         try {
@@ -67,7 +68,7 @@ public class DatosController {
         }
     }
 
-    @GetMapping("/api/evaluar")
+    @GetMapping(value = "/api/evaluar", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> evaluar(
             @RequestParam(defaultValue = "60") double x1,
@@ -89,7 +90,7 @@ public class DatosController {
         }
     }
 
-    @GetMapping("/api/ranking")
+    @GetMapping(value = "/api/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getRanking(
             @RequestParam(defaultValue = "5") int top) {

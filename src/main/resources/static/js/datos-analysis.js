@@ -39,7 +39,7 @@ function renderTodo(rt, optimo, ranking) {
     <div class="mb-2">
       <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 font-work mb-3 flex items-center gap-2">
         <span class="material-symbols-outlined text-sm">storage</span>
-        Datos reales de la base de datos (MongoDB)
+        Datos reales de la base de datos (PostgreSQL)
       </p>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         ${kpiCard('receipt_long', 'Pedidos registrados', fmt(rt.totalPedidos, 0) + ' pedidos', 'text-gray-500')}

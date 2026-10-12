@@ -1,97 +1,80 @@
-<div th:fragment="detalle" xmlns:th="http://www.w3.org/1999/xhtml">
-    <!-- Vista normal (para el modal) -->
-    <div class="vista-normal">
-        <h2>Factura Detalle</h2>
-        <p><strong>Mesa:</strong> <span th:text="${factura.mesaNum}">Mesa</span></p>
-        <p><strong>Mesero:</strong> <span th:text="${factura.meseroName}">Mesero</span></p>
-        <p><strong>Fecha:</strong> <span th:text="${#temporals.format(factura.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
-        <p><strong>Estado:</strong> <span th:text="${factura.estado}">Estado</span></p>
+<div th:fragment="detalle" xmlns:th="http://www.thymeleaf.org" class="space-y-6">
 
-        <table>
+    <!-- Encabezado de la Factura -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Comprobante Fiscal</span>
+                <span th:if="${factura.estado != null and factura.estado.name() == 'APROBADA'}"
+                      class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Aprobada / Pagada
+                </span>
+                <span th:if="${factura.estado != null and factura.estado.name() == 'PENDIENTE'}"
+                      class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    Pendiente de Pago
+                </span>
+            </div>
+            <h3 class="text-xl font-extrabold font-jakarta text-slate-800 mt-1">
+                Factura <span class="text-sky-700" th:text="'#' + (${factura.id != null and factura.id.length() >= 8 ? factura.id.substring(0,8) : factura.id})">#000</span>
+            </h3>
+        </div>
+
+        <div class="text-left sm:text-right text-xs text-slate-500 space-y-0.5">
+            <div><strong>Mesa:</strong> <span class="font-bold text-slate-800" th:text="'Mesa ' + ${factura.mesaNum}">Mesa</span></div>
+            <div><strong>Mesero:</strong> <span th:text="${factura.meseroName}">Mesero</span></div>
+            <div><strong>Fecha:</strong> <span th:text="${factura.fecha != null ? #temporals.format(factura.fecha, 'dd/MM/yyyy HH:mm') : '--'}">Fecha</span></div>
+        </div>
+    </div>
+
+    <!-- Tabla de Platillos Facturados -->
+    <div class="overflow-hidden rounded-2xl border border-slate-200 shadow-2xs">
+        <table class="w-full text-left border-collapse text-xs">
             <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Subtotal</th>
-            </tr>
+                <tr class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <th class="py-3 px-4">Platillo / Consumo</th>
+                    <th class="py-3 px-3 text-center">Cant</th>
+                    <th class="py-3 px-3 text-right">Unitario</th>
+                    <th class="py-3 px-4 text-right">Subtotal</th>
+                </tr>
             </thead>
-            <tbody>
-            <tr th:each="item : ${factura.items}">
-                <td th:text="${item.name}">Producto</td>
-                <td th:text="${item.unidades}">Cantidad</td>
-                <td th:text="${#numbers.formatDecimal(item.price, 2, 'POINT', 0, 'COMMA')}">Precio</td>
-                <td th:text="${#numbers.formatDecimal(item.price * item.unidades, 2, 'POINT', 0, 'COMMA')}">Subtotal</td>
-            </tr>
+            <tbody class="divide-y divide-slate-100">
+                <tr th:each="item : ${factura.items}" class="hover:bg-slate-50/60 transition-colors">
+                    <td class="py-3 px-4 font-semibold text-slate-800" th:text="${item.name}">Platillo</td>
+                    <td class="py-3 px-3 text-center font-bold text-slate-600" th:text="${item.unidades}">1</td>
+                    <td class="py-3 px-3 text-right text-slate-500 font-mono" 
+                        th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                    <td class="py-3 px-4 text-right font-bold text-slate-800 font-mono" 
+                        th:text="'$' + ${#numbers.formatDecimal(item.price * item.unidades, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                </tr>
             </tbody>
+            <tfoot>
+                <tr class="bg-slate-50 font-bold text-slate-800 border-t-2 border-slate-200">
+                    <td colspan="3" class="py-3.5 px-4 text-right text-xs uppercase tracking-wider text-slate-500">Total Liquidación:</td>
+                    <td class="py-3.5 px-4 text-right text-base font-black font-jakarta text-[#0c6780]" 
+                        th:text="'$' + ${#numbers.formatDecimal(factura.total, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                </tr>
+            </tfoot>
         </table>
-
-        <p class="total">
-            Total: $<span th:text="${#numbers.formatDecimal(factura.total, 2, 'POINT', 0, 'COMMA')}">Total</span>
-        </p>
-
-        <!-- SOLO mostrar Registrar Pago si está PENDIENTE -->
-        <div th:if="${factura.estado != null and factura.estado.name() == 'PENDIENTE'}" style="margin-top: 15px;">
-            <a th:href="@{/pagos/nuevo/{id}(id=${factura.id})}" class="btn btn-success">💳 Registrar Pago</a>
-        </div>
-
-        <!-- SOLO mostrar Imprimir si está APROBADA -->
-        <div th:if="${factura.estado != null and factura.estado.name() == 'APROBADA'}" style="margin-top: 20px;">
-            <button onclick="imprimirTicket()" class="btn btn-primary">🧾 Imprimir Factura</button>
-        </div>
-
-        <!-- Mensaje si ya está pagada -->
-        <div th:if="${factura.estado != null and factura.estado.name() == 'APROBADA'}" style="margin-top: 10px;">
-            <p style="color: #28a745; font-weight: bold;">✅ Esta factura ya ha sido pagada y aprobada</p>
-        </div>
     </div>
 
-    <div id="ticket-impresion" class="ticket-impresion" style="display: none;">
-        <div class="ticket-header">
-            <h2>SR KITCHEN</h2>
-            <p>Restaurante & Bar</p>
-            <p>--------------------------------</p>
-        </div>
+    <!-- Acciones de Caja -->
+    <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+        <!-- Registrar Pago si está PENDIENTE -->
+        <a th:if="${factura.estado != null and factura.estado.name() == 'PENDIENTE'}"
+           th:href="@{'/pagos/nuevo/' + ${factura.id}}" 
+           class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+            <i data-lucide="credit-card" class="size-4"></i>
+            <span>Cobrar y Registrar Pago</span>
+        </a>
 
-        <div class="ticket-info">
-            <p><strong>FACTURA #</strong><span th:text="${factura.id}"></span></p>
-            <p><strong>MESA:</strong> <span th:text="${factura.mesaNum}"></span></p>
-            <p><strong>MESERO:</strong> <span th:text="${factura.meseroName}"></span></p>
-            <p><strong>FECHA:</strong> <span th:text="${#temporals.format(factura.fecha, 'dd/MM/yyyy HH:mm')}"></span></p>
-            <p><strong>ESTADO:</strong> <span th:text="${factura.estado}"></span></p>
-            <p>--------------------------------</p>
-        </div>
-
-        <div class="ticket-items">
-            <table class="ticket-table">
-                <thead>
-                <tr>
-                    <th>PRODUCTO</th>
-                    <th>CANT</th>
-                    <th>PRECIO</th>
-                    <th>SUBTO</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="item : ${factura.items}">
-                    <td th:text="${item.name}">Producto</td>
-                    <td style="text-align: center;" th:text="${item.unidades}">Cant</td>
-                    <td style="text-align: right;" th:text="${#numbers.formatDecimal(item.price, 2, 'POINT', 0, 'COMMA')}">Precio</td>
-                    <td style="text-align: right;" th:text="${#numbers.formatDecimal(item.price * item.unidades, 2, 'POINT', 0, 'COMMA')}">Subto</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="ticket-total">
-            <p>--------------------------------</p>
-            <p><strong>TOTAL: $<span th:text="${#numbers.formatDecimal(factura.total, 2, 'POINT', 0, 'COMMA')}"></span></strong></p>
-        </div>
-
-        <div class="ticket-footer">
-            <p>¡Gracias por su visita!</p>
-            <p>Vuelva pronto</p>
-            <p>SR Kitchen</p>
-        </div>
+        <!-- Imprimir Comprobante si está APROBADA -->
+        <a th:if="${factura.estado != null and factura.estado.name() == 'APROBADA'}"
+           th:href="@{'/factura/imprimir/' + ${factura.id}}"
+           target="_blank"
+           class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+            <i data-lucide="printer" class="size-4"></i>
+            <span>Imprimir Ticket Fiscal</span>
+        </a>
     </div>
+
 </div>

@@ -3,258 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SR Kitchen - Gestión de Restaurantes Inteligente</title>
+    <title>SR Kitchen – Sistema Operativo de Restaurante Inteligente</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
+    <!-- Tipografía: Plus Jakarta Sans & Work Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Global Styles -->
+    <!-- Tailwind CSS compilado localmente (100% offline) -->
     <link rel="stylesheet" th:href="@{/css/globals.css}">
-    
-    <style>
-        .hero-gradient {
-            background: linear-gradient(135deg, #0c6780 0%, #87ceeb 100%);
-        }
-        .feature-card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(12, 103, 128, 0.15);
-        }
-    </style>
-</head>
-<body class="bg-bg-light">
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+    <!-- Lucide Icons & Alpine.js -->
+    <script th:src="@{/js/lucide.min.js}"></script>
+    <script defer th:src="@{/js/alpine.min.js}"></script>
+</head>
+
+<body class="bg-slate-50 font-work text-slate-900 antialiased selection:bg-[#0c6780] selection:text-white">
+
+    <!-- ══════════════════════════════════════════════════════════
+         NAVBAR PÚBLICA
+         ══════════════════════════════════════════════════════════ -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center space-x-2">
-                    <img th:src="@{/img/logo.png}" alt="SR Kitchen" class="h-10 w-10 object-contain">
-                    <h1 class="text-2xl font-jakarta font-bold text-primary">SR Kitchen</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="#features" class="font-work text-gray-600 hover:text-primary transition-colors">Características</a>
-                    <a href="#about" class="font-work text-gray-600 hover:text-primary transition-colors">Sobre Nosotros</a>
-                    <a href="/login" class="btn-primary">
-                        <span class="material-symbols-outlined inline-block text-base align-middle">login</span>
-                        Ingresar
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <a href="/landing" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-sky-50 border border-sky-100 p-1.5 flex items-center justify-center shrink-0"
+                         style="width: 40px; height: 40px;">
+                        <img th:src="@{/img/logo.png}" 
+                             alt="SR Kitchen Logo" 
+                             width="32" 
+                             height="32" 
+                             class="object-contain"
+                             style="width: 32px; height: 32px; max-width: 32px; max-height: 32px;">
+                    </div>
+                    <div>
+                        <strong class="text-base sm:text-lg font-black font-jakarta tracking-tight text-slate-900 leading-none block">SR Kitchen</strong>
+                        <span class="text-[10px] font-bold text-[#0c6780] uppercase tracking-widest leading-none">Restaurant OS</span>
+                    </div>
+                </a>
+
+                <div class="flex items-center gap-6">
+                    <div class="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700">
+                        <a href="#features" class="hover:text-[#0c6780] transition-colors">Módulos</a>
+                        <a href="#workflow" class="hover:text-[#0c6780] transition-colors">Flujo Operativo</a>
+                        <a href="#tech" class="hover:text-[#0c6780] transition-colors">Tecnología</a>
+                        <a href="https://app.powerbi.com/view?r=eyJrIjoiZGVhODExZDQtOWEyMi00ODdlLWIzMDQtMWM5Yjc2ZmY4MDZiIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9" 
+                           target="_blank" rel="noopener noreferrer" 
+                           class="hover:text-[#0c6780] transition-colors flex items-center gap-1.5 text-[#0c6780]">
+                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+                            <span>Power BI</span>
+                        </a>
+                    </div>
+
+                    <a href="/login" 
+                       class="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs sm:text-sm shadow transition-all cursor-pointer"
+                       style="background-color: #0c6780; color: #ffffff;">
+                        <i data-lucide="log-in" class="w-4 h-4 text-white"></i>
+                        <span class="text-white">Ingresar al Sistema</span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient pt-32 pb-20 px-4 sm:px-6 lg:px-8 text-center">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-5xl sm:text-6xl font-jakarta font-bold text-white mb-6">
-                Gestión de Restaurantes Inteligente
+    <!-- ══════════════════════════════════════════════════════════
+         HERO SECTION
+         ══════════════════════════════════════════════════════════ -->
+    <section class="relative pt-32 pb-20 sm:pt-40 sm:pb-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-[#0c6780] via-[#095166] to-slate-900 text-white">
+        <!-- Luces y resplandores de fondo -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[550px] h-[550px] bg-sky-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Base de Datos Relacional PostgreSQL 16 &bull; Alta Disponibilidad</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black font-jakarta tracking-tight leading-tight text-white" style="color: #ffffff;">
+                El Sistema Operativo para <br class="hidden sm:inline">
+                <span class="text-sky-300">Restaurantes de Alto Rendimiento</span>
             </h1>
-            <p class="text-xl text-white/90 font-work mb-10 max-w-2xl mx-auto">
-                Transforma tu restaurante con SR Kitchen: la plataforma digital completa para mesas, pedidos, facturas y análisis predictivo basado en IA.
+
+            <p class="text-sm sm:text-base lg:text-lg text-slate-100 max-w-2xl mx-auto font-normal leading-relaxed">
+                Control ágil de comandas en salón, facturación instantánea de cuentas, gestión rigurosa de insumos y modelos de optimización matemática con IA.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/login" class="btn-primary px-8 py-4 text-lg inline-flex items-center justify-center">
-                    <span class="material-symbols-outlined mr-2">arrow_forward</span>
-                    Comenzar Ahora
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
+                <a href="/login" 
+                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-lg bg-white text-[#0c6780] font-bold text-sm shadow-xl hover:bg-sky-50 transition-all cursor-pointer">
+                    <i data-lucide="play-circle" class="w-5 h-5 text-[#0c6780]"></i>
+                    <span>Iniciar Sesión en el Panel</span>
                 </a>
-                <a href="#about" class="btn-ghost px-8 py-4 text-lg bg-white/10 text-white hover:bg-white/20">
-                    <span class="material-symbols-outlined mr-2">info</span>
-                    Conocer Más
+                <a href="#features" 
+                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/25 backdrop-blur-sm transition-all cursor-pointer">
+                    <i data-lucide="compass" class="w-4 h-4 text-white"></i>
+                    <span>Explorar Módulos</span>
+                </a>
+            </div>
+
+            <!-- Datos de rendimiento rápido -->
+            <div class="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto border-t border-white/15 text-center">
+                <div>
+                    <strong class="text-2xl font-black font-jakarta text-white block">100%</strong>
+                    <span class="text-[11px] text-sky-200 font-medium">Transacciones ACID</span>
+                </div>
+                <div>
+                    <strong class="text-2xl font-black font-jakarta text-white block">&lt; 3 seg</strong>
+                    <span class="text-[11px] text-sky-200 font-medium">Emisión de Comandas</span>
+                </div>
+                <div>
+                    <strong class="text-2xl font-black font-jakarta text-white block">0 mermas</strong>
+                    <span class="text-[11px] text-sky-200 font-medium">Control de Stock Crítico</span>
+                </div>
+                <div>
+                    <strong class="text-2xl font-black font-jakarta text-white block">Power BI</strong>
+                    <span class="text-[11px] text-sky-200 font-medium">Analítica en Tiempo Real</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         MÓDULOS INTEGRADOS (TARJETAS COMPLETAS CON ALTO CONTRASTE)
+         ══════════════════════════════════════════════════════════ -->
+    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-[#0c6780]">Módulos de Producción</span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold font-jakarta text-slate-900 tracking-tight">
+                Todo el flujo de trabajo en una sola plataforma
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600">Diseñado para la velocidad y precisión que requiere el servicio gastronómico profesional</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- 1. Salón y Mesas -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-xs hover:border-[#0c6780]/60 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-lg bg-sky-50 text-[#0c6780] border border-sky-100 flex items-center justify-center mb-4">
+                        <i data-lucide="layout-grid" class="w-6 h-6 stroke-[2]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold font-jakarta text-slate-900 mb-2">Salón y Mesas en Tiempo Real</h3>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                        Visualización del estado de ocupación de las mesas (libres, ocupadas o en cuenta). Asignación ágil de meseros por zona de salón y liberación automática tras el cobro del pedido.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1.5 mb-4">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Mapa visual interactivo de mesas</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Asignación de personal por mesa</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-xs font-bold text-[#0c6780] flex items-center justify-between">
+                    <span>Módulo Activo</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <!-- 2. Comandas y Pedidos -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-xs hover:border-amber-500/60 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center mb-4">
+                        <i data-lucide="shopping-bag" class="w-6 h-6 stroke-[2]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold font-jakarta text-slate-900 mb-2">Comandas Instantáneas</h3>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                        Toma de pedidos ágil con autocompletado y cálculo automático de totales. Permite registrar especificaciones de preparación y enviar comandas directamente al área de cocina.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1.5 mb-4">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Buscador inteligente de platillos</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Cálculo automático de subtotales</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-xs font-bold text-amber-700 flex items-center justify-between">
+                    <span>Flujo de Cocina</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <!-- 3. Facturación y Caja -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-xs hover:border-emerald-500/60 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center mb-4">
+                        <i data-lucide="receipt" class="w-6 h-6 stroke-[2]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold font-jakarta text-slate-900 mb-2">Caja y Facturación Fiscal</h3>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                        Liquidación rápida de cuentas en efectivo, tarjeta o transferencias digitales. Generación de tickets de venta con desglose tributario, historial contable y formato listo para impresión.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1.5 mb-4">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Emisión de tickets de venta</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Arqueo de caja por turno</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-xs font-bold text-emerald-700 flex items-center justify-between">
+                    <span>Control de Cobros</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <!-- 4. Menú y Carta Digital -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-xs hover:border-purple-500/60 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-lg bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center mb-4">
+                        <i data-lucide="utensils" class="w-6 h-6 stroke-[2]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold font-jakarta text-slate-900 mb-2">Catálogo de Platillos</h3>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                        Administración centralizada de la carta de alimentos y bebidas. Actualización inmediata de precios, recetas, ingredientes requeridos y control de disponibilidad de cocina.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1.5 mb-4">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Categorización de entradas y fondos</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Gestión de porciones y costos</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-xs font-bold text-purple-700 flex items-center justify-between">
+                    <span>Menú Digital</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <!-- 5. Inventario y Materias Primas -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-xs hover:border-teal-500/60 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-lg bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center mb-4">
+                        <i data-lucide="boxes" class="w-6 h-6 stroke-[2]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold font-jakarta text-slate-900 mb-2">Inventario y Stock Crítico</h3>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                        Supervisión continua de existencias de materias primas e insumos clave. Sistema de alertas visuales automáticas cuando los niveles bajan del mínimo establecido para evitar roturas de stock.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1.5 mb-4">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Alertas preventivas de bajo stock</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Seguimiento de costos por unidad</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-xs font-bold text-teal-700 flex items-center justify-between">
+                    <span>Control de Insumos</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <!-- 6. Optimización e Inteligencia -->
+            <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-xs hover:border-sky-500/60 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-lg bg-sky-50 text-[#0c6780] border border-sky-100 flex items-center justify-center mb-4">
+                        <i data-lucide="brain-circuit" class="w-6 h-6 stroke-[2]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold font-jakarta text-slate-900 mb-2">Optimización e Inteligencia</h3>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                        Asistente inteligente con Groq LLaMA y formulación de programación lineal para maximizar la rentabilidad de las recetas según el stock disponible en bodega.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1.5 mb-4">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Modelado matemático lineal</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <span>Tableros analíticos en Power BI</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-xs font-bold text-[#0c6780] flex items-center justify-between">
+                    <span>Inteligencia Operativa</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         FLUJO OPERATIVO EN SERVICIO (PASO A PASO)
+         ══════════════════════════════════════════════════════════ -->
+    <section id="workflow" class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#0c6780] via-[#095166] to-slate-900 text-white">
+        <div class="max-w-7xl mx-auto space-y-10">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <span class="text-xs font-bold uppercase tracking-widest text-sky-300">Flujo de Servicio</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold font-jakarta tracking-tight text-white" style="color: #ffffff;">
+                    Experiencia fluida desde la mesa hasta la cocina
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-200">
+                    Proceso sincronizado para reducir tiempos de espera y eliminar errores de comanda
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Paso 1 -->
+                <div class="p-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 space-y-3">
+                    <span class="w-8 h-8 rounded-lg bg-sky-400 text-slate-900 font-extrabold flex items-center justify-center text-sm">
+                        01
+                    </span>
+                    <strong class="text-base font-bold font-jakarta block text-white">Recepción y Asignación</strong>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        El anfitrión o mesero asigna comensales a una mesa libre con un solo toque en el plano del salón.
+                    </p>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="p-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 space-y-3">
+                    <span class="w-8 h-8 rounded-lg bg-sky-400 text-slate-900 font-extrabold flex items-center justify-center text-sm">
+                        02
+                    </span>
+                    <strong class="text-base font-bold font-jakarta block text-white">Toma de Comanda</strong>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        Selección rápida de platillos y bebidas en la interfaz, con cálculo automático y observaciones especiales.
+                    </p>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="p-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 space-y-3">
+                    <span class="w-8 h-8 rounded-lg bg-sky-400 text-slate-900 font-extrabold flex items-center justify-center text-sm">
+                        03
+                    </span>
+                    <strong class="text-base font-bold font-jakarta block text-white">Preparación en Cocina</strong>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        Los cocineros visualizan el pedido en la cola activa, priorizando comandas por orden de llegada.
+                    </p>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="p-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 space-y-3">
+                    <span class="w-8 h-8 rounded-lg bg-sky-400 text-slate-900 font-extrabold flex items-center justify-center text-sm">
+                        04
+                    </span>
+                    <strong class="text-base font-bold font-jakarta block text-white">Cobro y Liberación</strong>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        Caja genera el comprobante fiscal, actualiza el flujo contable y libera la mesa para los siguientes clientes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         ARQUITECTURA Y CONFIABILIDAD TÉCNICA
+         ══════════════════════════════════════════════════════════ -->
+    <section id="tech" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-[#0c6780]">Infraestructura Moderna</span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold font-jakarta text-slate-900 tracking-tight">
+                Construido con tecnología robusta y segura
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600">Cumplimiento de estándares empresariales para máxima disponibilidad y consistencia</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-2">
+                <div class="w-9 h-9 rounded-lg bg-sky-50 text-[#0c6780] flex items-center justify-center font-bold">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                </div>
+                <strong class="text-sm font-bold font-jakarta text-slate-900 block">PostgreSQL 16</strong>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Motor de base de datos relacional con integridad referencial y transacciones ACID garantizadas.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-2">
+                <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <strong class="text-sm font-bold font-jakarta text-slate-900 block">Spring Security 6</strong>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Control de accesos basado en roles (ADMIN y MESERO) con protección contra CSRF y sesiones seguras.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-2">
+                <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <i data-lucide="container" class="w-5 h-5"></i>
+                </div>
+                <strong class="text-sm font-bold font-jakarta text-slate-900 block">Docker & PgAdmin</strong>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Contenedores aislados para entorno de aplicación, base de datos y consola de administración en compose.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-2">
+                <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <strong class="text-sm font-bold font-jakarta text-slate-900 block">Offline & Tailwind</strong>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Hojas de estilo y librerías JavaScript 100% locales sin dependencia de CDNs de terceros.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         BANNER DE LLAMADO A LA ACCIÓN
+         ══════════════════════════════════════════════════════════ -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <div class="bg-gradient-to-r from-[#0c6780] to-slate-900 rounded-xl p-8 sm:p-12 text-white text-center space-y-5 shadow-xl border border-sky-400/30">
+            <h2 class="text-2xl sm:text-4xl font-extrabold font-jakarta tracking-tight text-white" style="color: #ffffff;">
+                Listo para transformar la operación de tu salón
+            </h2>
+            <p class="text-xs sm:text-base text-slate-200 max-w-xl mx-auto font-normal leading-relaxed">
+                Inicia sesión con tus credenciales de mesero o administrador para comenzar el servicio de hoy.
+            </p>
+            <div class="pt-2">
+                <a href="/login" 
+                   class="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg bg-white text-[#0c6780] hover:bg-sky-50 font-bold text-sm shadow-md transition-all cursor-pointer">
+                    <i data-lucide="log-in" class="w-4 h-4 text-[#0c6780]"></i>
+                    <span>Ingresar a SR Kitchen</span>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-4xl font-jakarta font-bold text-primary mb-4 text-center">Características Principales</h2>
-            <p class="text-gray-600 font-work text-center mb-16 max-w-2xl mx-auto">
-                Todas las herramientas que necesitas para gestionar tu restaurante eficientemente
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Feature 1 -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary group-hover:bg-primary group-hover:text-white rounded-xl mb-6 transition-colors duration-300">
-                        <span class="material-symbols-outlined text-3xl">table_restaurant</span>
-                    </div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Gestión de Mesas</h3>
-                    <p class="text-gray-600 font-work">Administra eficientemente todas tus mesas, asigna meseros y visualiza el estado en tiempo real.</p>
+    <!-- ══════════════════════════════════════════════════════════
+         FOOTER INSTITUCIONAL
+         ══════════════════════════════════════════════════════════ -->
+    <footer class="bg-slate-900 text-white border-t border-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20"
+                     style="width: 36px; height: 36px;">
+                    <img th:src="@{/img/logo.png}" 
+                         alt="SR Kitchen Logo" 
+                         width="28" 
+                         height="28" 
+                         class="object-contain"
+                         style="width: 28px; height: 28px; max-width: 28px; max-height: 28px;">
                 </div>
-
-                <!-- Feature 2 -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary group-hover:bg-primary group-hover:text-white rounded-xl mb-6 transition-colors duration-300">
-                        <span class="material-symbols-outlined text-3xl">shopping_cart</span>
-                    </div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Gestión de Pedidos</h3>
-                    <p class="text-gray-600 font-work">Sistema intuitivo para crear, editar y gestionar pedidos de forma rápida y eficiente.</p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary group-hover:bg-primary group-hover:text-white rounded-xl mb-6 transition-colors duration-300">
-                        <span class="material-symbols-outlined text-3xl">receipt_long</span>
-                    </div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Facturación Automática</h3>
-                    <p class="text-gray-600 font-work">Genera facturas automáticas y mantén un registro completo de todas tus transacciones.</p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary group-hover:bg-primary group-hover:text-white rounded-xl mb-6 transition-colors duration-300">
-                        <span class="material-symbols-outlined text-3xl">restaurant_menu</span>
-                    </div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Catálogo de Platillos</h3>
-                    <p class="text-gray-600 font-work">Administra tu menú, precios y disponibilidad de platillos de forma centralizada.</p>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary group-hover:bg-primary group-hover:text-white rounded-xl mb-6 transition-colors duration-300">
-                        <span class="material-symbols-outlined text-3xl">smart_toy</span>
-                    </div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Análisis Predictivo IA</h3>
-                    <p class="text-gray-600 font-work">Utiliza Machine Learning para predicciones inteligentes sobre ganancias y tendencias.</p>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary group-hover:bg-primary group-hover:text-white rounded-xl mb-6 transition-colors duration-300">
-                        <span class="material-symbols-outlined text-3xl">analytics</span>
-                    </div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Reportes Detallados</h3>
-                    <p class="text-gray-600 font-work">Accede a análisis detallados y reportes de desempeño para tomar decisiones informadas.</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-4xl font-jakarta font-bold text-primary mb-4 text-center">Sobre SR Kitchen</h2>
-            <p class="text-gray-800 font-work text-center mb-16 max-w-2xl mx-auto">
-                Somos líderes en soluciones digitales para la industria gastronómica
-            </p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
                 <div>
-                    <h3 class="text-2xl font-jakarta font-bold text-primary mb-4">Nuestra Misión</h3>
-                    <p class="text-gray-900 font-work mb-4">
-                        Nuestra misión principal es ayudar al mayor número de restaurantes posible. Cada opción que ofrecemos está estratégicamente pensada para lograr esta misión.
-                    </p>
-                    <p class="text-gray-900 font-work mb-4">
-                        Identificamos una brecha crítica en la industria: los sistemas de gestión anticuados impedían que los restaurantes alcanzaran su máximo potencial. Por eso creamos SR Kitchen.
-                    </p>
-                    <p class="text-gray-900 font-work">
-                        Hoy, somos más que un software; somos un socio tecnológico estratégico para miles de restaurantes en toda la región.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-gradient-to-br from-sky-50 to-white border border-sky-100 shadow-md rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300">
-                        <p class="text-4xl font-jakarta font-bold text-primary mb-2">50K+</p>
-                        <p class="text-gray-700 font-work font-medium">Clientes Satisfechos</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-sky-50 to-white border border-sky-100 shadow-md rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300">
-                        <p class="text-4xl font-jakarta font-bold text-primary mb-2">8+</p>
-                        <p class="text-gray-700 font-work font-medium">Años Experiencia</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-sky-50 to-white border border-sky-100 shadow-md rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300">
-                        <p class="text-4xl font-jakarta font-bold text-primary mb-2">99%</p>
-                        <p class="text-gray-700 font-work font-medium">Uptime Garantizado</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-sky-50 to-white border border-sky-100 shadow-md rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300">
-                        <p class="text-4xl font-jakarta font-bold text-primary mb-2">24/7</p>
-                        <p class="text-gray-700 font-work font-medium">Soporte Disponible</p>
-                    </div>
+                    <strong class="text-sm font-bold font-jakarta text-white leading-tight block">SR Kitchen</strong>
+                    <span class="text-[11px] text-slate-400">Sistema Operativo de Restaurante</span>
                 </div>
             </div>
 
-            <!-- Why Choose Us -->
-            <h3 class="text-3xl font-jakarta font-bold text-primary mb-12 text-center mt-12">¿Por Qué Elegir SR Kitchen?</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary rounded-full mb-6 mx-auto">
-                        <span class="material-symbols-outlined text-3xl">check_circle</span>
-                    </div>
-                    <h4 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Fácil de Usar</h4>
-                    <p class="text-gray-600 font-work">Interfaz intuitiva diseñada para usuarios sin experiencia técnica, reduciendo el tiempo de aprendizaje.</p>
-                </div>
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary rounded-full mb-6 mx-auto">
-                        <span class="material-symbols-outlined text-3xl">shield</span>
-                    </div>
-                    <h4 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Seguridad Máxima</h4>
-                    <p class="text-gray-600 font-work">Tus datos están protegidos con los más altos estándares de encriptación y seguridad del mercado.</p>
-                </div>
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div class="flex items-center justify-center w-16 h-16 bg-sky-100 text-primary rounded-full mb-6 mx-auto">
-                        <span class="material-symbols-outlined text-3xl">support_agent</span>
-                    </div>
-                    <h4 class="text-xl font-jakarta font-bold text-gray-900 mb-3">Soporte Premium</h4>
-                    <p class="text-gray-600 font-work">Equipo dedicado disponible 24/7 para ayudarte en cada paso del camino y resolver tus dudas.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="hero-gradient py-20 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl font-jakarta font-bold text-white mb-6">Comienza tu Transformación Digital Hoy</h2>
-            <p class="text-xl text-white/90 font-work mb-8">
-                Únete a miles de restaurantes que ya confían en SR Kitchen
-            </p>
-            <a href="/login" class="btn-primary bg-white text-primary hover:bg-gray-100 px-8 py-4 text-lg inline-flex items-center">
-                <span class="material-symbols-outlined mr-2">arrow_forward</span>
-                Acceder Ahora
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-white text-gray-900 border-t border-gray-200 py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div>
-                    <h3 class="text-xl font-jakarta font-bold text-gray-900 mb-2">🍳 SR Kitchen</h3>
-                    <p class="text-gray-600 text-sm">Solución integral de gestión de restaurantes inteligente y eficiente.</p>
-                </div>
-
-                <div>
-                    <h4 class="font-jakarta font-semibold mb-3 text-gray-900">Contacto</h4>
-                    <p class="text-gray-600 text-sm">📞 +1 234 567 890</p>
-                    <p class="text-gray-600 text-sm">✉️ info@srkitchen.com</p>
-                </div>
-
-                <div>
-                    <h4 class="font-jakarta font-semibold mb-3 text-gray-900">Síguenos</h4>
-                    <p class="text-gray-600 text-sm">Instagram: @srkitchen</p>
-                    <p class="text-gray-600 text-sm">Facebook: /srkitchen</p>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-200 pt-8 text-center">
-                <p class="text-gray-500 text-sm">© 2025 SR Kitchen | Todos los derechos reservados | Diseñado con pasión por la gastronomía</p>
+            <div class="text-xs text-slate-400 text-center sm:text-right space-y-1">
+                <p>&copy; 2026 SR Kitchen. Desarrollado con Spring Boot 3, Tailwind CSS y PostgreSQL 16.</p>
+                <p class="text-slate-500 text-[11px]">Diseñado para entornos comerciales con tolerancia a fallos.</p>
             </div>
         </div>
     </footer>
+
+    <!-- Inicialización de Iconos Lucide -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
+        });
+    </script>
+
 </body>
 </html>
-
-
-
-

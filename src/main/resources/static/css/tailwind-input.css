@@ -14,19 +14,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  @apply font-jakarta font-bold;
-}
-
-h1 {
-  @apply text-4xl text-primary;
-}
-
-h2 {
-  @apply text-3xl text-primary;
-}
-
-h3 {
-  @apply text-xl text-primary;
+  @apply font-jakarta font-bold text-slate-900;
 }
 
 /* Links */

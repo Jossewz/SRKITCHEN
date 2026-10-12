@@ -1,9 +1,31 @@
 /** @type {import('tailwindcss').Config} */
+const fs = require('fs');
+const path = require('path');
+
+function getFiles(dir, files = []) {
+  if (!fs.existsSync(dir)) return files;
+  const fileList = fs.readdirSync(dir);
+  for (const file of fileList) {
+    const fullPath = path.join(dir, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      getFiles(fullPath, files);
+    } else if (file.endsWith('.html') || file.endsWith('.js')) {
+      files.push(fullPath.replace(/\\/g, '/'));
+    }
+  }
+  return files;
+}
+
+const matchedFiles = [
+  ...getFiles(path.resolve(__dirname, 'src/main/resources/templates')),
+  ...getFiles(path.resolve(__dirname, 'src/main/resources/static'))
+];
+console.log("Matched files count:", matchedFiles.length);
+
 module.exports = {
-  content: [
-    './src/main/resources/templates/**/*.{html,js}',
-    './src/main/resources/static/**/*.{html,js}'
-  ],
+  content: {
+    files: matchedFiles
+  },
   theme: {
     extend: {
       colors: {
