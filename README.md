@@ -98,10 +98,19 @@ Si prefieres correr la aplicación directamente con Maven mientras la base de da
    ./mvnw spring-boot:run
    ```
 
-3. **Ejecutar pruebas unitarias y de integración:**
-   ```bash
-   ./mvnw test
+3. **Ejecutar la suite completa de pruebas:**
+   Las pruebas utilizan una base de datos PostgreSQL simulada en memoria (H2), por lo que **no requieren Docker ni PostgreSQL activo** para ejecutarse.
+   ```powershell
+   # Opción 1: Script de un clic (CMD / Explorador)
+   run_tests.bat
+
+   # Opción 2: Script PowerShell
+   .\run_tests.ps1
+
+   # Opción 3: Maven estándar
+   .\mvnw.cmd test
    ```
+   > 💡 Incluye **42 pruebas automatizadas** que cubren Modelos, Servicios (Mock), Controladores (MockMvc), Seguridad/Autorización (Roles) y Repositorios JPA.
 
 ---
 
