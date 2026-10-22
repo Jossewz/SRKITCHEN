@@ -18,7 +18,10 @@ public class ProductoController {
 
     @GetMapping
     public String getAllProductos(Model model) {
-        List<Producto> productos = productoRep.findAll();
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        List<Producto> productos = (restaurantId != null) 
+                ? productoRep.findByRestaurantId(restaurantId) 
+                : java.util.Collections.emptyList();
         model.addAttribute("productos", productos);
         model.addAttribute("productoForm", new Producto());
         return "productos";
@@ -26,6 +29,10 @@ public class ProductoController {
 
     @PostMapping("/guardar")
     public String guardarProducto(@ModelAttribute("productoForm") Producto producto) {
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        if (restaurantId != null) {
+            producto.setRestaurantId(restaurantId);
+        }
         if (producto.getId() == null || producto.getId().isEmpty()) {
             producto.setId(null);
         }

@@ -25,6 +25,7 @@ public class Pedido {
 
     private double total;
     private boolean pagado;
+    private Long restaurantId;
 
     public Pedido() {
         this.fecha = LocalDateTime.now();
@@ -130,5 +131,13 @@ public class Pedido {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

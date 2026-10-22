@@ -292,7 +292,7 @@
                             <div th:each="item : ${pedido.items}" class="flex items-center justify-between text-slate-700">
                                 <span class="truncate pr-2 font-medium" th:text="${item.name + ' ×' + item.cant}">Platillo</span>
                                 <span class="font-bold text-slate-900 shrink-0" 
-                                      th:text="'$' + ${#numbers.formatDecimal(item.price * item.cant, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+                                      th:text="'$' + ${#numbers.formatDecimal((item.unidades != null ? item.unidades : 1) * (item.price != null ? item.price : 0.0), 1, 'COMMA', 2, 'POINT')}">$0.00</span>
                             </div>
                         </div>
                     </div>

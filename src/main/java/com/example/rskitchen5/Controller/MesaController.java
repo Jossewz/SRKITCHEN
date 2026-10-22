@@ -40,7 +40,11 @@ public class MesaController {
 
     @GetMapping("")
     public String mostrarVistaMesa(Model model) {
-        List<Mesa> mesas = mesaRepository.findAll();
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        List<Mesa> mesas = (restaurantId != null) 
+                ? mesaRepository.findByRestaurantId(restaurantId) 
+                : Collections.emptyList();
+
         Map<String, String> nombresMeseros = new HashMap<>();
         Map<String, List<PedidoDetalleDTO>> pedidosPorMesa = new HashMap<>();
 
@@ -72,6 +76,12 @@ public class MesaController {
     @PostMapping("/crear")
     public String crearMesa(@ModelAttribute Mesa mesa, RedirectAttributes redirect) {
         try {
+            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            if (restaurantId == null) {
+                redirect.addFlashAttribute("mensajeError", "No se puede crear mesa sin un restaurante activo");
+                return "redirect:/mesa";
+            }
+            mesa.setRestaurantId(restaurantId);
             mesaRepository.save(mesa);
             redirect.addFlashAttribute("mensajeExito", "Mesa creada exitosamente");
         } catch (Exception e) {
@@ -176,6 +186,7 @@ public class MesaController {
         factura.setFecha(LocalDateTime.now());
         factura.setItems(allItems);
         factura.setTotal(totalMesa);
+        factura.setRestaurantId(mesa.getRestaurantId());
 
         facturaRep.save(factura);
 

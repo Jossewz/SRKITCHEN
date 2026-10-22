@@ -11,6 +11,10 @@ public interface ProductoRep extends JpaRepository<Producto, Long> {
 
     Optional<Producto> findByName(String name);
 
+    java.util.List<Producto> findByRestaurantId(Long restaurantId);
+
+    Optional<Producto> findByIdAndRestaurantId(Long id, Long restaurantId);
+
     default Optional<Producto> findById(String id) {
         if (id == null || id.trim().isEmpty()) return Optional.empty();
         try {

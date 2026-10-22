@@ -43,15 +43,13 @@ public class PedidoController {
                 pedido = new Pedido();
             }
 
+            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
             model.addAttribute("pedido", pedido);
             model.addAttribute("modoEdicion", modoEdicion);
-            model.addAttribute("mesas", mesaRep.findByOcupadoFalse());
-            model.addAttribute("platillos", platilloRep.findAll());
+            model.addAttribute("mesas", (restaurantId != null) ? mesaRep.findByRestaurantIdAndOcupadoFalse(restaurantId) : Collections.emptyList());
+            model.addAttribute("platillos", (restaurantId != null) ? platilloRep.findByRestaurantId(restaurantId) : Collections.emptyList());
 
-            List<User> meseros = userRep.findAll().stream()
-                    .filter(user -> user.getRol() != null &&
-                            ("MESERO".equalsIgnoreCase(user.getRol()) || "ROLE_MESERO".equalsIgnoreCase(user.getRol())))
-                    .collect(Collectors.toList());
+            List<User> meseros = (restaurantId != null) ? userRep.findMeserosByRestaurantId(restaurantId) : Collections.emptyList();
             model.addAttribute("meseros", meseros);
 
             model.addAttribute("pedidosRecientes", getPedidosConDetalles());
@@ -79,17 +77,15 @@ public class PedidoController {
                 mesaActual = mesaRep.findById(pedido.getMesaId()).orElse(null);
             }
 
-            List<Mesa> mesas = mesaRep.findAll();
+            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            List<Mesa> mesas = (restaurantId != null) ? mesaRep.findByRestaurantId(restaurantId) : Collections.emptyList();
 
             model.addAttribute("pedido", pedido);
             model.addAttribute("mesas", mesas);
             model.addAttribute("mesaActual", mesaActual);
-            model.addAttribute("platillosDisponibles", platilloRep.findAll());
+            model.addAttribute("platillosDisponibles", (restaurantId != null) ? platilloRep.findByRestaurantId(restaurantId) : Collections.emptyList());
 
-            List<User> meseros = userRep.findAll().stream()
-                    .filter(user -> user.getRol() != null &&
-                            ("MESERO".equalsIgnoreCase(user.getRol()) || "ROLE_MESERO".equalsIgnoreCase(user.getRol())))
-                    .collect(Collectors.toList());
+            List<User> meseros = (restaurantId != null) ? userRep.findMeserosByRestaurantId(restaurantId) : Collections.emptyList();
             model.addAttribute("meseros", meseros);
 
             return "pedido-editar";
@@ -195,12 +191,10 @@ public class PedidoController {
         } else {
             model.addAttribute("mesaActual", null);
         }
-        model.addAttribute("mesas", mesaRep.findAll());
-        model.addAttribute("platillosDisponibles", platilloRep.findAll());
-        List<User> meseros = userRep.findAll().stream()
-                .filter(user -> user.getRol() != null &&
-                        ("MESERO".equalsIgnoreCase(user.getRol()) || "ROLE_MESERO".equalsIgnoreCase(user.getRol())))
-                .collect(Collectors.toList());
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        model.addAttribute("mesas", (restaurantId != null) ? mesaRep.findByRestaurantId(restaurantId) : Collections.emptyList());
+        model.addAttribute("platillosDisponibles", (restaurantId != null) ? platilloRep.findByRestaurantId(restaurantId) : Collections.emptyList());
+        List<User> meseros = (restaurantId != null) ? userRep.findMeserosByRestaurantId(restaurantId) : Collections.emptyList();
         model.addAttribute("meseros", meseros);
     }
 
@@ -261,7 +255,12 @@ public class PedidoController {
     }
 
     private List<Pedido> getPedidosConDetalles() {
-        return pedidoRep.findTop5ByOrderByFechaDesc().stream()
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        List<Pedido> pedidos = (restaurantId != null) 
+                ? pedidoRep.findTop5ByRestaurantIdOrderByFechaDesc(restaurantId)
+                : Collections.emptyList();
+
+        return pedidos.stream()
                 .map(pedido -> {
                     if (pedido.getMesaId() != null) {
                         Mesa mesa = mesaRep.findById(pedido.getMesaId()).orElse(new Mesa());
@@ -358,6 +357,8 @@ public class PedidoController {
     private String crearNuevoPedido(Pedido pedidoData, Mesa mesa, User mesero,
                                     List<String> platillosIds, Map<String, String> allParams, Model model) {
         Pedido nuevoPedido = new Pedido();
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        nuevoPedido.setRestaurantId(restaurantId);
         nuevoPedido.setMesaId(mesa.getId());
         nuevoPedido.setMesaNum(mesa.getNum());
         nuevoPedido.setMeseroId(String.valueOf(mesero.getId()));
@@ -396,19 +397,17 @@ public class PedidoController {
 
     private String cargarDatosModelo(Model model, Pedido pedido) {
         model.addAttribute("pedido", pedido);
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
         if (pedido.getId() == null || pedido.getId().isEmpty()) {
-            model.addAttribute("mesas", mesaRep.findByOcupadoFalse());
+            model.addAttribute("mesas", (restaurantId != null) ? mesaRep.findByRestaurantIdAndOcupadoFalse(restaurantId) : Collections.emptyList());
         } else {
-            model.addAttribute("mesas", mesaRep.findAll());
+            model.addAttribute("mesas", (restaurantId != null) ? mesaRep.findByRestaurantId(restaurantId) : Collections.emptyList());
             if (pedido.getMesaId() != null) {
                 mesaRep.findById(pedido.getMesaId()).ifPresent(mesa -> model.addAttribute("mesaActual", mesa));
             }
         }
-        model.addAttribute("platillos", platilloRep.findAll());
-        List<User> meseros = userRep.findAll().stream()
-                .filter(user -> user.getRol() != null &&
-                        ("MESERO".equalsIgnoreCase(user.getRol()) || "ROLE_MESERO".equalsIgnoreCase(user.getRol())))
-                .collect(Collectors.toList());
+        model.addAttribute("platillos", (restaurantId != null) ? platilloRep.findByRestaurantId(restaurantId) : Collections.emptyList());
+        List<User> meseros = (restaurantId != null) ? userRep.findMeserosByRestaurantId(restaurantId) : Collections.emptyList();
         model.addAttribute("meseros", meseros);
         model.addAttribute("pedidosRecientes", getPedidosConDetalles());
         return "pedido";

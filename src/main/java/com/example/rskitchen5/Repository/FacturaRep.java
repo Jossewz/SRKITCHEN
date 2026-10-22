@@ -9,6 +9,12 @@ import java.util.Optional;
 @Repository
 public interface FacturaRep extends JpaRepository<Factura, Long> {
 
+    java.util.List<Factura> findByRestaurantId(Long restaurantId);
+
+    org.springframework.data.domain.Page<Factura> findByRestaurantId(Long restaurantId, org.springframework.data.domain.Pageable pageable);
+
+    Optional<Factura> findByIdAndRestaurantId(Long id, Long restaurantId);
+
     default Optional<Factura> findById(String id) {
         if (id == null || id.trim().isEmpty()) return Optional.empty();
         try {

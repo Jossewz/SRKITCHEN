@@ -12,12 +12,14 @@ public class Mesa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private int num;
 
     private boolean ocupado;
 
     private String meseroId;
+
+    private Long restaurantId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "mesa_pedidos", joinColumns = @JoinColumn(name = "mesa_id"))
@@ -85,5 +87,13 @@ public class Mesa {
 
     public void setPedidosId(List<String> pedidosId) {
         this.pedidosId = pedidosId != null ? pedidosId : new ArrayList<>();
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

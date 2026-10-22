@@ -11,6 +11,10 @@ public interface PlatilloRep extends JpaRepository<Platillo, Long> {
 
     Optional<Platillo> findByName(String name);
 
+    java.util.List<Platillo> findByRestaurantId(Long restaurantId);
+
+    Optional<Platillo> findByIdAndRestaurantId(Long id, Long restaurantId);
+
     default Optional<Platillo> findById(String id) {
         if (id == null || id.trim().isEmpty()) return Optional.empty();
         try {

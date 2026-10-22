@@ -82,7 +82,10 @@ public class OptimizacionService {
     }
 
     public DatosReales obtenerDatosReales() {
-        List<Pedido> pedidos = pedidoRep.findAll();
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        List<Pedido> pedidos = (restaurantId != null) 
+                ? pedidoRep.findByRestaurantId(restaurantId) 
+                : java.util.Collections.emptyList();
         long totalPedidos = pedidos.size();
 
         double x1 = 0, x2 = 0, ingreso = 0;

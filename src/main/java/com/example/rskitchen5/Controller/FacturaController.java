@@ -29,14 +29,21 @@ public class FacturaController {
             Model model) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "fecha"));
-        Page<Factura> facturasPage = facturaRep.findAll(pageable);
+        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        Page<Factura> facturasPage = (restaurantId != null) 
+                ? facturaRep.findByRestaurantId(restaurantId, pageable) 
+                : Page.empty();
 
         model.addAttribute("facturas", facturasPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", facturasPage.getTotalPages());
 
         if (id != null) {
-            facturaRep.findById(id).ifPresent(f -> model.addAttribute("factura", f));
+            if (restaurantId != null) {
+                facturaRep.findByIdAndRestaurantId(Long.parseLong(id), restaurantId).ifPresent(f -> model.addAttribute("factura", f));
+            } else {
+                facturaRep.findById(id).ifPresent(f -> model.addAttribute("factura", f));
+            }
         }
 
         return "factura";

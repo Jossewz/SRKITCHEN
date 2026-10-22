@@ -12,7 +12,17 @@ public interface PedidoRep extends JpaRepository<Pedido, Long> {
 
     List<Pedido> findTop5ByOrderByFechaDesc();
 
+    List<Pedido> findTop5ByRestaurantIdOrderByFechaDesc(Long restaurantId);
+
     List<Pedido> findByMesaId(String mesaId);
+
+    List<Pedido> findByRestaurantId(Long restaurantId);
+
+    List<Pedido> findByRestaurantIdAndMesaId(Long restaurantId, String mesaId);
+
+    List<Pedido> findByRestaurantIdOrderByFechaDesc(Long restaurantId);
+
+    Optional<Pedido> findByIdAndRestaurantId(Long id, Long restaurantId);
 
     default Optional<Pedido> findById(String id) {
         if (id == null || id.trim().isEmpty()) return Optional.empty();

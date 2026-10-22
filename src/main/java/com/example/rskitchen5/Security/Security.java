@@ -9,27 +9,29 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true)
 public class Security {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    /**
-     * Custom entry point that returns 401 for API requests (paths starting with /api/)
-     * and falls back to redirect to form login for non-API requests (Thymeleaf web).
-     */
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private AuthenticationEntryPoint apiAwareEntryPoint() {
         return new AuthenticationEntryPoint() {
@@ -38,9 +40,10 @@ public class Security {
                                  org.springframework.security.core.AuthenticationException authException) throws IOException {
                 String path = request.getRequestURI();
                 if (path != null && path.startsWith("/api/")) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    response.setContentType("application/json");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"error\": \"No autorizado\", \"message\": \"" + authException.getMessage() + "\"}");
                 } else {
-                    // fallback to default behaviour (redirect to login page)
                     response.sendRedirect("/login");
                 }
             }
@@ -50,16 +53,12 @@ public class Security {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // apply CORS config from corsConfigurationSource()
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // disable CSRF for API endpoints (make sure form login still works)
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
-                // Exception handling: return 401 JSON for API unauthenticated requests
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/usuarios/**"))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(apiAwareEntryPoint()))
                 .authorizeHttpRequests(auth -> auth
-                        // Allow preflight OPTIONS for everyone
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Public/static and API endpoints (adjust as needed)
+                        // Public / Static endpoints
                         .requestMatchers(
                                 "/",
                                 "/landing",
@@ -68,23 +67,43 @@ public class Security {
                                 "/js/**",
                                 "/img/**",
                                 "/images/**",
-                                "/datos/**",
                                 "/weka/**",
-                                "/api/auth/**",
-                                "/api/**"
+                                "/api/auth/**"
                         ).permitAll()
-                        // protected routes
-                        .requestMatchers("/mesa/**", "/pedido/**", "/pedidos/**", "/factura/**", "/pagos/**")
-                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_MESERO")
-                        .requestMatchers("/admin/**", "/mesero/**", "/platillos/**", "/producto/**")
-                        .hasAuthority("ROLE_ADMIN")
+                        // Exclusivo para CREATOR (Super Admin maestro)
+                        .requestMatchers("/api/restaurantes/**", "/admin/restaurantes/**").hasAuthority("ROLE_CREATOR")
+                        // Protegidos para ADMIN del restaurante
+                        .requestMatchers("/admin/**", "/usuarios/**", "/mesero/**").hasAuthority("ROLE_ADMIN")
+                        // Protegidos para ADMIN y MESEROS de su respectivo restaurante
+                        .requestMatchers(
+                                "/home",
+                                "/start",
+                                "/mesa/**",
+                                "/pedido/**",
+                                "/pedidos/**",
+                                "/factura/**",
+                                "/pagos/**",
+                                "/platillos/**",
+                                "/producto/**",
+                                "/datos/**",
+                                "/foro/**"
+                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_MESERO")
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                // keep form login for Thymeleaf web
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home", true)
+                        .successHandler((request, response, authentication) -> {
+                            boolean isCreator = authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_CREATOR"));
+                            if (isCreator) {
+                                response.sendRedirect("/admin/restaurantes");
+                            } else {
+                                response.sendRedirect("/home");
+                            }
+                        })
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -97,20 +116,12 @@ public class Security {
         return http.build();
     }
 
-    /**
-     * CORS configuration tuned for development with Flutter Web.
-     * - allowedOriginPatterns("*") allows dynamic origins (needed when using credentials + multiple localhost ports).
-     * - allowCredentials may be true if you plan to rely on cookies; if not using cookies, you can set it to false.
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Use allowedOriginPatterns to be flexible during dev (avoids issues with exact origin matching)
         configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
-        // If your API uses cookies/sessions from the browser, set to true. If not, false is safer.
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

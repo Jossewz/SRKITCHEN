@@ -14,6 +14,7 @@ public class Producto {
     private String cant;
     private double price;
     private int stock;
+    private Long restaurantId;
 
     public Producto() {
     }
@@ -84,5 +85,13 @@ public class Producto {
                 this.stock = Integer.parseInt(stockStr.trim());
             } catch (NumberFormatException ignored) {}
         }
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

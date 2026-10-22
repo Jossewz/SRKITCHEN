@@ -14,6 +14,14 @@ public interface MesaRep extends JpaRepository<Mesa, Long> {
 
     Optional<Mesa> findByNum(int num);
 
+    List<Mesa> findByRestaurantId(Long restaurantId);
+
+    List<Mesa> findByRestaurantIdAndOcupadoFalse(Long restaurantId);
+
+    Optional<Mesa> findByRestaurantIdAndNum(Long restaurantId, int num);
+
+    Optional<Mesa> findByIdAndRestaurantId(Long id, Long restaurantId);
+
     default Optional<Mesa> findById(String id) {
         if (id == null || id.trim().isEmpty()) return Optional.empty();
         try {

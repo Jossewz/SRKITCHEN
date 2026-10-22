@@ -1,13 +1,15 @@
 package com.example.rskitchen5.Flutter;
 
-import com.example.rskitchen5.Model.User;
-import com.example.rskitchen5.Repository.UserRep;
+import com.example.rskitchen5.DTO.AuthResponse;
+import com.example.rskitchen5.Security.JwtService;
+import com.example.rskitchen5.Security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,25 +25,39 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRep userRep;
+    private JwtService jwtService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            authenticationManager.authenticate(
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getMail(), request.getPassword())
             );
 
-            User user = userRep.findByMail(request.getMail())
-                    .orElseThrow(() -> new BadCredentialsException("Usuario no encontrado"));
+            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 
-            return ResponseEntity.ok(user);
+            String token = jwtService.generateToken(
+                    principal.getUsername(),
+                    principal.getRole(),
+                    principal.getRestaurantId(),
+                    principal.getNombre()
+            );
+
+            AuthResponse response = new AuthResponse(
+                    token,
+                    principal.getUsername(),
+                    principal.getRole(),
+                    principal.getRestaurantId(),
+                    principal.getNombre()
+            );
+
+            return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Credenciales inválidas"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Error en autenticación"));
         }
     }
 }

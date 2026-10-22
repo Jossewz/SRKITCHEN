@@ -26,6 +26,11 @@ public class User {
     @Column(nullable = false)
     private String rol;
 
+    private Long restaurantId;
+
+    @Column(nullable = false)
+    private boolean activo = true;
+
     public User() {
     }
 
@@ -91,5 +96,21 @@ public class User {
 
     public void setRole(String rol) {
         this.rol = rol;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

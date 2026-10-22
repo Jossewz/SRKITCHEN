@@ -18,7 +18,10 @@ public class PlatilloController {
     @GetMapping
     public String getAllPlatillos(Model model) {
         try {
-            List<Platillo> platillos = platilloRep.findAll();
+            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            List<Platillo> platillos = (restaurantId != null) 
+                    ? platilloRep.findByRestaurantId(restaurantId) 
+                    : java.util.Collections.emptyList();
             model.addAttribute("platillos", platillos);
             model.addAttribute("platilloNuevo", new Platillo());
             return "platillos";
@@ -31,6 +34,12 @@ public class PlatilloController {
     @PostMapping("/guardar")
     public String crearPlatillo(@ModelAttribute("platilloNuevo") Platillo platillo, Model model) {
         try {
+            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            if (restaurantId == null) {
+                model.addAttribute("error", "No se puede guardar platillo sin un restaurante activo");
+                return "platillos";
+            }
+            platillo.setRestaurantId(restaurantId);
             platilloRep.save(platillo);
             return "redirect:/platillos";
         } catch (Exception e) {

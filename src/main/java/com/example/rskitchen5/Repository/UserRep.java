@@ -40,4 +40,11 @@ public interface UserRep extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE UPPER(u.rol) = 'MESERO' OR UPPER(u.rol) = 'ROLE_MESERO'")
     List<User> findAllMeseros();
+
+    List<User> findByRestaurantId(Long restaurantId);
+
+    @Query("SELECT u FROM User u WHERE u.restaurantId = :restaurantId AND (UPPER(u.rol) = 'MESERO' OR UPPER(u.rol) = 'ROLE_MESERO')")
+    List<User> findMeserosByRestaurantId(Long restaurantId);
+
+    Optional<User> findByIdAndRestaurantId(Long id, Long restaurantId);
 }

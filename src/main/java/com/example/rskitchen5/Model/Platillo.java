@@ -17,6 +17,7 @@ public class Platillo {
     private double price;
 
     private String cant;
+    private Long restaurantId;
 
     public Platillo() {
     }
@@ -70,5 +71,13 @@ public class Platillo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

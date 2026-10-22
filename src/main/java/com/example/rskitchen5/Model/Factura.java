@@ -33,6 +33,8 @@ public class Factura {
     @Enumerated(EnumType.STRING)
     private EstadoFacturaDTO estado;
 
+    private Long restaurantId;
+
     public Factura() {
         this.estado = EstadoFacturaDTO.PENDIENTE;
         this.fecha = LocalDateTime.now();
@@ -132,5 +134,13 @@ public class Factura {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }
