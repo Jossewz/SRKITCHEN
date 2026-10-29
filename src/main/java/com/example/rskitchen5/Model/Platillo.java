@@ -1,6 +1,8 @@
 package com.example.rskitchen5.Model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "platillos")
@@ -18,6 +20,9 @@ public class Platillo {
 
     private String cant;
     private Long restaurantId;
+
+    @OneToMany(mappedBy = "platillo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<PlatilloIngrediente> ingredientes = new ArrayList<>();
 
     public Platillo() {
     }
@@ -79,5 +84,52 @@ public class Platillo {
 
     public void setRestaurantId(Long restaurantId) {
         this.restaurantId = restaurantId;
+    }
+
+    public List<PlatilloIngrediente> getIngredientes() {
+        return ingredientes != null ? ingredientes : new ArrayList<>();
+    }
+
+    public void setIngredientes(List<PlatilloIngrediente> ingredientes) {
+        this.ingredientes.clear();
+        if (ingredientes != null) {
+            for (PlatilloIngrediente ing : ingredientes) {
+                ing.setPlatillo(this);
+                this.ingredientes.add(ing);
+            }
+        }
+    }
+
+    public void addIngrediente(PlatilloIngrediente ing) {
+        if (ing != null) {
+            ing.setPlatillo(this);
+            this.ingredientes.add(ing);
+        }
+    }
+
+    public void removeIngrediente(PlatilloIngrediente ing) {
+        if (ing != null) {
+            this.ingredientes.remove(ing);
+            ing.setPlatillo(null);
+        }
+    }
+
+    /**
+     * Determina si el platillo está disponible para la venta.
+     * Si no tiene receta registrada, está disponible por defecto.
+     * Si tiene receta, verifica que cada ingrediente tenga stock suficiente.
+     */
+    public boolean isDisponible() {
+        if (ingredientes == null || ingredientes.isEmpty()) {
+            return true;
+        }
+        for (PlatilloIngrediente ing : ingredientes) {
+            if (ing.getProducto() != null) {
+                if (ing.getProducto().getStock() < ing.getCantidad()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

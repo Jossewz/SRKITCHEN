@@ -313,12 +313,11 @@ public class ChatbotService {
                 Platillo nuevo = new Platillo();
                 nuevo.setName(nombre.trim());
                 nuevo.setPrice(precio);
-                nuevo.setCant(cantidad != null && !cantidad.isBlank() ? cantidad.trim() : "0");
-
+                
                 platilloRep.save(nuevo);
 
                 return "✅ Platillo '" + nuevo.getName() + "' guardado en la BD\n"
-                                + "   Precio: $" + nuevo.getPrice() + " | Cantidad: " + nuevo.getCant();
+                                + "   Precio: $" + nuevo.getPrice() ;
         }
 
         /**
@@ -426,11 +425,7 @@ public class ChatbotService {
                         cambios.append(" precio=$").append(nuevoPrecio).append(";");
                 }
 
-                String nuevaCant = extraerCampoTexto(original, "cantidad");
-                if (nuevaCant != null && !nuevaCant.isBlank()) {
-                        platillo.setCant(nuevaCant.trim());
-                        cambios.append(" cantidad=").append(nuevaCant.trim()).append(";");
-                }
+                // raciones eliminadas del modelo de Platillo
 
                 String nuevoNombre = extraerCampoTexto(original, "nuevonombre");
                 if (nuevoNombre != null && !nuevoNombre.isBlank()) {
@@ -602,8 +597,7 @@ public class ChatbotService {
                                         MENÚ DEL RESTAURANTE
                                         %s
                                         """.formatted(platillos.stream()
-                                        .map(p -> "- " + p.getName() + " | $" + p.getPrice() + " | Cant: "
-                                                        + p.getCant())
+                                        .map(p -> "- " + p.getName() + " | $" + p.getPrice() )
                                         .collect(Collectors.joining("\n")));
                 }
 

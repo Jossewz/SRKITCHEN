@@ -176,8 +176,15 @@
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="text-xs font-extrabold text-[#0c6780] font-jakarta" 
                                               th:text="'$' + ${#numbers.formatDecimal(platillo.price, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
-                                        <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 font-semibold"
-                                              th:text="'Stock: ' + ${platillo.cant}">Stock: 0</span>
+                                        <span th:if="${platillo.disponible}" 
+                                              class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold">
+                                            Disponible
+                                        </span>
+                                        <span th:unless="${platillo.disponible}" 
+                                              class="text-[10px] px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 font-semibold"
+                                              title="Faltan ingredientes en inventario">
+                                            Agotado
+                                        </span>
                                     </div>
                                 </label>
                             </div>
@@ -342,3 +349,4 @@
 
 </body>
 </html>
+

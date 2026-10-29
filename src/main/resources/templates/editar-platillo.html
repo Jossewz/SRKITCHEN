@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      th:replace="~{layouts/base :: html(~{::content}, 'platillos', 'Editar Platillo')}">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:replace="~{layouts/base :: html(~{::content}, 'platillos', 'Editar Platillo')}">
 
 <head>
     <title>Editar Platillo – SR Kitchen</title>
@@ -10,82 +8,200 @@
 
 <body>
 
-<th:block th:fragment="content">
-    
-    <div class="max-w-xl mx-auto space-y-6">
+    <th:block th:fragment="content">
 
-        <div class="flex items-center justify-between pb-2 border-b border-slate-200/80">
-            <div>
-                <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Editar Platillo</h1>
-                <p class="text-xs text-slate-500">Actualiza el nombre, raciones disponibles y precio de venta</p>
-            </div>
-            
-            <a href="/platillos"
-               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer">
-                <i data-lucide="arrow-left" class="size-4"></i>
-                <span>Volver a Platillos</span>
-            </a>
-        </div>
+        <div class="max-w-2xl mx-auto space-y-6">
 
-        <div class="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">
-            <form th:action="@{'/platillos/editar/' + ${platillo.id}}" th:object="${platillo}" method="post" class="space-y-5">
-                
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200/80">
                 <div>
-                    <label for="platilloNombre" class="block text-xs font-bold text-slate-700 mb-1.5">
-                        Nombre del Platillo <span class="text-rose-500">*</span>
-                    </label>
-                    <input type="text" 
-                           id="platilloNombre" 
-                           th:field="*{name}" 
-                           required
-                           class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                    <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Editar Platillo</h1>
+                    <p class="text-xs text-slate-500">Actualiza el nombre, ingredientes asociados y precio de venta</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="platilloCantidad" class="block text-xs font-bold text-slate-700 mb-1.5">
-                            Stock / Raciones <span class="text-rose-500">*</span>
-                        </label>
-                        <input type="number" 
-                               id="platilloCantidad" 
-                               th:field="*{cant}" 
-                               required
-                               min="0"
-                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
-                    </div>
+                <a href="/platillos"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                    <i data-lucide="arrow-left" class="size-4"></i>
+                    <span>Volver a Platillos</span>
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">
+                <form th:action="@{'/platillos/editar/' + ${platillo.id}}" th:object="${platillo}" method="post"
+                    class="space-y-5">
 
                     <div>
-                        <label for="platilloPrecio" class="block text-xs font-bold text-slate-700 mb-1.5">
-                            Precio de Venta ($) <span class="text-rose-500">*</span>
+                        <label for="platilloNombre" class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Nombre del Platillo <span class="text-rose-500">*</span>
                         </label>
-                        <input type="number" 
-                               id="platilloPrecio" 
-                               th:field="*{price}" 
-                               required
-                               step="0.01" 
-                               min="0"
-                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                        <input type="text" id="platilloNombre" th:field="*{name}" required
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
                     </div>
-                </div>
 
-                <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
-                    <button type="submit" 
+                    <!-- Contenedor dinámico de filas de ingredientes -->
+                    <div id="contenedorIngredientesEditar" class="space-y-2.5">
+                        <!-- Filas existentes precargadas -->
+                        <div th:each="ing : ${platillo.ingredientes}" class="fila-ingrediente flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="flex-1 min-w-0">
+                                <select name="productoIds" required class="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                                    <option value="" disabled>-- Seleccionar Producto --</option>
+                                    <option th:each="prod : ${productos}" 
+                                            th:value="${prod.idLong}" 
+                                            th:selected="${ing.producto != null and ing.producto.idLong == prod.idLong}"
+                                            th:text="${prod.name} + ' - Stock: ' + ${prod.stock}"></option>
+                                </select>
+                            </div>
+                            <button type="button" onclick="agregarFilaIngredienteEditar()"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#0c6780] font-bold text-xs transition-colors cursor-pointer shrink-0">
+                                <i data-lucide="plus" class="size-3.5 stroke-[2.5]"></i>
+                                <span>+ Agregar Ingrediente</span>
+                            </button>
+                        </div>
+
+                        <!-- Contenedor dinámico de filas de ingredientes -->
+                        <div id="contenedorIngredientesEditar" class="space-y-2.5">
+                            <!-- Filas existentes precargadas -->
+                            <div th:each="ing : ${platillo.ingredientes}"
+                                class="fila-ingrediente flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <div class="flex-1 min-w-0">
+                                    <select name="productoIds" required
+                                        class="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                                        <option value="" disabled>-- Seleccionar Producto --</option>
+                                        <option th:each="prod : ${productos}" th:value="${prod.idLong}"
+                                            th:selected="${ing.producto != null and ing.producto.idLong == prod.idLong}"
+                                            th:text="${prod.name + ' (' + (prod.uMedida != null ? prod.uMedida : 'un') + ') - Stock: ' + prod.stock}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="w-28 shrink-0">
+                                    <input type="number" name="cantidades" step="any" min="0.01"
+                                        th:value="${ing.cantidad}" required placeholder="Cant."
+                                        title="Cantidad que consume este platillo"
+                                        class="w-full px-2.5 py-2 text-xs text-center font-bold bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                                </div>
+                                <button type="button" onclick="eliminarFilaIngrediente(this)"
+                                    class="size-8 rounded-lg text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                                    title="Quitar ingrediente">
+                                    <i data-lucide="trash-2" class="size-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="sinIngredientesEditar"
+                            th:style="${platillo.ingredientes != null and !platillo.ingredientes.isEmpty() ? 'display: none;' : 'display: block;'}"
+                            class="p-4 text-center rounded-xl bg-slate-50 border border-dashed border-slate-200 text-xs text-slate-400">
+                            No hay ingredientes asignados a este platillo. Pulsa <strong>+ Agregar Ingrediente</strong>
+                            para vincularlo a productos en inventario.
+                        </div>
+
+                        <p
+                            class="text-[11px] text-amber-700 bg-amber-50/80 p-2.5 rounded-xl border border-amber-200/60 flex items-start gap-1.5">
+                            <i data-lucide="info" class="size-3.5 text-amber-600 shrink-0 mt-0.5"></i>
+                            <span>Al liquidar el pago de un pedido con este platillo, el stock de cada producto
+                                configurado se descontará automáticamente.</span>
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+                        <button type="submit"
                             class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer">
-                        <i data-lucide="check" class="size-4"></i>
-                        <span>Guardar Cambios</span>
-                    </button>
-                    <a href="/platillos" 
-                       class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer">
-                        Cancelar
-                    </a>
-                </div>
+                            <i data-lucide="check" class="size-4"></i>
+                            <span>Guardar Cambios</span>
+                        </button>
+                        <a href="/platillos"
+                            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer">
+                            Cancelar
+                        </a>
+                    </div>
 
-            </form>
+                </form>
+            </div>
+
+            <!-- Template HTML para clonar filas de ingredientes -->
+            <template id="plantillaFilaIngredienteEditar">
+                <div
+                    class="fila-ingrediente flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="flex-1 min-w-0">
+                        <select name="productoIds" required
+                            class="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                            <option value="" disabled selected>-- Seleccionar Producto --</option>
+                            <th:block th:each="prod : ${productos}">
+                                <option th:value="${prod.idLong}"
+                                    th:text="${prod.name + ' (' + (prod.uMedida != null ? prod.uMedida : 'un') + ') - Stock: ' + prod.stock}">
+                                </option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="w-28 shrink-0">
+                        <input type="number" name="cantidades" step="any" min="0.01" value="1" required
+                            placeholder="Cant." title="Cantidad que consume este platillo"
+                            class="w-full px-2.5 py-2 text-xs text-center font-bold bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                    </div>
+                    <button type="button" onclick="eliminarFilaIngrediente(this)"
+                        class="size-8 rounded-lg text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                        title="Quitar ingrediente">
+                        <i data-lucide="trash-2" class="size-4"></i>
+                    </button>
+                </div>
+            </template>
+
         </div>
 
-    </div>
+        <!-- Template HTML para clonar filas de ingredientes -->
+        <template id="plantillaFilaIngredienteEditar">
+            <div class="fila-ingrediente flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="flex-1 min-w-0">
+                    <select name="productoIds" required class="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                        <option value="" disabled selected>-- Seleccionar Producto --</option>
+                        <th:block th:each="prod : ${productos}">
+                            <option th:value="${prod.idLong}" 
+                                    th:text="${prod.name} + ' - Stock: ' + ${prod.stock}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="w-28 shrink-0">
+                    <input type="number" 
+                           name="cantidades" 
+                           step="any" 
+                           min="0.01" 
+                           value="1" 
+                           required
+                           placeholder="Cant." 
+                           title="Cantidad que consume este platillo"
+                           class="w-full px-2.5 py-2 text-xs text-center font-bold bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                </div>
+                <button type="button" 
+                        onclick="eliminarFilaIngrediente(this)" 
+                        class="size-8 rounded-lg text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0" 
+                        title="Quitar ingrediente">
+                    <i data-lucide="trash-2" class="size-4"></i>
+                </button>
+            </div>
+        </template>
 
-</th:block>
+                if (plantilla && contenedor) {
+                    const clone = plantilla.content.cloneNode(true);
+                    contenedor.appendChild(clone);
+                    if (sinIngredientes) sinIngredientes.style.display = 'none';
+                    if (window.lucide) lucide.createIcons();
+                }
+            }
+
+            function eliminarFilaIngrediente(btn) {
+                const fila = btn.closest('.fila-ingrediente');
+                if (fila) fila.remove();
+
+                const contenedor = document.getElementById('contenedorIngredientesEditar');
+                const sinIngredientes = document.getElementById('sinIngredientesEditar');
+                if (contenedor && sinIngredientes) {
+                    if (contenedor.children.length === 0) {
+                        sinIngredientes.style.display = 'block';
+                    }
+                }
+            }
+        </script>
+
+    </th:block>
 
 </body>
+
 </html>

@@ -24,6 +24,9 @@ class UserDetailsServiceImplTest {
     @Mock
     private UserRep userRep;
 
+    @Mock
+    private com.example.rskitchen5.Repository.RestaurantRep restaurantRep;
+
     @InjectMocks
     private UserDetailsServiceImpl userDetailsService;
 

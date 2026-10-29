@@ -27,20 +27,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
         // 1. Verificar si es una cuenta de Restaurant (Admin del restaurante)
-        Optional<Restaurant> restaurantOpt = restaurantRep.findByCorreo(mail);
-        if (restaurantOpt.isPresent()) {
-            Restaurant r = restaurantOpt.get();
-            if (!r.isActivo()) {
-                throw new org.springframework.security.authentication.DisabledException("El restaurante se encuentra desactivado.");
+        if (restaurantRep != null) {
+            Optional<Restaurant> restaurantOpt = restaurantRep.findByCorreo(mail);
+            if (restaurantOpt.isPresent()) {
+                Restaurant r = restaurantOpt.get();
+                if (!r.isActivo()) {
+                    throw new org.springframework.security.authentication.DisabledException("El restaurante se encuentra desactivado.");
+                }
+                return new UserPrincipal(
+                        r.getCorreo(),
+                        r.getContraseña(),
+                        "ADMIN",
+                        r.getId(),
+                        r.getNombre(),
+                        Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                );
             }
-            return new UserPrincipal(
-                    r.getCorreo(),
-                    r.getContraseña(),
-                    "ADMIN",
-                    r.getId(),
-                    r.getNombre(),
-                    Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"))
-            );
         }
 
         // 2. Verificar si es un Usuario (CREATOR o empleado como MESERO)

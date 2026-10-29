@@ -11,12 +11,23 @@ public class Producto {
     private Long id;
 
     private String name;
+
+    @Column(length = 1000)
+    private String descripcion;
+
+    @Column(name = "u_medida")
+    private String uMedida;
+
     private String cant;
     private double price;
     private int stock;
     private Long restaurantId;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     public Producto() {
+        this.activo = true;
     }
 
     public Producto(String cant, Long id, String name, double price, int stock) {
@@ -25,6 +36,30 @@ public class Producto {
         this.name = name;
         this.price = price;
         this.stock = stock;
+        this.uMedida = cant;
+        this.activo = true;
+    }
+
+    public Producto(String cant, Long id, String name, String descripcion, double price, int stock) {
+        this.cant = cant;
+        this.id = id;
+        this.name = name;
+        this.descripcion = descripcion;
+        this.price = price;
+        this.stock = stock;
+        this.uMedida = cant;
+        this.activo = true;
+    }
+
+    public Producto(Long id, String name, String descripcion, String cant, String uMedida, double price, int stock, boolean activo) {
+        this.id = id;
+        this.name = name;
+        this.descripcion = descripcion;
+        this.cant = cant;
+        this.uMedida = uMedida;
+        this.price = price;
+        this.stock = stock;
+        this.activo = activo;
     }
 
     public String getId() {
@@ -55,12 +90,55 @@ public class Producto {
         this.name = name;
     }
 
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getDescription() {
+        return descripcion;
+    }
+
+    public void setDescription(String description) {
+        this.descripcion = description;
+    }
+
+    public String getuMedida() {
+        return uMedida;
+    }
+
+    public void setuMedida(String uMedida) {
+        this.uMedida = uMedida;
+    }
+
+    public String getUMedida() {
+        return uMedida;
+    }
+
+    public void setUMedida(String uMedida) {
+        this.uMedida = uMedida;
+    }
+
+    public String getUnidadMedida() {
+        return uMedida;
+    }
+
+    public void setUnidadMedida(String unidadMedida) {
+        this.uMedida = unidadMedida;
+    }
+
     public String getCant() {
-        return cant;
+        return cant != null ? cant : uMedida;
     }
 
     public void setCant(String cant) {
         this.cant = cant;
+        if (this.uMedida == null || this.uMedida.isEmpty()) {
+            this.uMedida = cant;
+        }
     }
 
     public double getPrice() {
@@ -93,5 +171,25 @@ public class Producto {
 
     public void setRestaurantId(Long restaurantId) {
         this.restaurantId = restaurantId;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public void desactivar() {
+        this.activo = false;
+    }
+
+    public void activar() {
+        this.activo = true;
     }
 }

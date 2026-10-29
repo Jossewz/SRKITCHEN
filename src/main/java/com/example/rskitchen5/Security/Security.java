@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -54,15 +55,17 @@ public class Security {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/usuarios/**"))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(apiAwareEntryPoint()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Public / Static endpoints
+                        // Public / Static endpoints y página de error
                         .requestMatchers(
                                 "/",
                                 "/landing",
                                 "/login",
+                                "/error",
                                 "/css/**",
                                 "/js/**",
                                 "/img/**",
@@ -71,47 +74,46 @@ public class Security {
                                 "/api/auth/**"
                         ).permitAll()
                         // Exclusivo para CREATOR (Super Admin maestro)
-                        .requestMatchers("/api/restaurantes/**", "/admin/restaurantes/**").hasAuthority("ROLE_CREATOR")
-                        // Protegidos para ADMIN del restaurante
-                        .requestMatchers("/admin/**", "/usuarios/**", "/mesero/**").hasAuthority("ROLE_ADMIN")
-                        // Protegidos para ADMIN y MESEROS de su respectivo restaurante
+                        .requestMatchers("/api/restaurantes", "/api/restaurantes/**", "/admin/restaurantes", "/admin/restaurantes/**").hasAuthority("ROLE_CREATOR")
+                        // Protegidos para ADMIN del restaurante y CREATOR
+                        .requestMatchers(
+                                "/admin/**",
+                                "/usuarios",
+                                "/usuarios/**",
+                                "/mesero",
+                                "/mesero/**",
+                                "/platillos",
+                                "/platillos/**",
+                                "/platillo",
+                                "/platillo/**",
+                                "/producto",
+                                "/producto/**",
+                                "/productos",
+                                "/productos/**"
+                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_CREATOR")
+                        // Protegidos para ADMIN, MESEROS y CREATOR
                         .requestMatchers(
                                 "/home",
                                 "/start",
+                                "/mesa",
                                 "/mesa/**",
+                                "/pedido",
                                 "/pedido/**",
+                                "/pedidos",
                                 "/pedidos/**",
+                                "/factura",
                                 "/factura/**",
+                                "/pagos",
                                 "/pagos/**",
-                                "/platillos/**",
-                                "/producto/**",
+                                "/datos",
                                 "/datos/**",
+                                "/foro",
                                 "/foro/**"
-                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_MESERO")
+                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_MESERO", "ROLE_CREATOR")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .successHandler((request, response, authentication) -> {
-                            boolean isCreator = authentication.getAuthorities().stream()
-                                    .anyMatch(a -> a.getAuthority().equals("ROLE_CREATOR"));
-                            if (isCreator) {
-                                response.sendRedirect("/admin/restaurantes");
-                            } else {
-                                response.sendRedirect("/home");
-                            }
-                        })
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll()
-                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

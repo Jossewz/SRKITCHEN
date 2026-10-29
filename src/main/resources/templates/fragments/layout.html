@@ -110,13 +110,10 @@
 
   <!-- Logout -->
   <div class="border-t border-sky-light/20 p-4">
-    <form th:action="@{/logout}" method="post" class="w-full">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-      <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-sky-light/10 hover:bg-sky-light/30 transition-all duration-200 text-red-200 hover:text-red-100">
-        <span class="material-symbols-outlined text-xl">logout</span>
-        <span class="font-jakarta font-medium">Cerrar Sesión</span>
-      </button>
-    </form>
+    <button type="button" onclick="rskLogout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-sky-light/10 hover:bg-sky-light/30 transition-all duration-200 text-red-200 hover:text-red-100">
+      <span class="material-symbols-outlined text-xl">logout</span>
+      <span class="font-jakarta font-medium">Cerrar Sesión</span>
+    </button>
   </div>
 
 </div>

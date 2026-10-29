@@ -54,17 +54,26 @@
                 <p class="text-xs text-slate-500 mt-1 font-medium">Sistema Operativo de Restaurante &bull; Acceso Seguro</p>
             </div>
 
-            <!-- Alerta de Error de Autenticación -->
-            <div th:if="${param.error}" class="mb-5 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2.5 shadow-xs">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i>
+            <!-- Alerta de Cierre de Sesión Exitoso -->
+            <div th:if="${param.logout}" class="mb-5 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2.5 shadow-xs">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>
                 <div>
-                    <strong class="block">Credenciales inválidas</strong>
-                    <span class="text-rose-700 font-normal">Revisa tu correo o contraseña e intenta de nuevo.</span>
+                    <strong class="block">Sesión cerrada</strong>
+                    <span class="text-emerald-700 font-normal">Has cerrado sesión correctamente.</span>
                 </div>
             </div>
 
-            <!-- Formulario de Login -->
-            <form th:action="@{/login}" method="POST" class="space-y-4">
+            <!-- Alerta de Error de Autenticación (dinámica via JS) -->
+            <div id="loginError" style="display:none" class="mb-5 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2.5 shadow-xs">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i>
+                <div>
+                    <strong class="block">Error de autenticación</strong>
+                    <span id="loginErrorMsg" class="text-rose-700 font-normal">Revisa tu correo o contraseña e intenta de nuevo.</span>
+                </div>
+            </div>
+
+            <!-- Formulario de Login (ahora via fetch + JWT) -->
+            <form id="loginForm" class="space-y-4">
                 
                 <!-- Correo Electrónico -->
                 <div>
@@ -73,6 +82,7 @@
                         <span>Correo Electrónico</span>
                     </label>
                     <input type="email" 
+                           id="loginEmail"
                            name="username" 
                            required
                            autocomplete="username"
@@ -87,6 +97,7 @@
                         <span>Contraseña</span>
                     </label>
                     <input type="password" 
+                           id="loginPassword"
                            name="password" 
                            required
                            autocomplete="current-password"
@@ -94,11 +105,9 @@
                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
                 </div>
 
-                <!-- Token CSRF Spring Security -->
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
                 <!-- Botón de Envío de Alto Contraste -->
                 <button type="submit" 
+                        id="loginBtn"
                         class="w-full py-3 px-5 rounded-lg bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mt-4"
                         style="background-color: #0c6780; color: #ffffff;">
                     <i data-lucide="log-in" class="w-4 h-4 stroke-[2] text-white"></i>
@@ -121,12 +130,75 @@
 
     </div>
 
-    <!-- Inicialización de Iconos Lucide -->
+    <!-- Login via JWT + sessionStorage (independiente por pestaña) -->
     <script>
+        // En la pantalla de login, limpiar cualquier sesión residual en esta pestaña
+        sessionStorage.removeItem('rskitchen_jwt');
+
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide && typeof window.lucide.createIcons === 'function') {
                 window.lucide.createIcons();
             }
+
+            const form = document.getElementById('loginForm');
+            const errorDiv = document.getElementById('loginError');
+            const errorMsg = document.getElementById('loginErrorMsg');
+            const loginBtn = document.getElementById('loginBtn');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorDiv.style.display = 'none';
+
+                const mail = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+
+                if (!mail || !password) {
+                    errorMsg.textContent = 'Completa todos los campos.';
+                    errorDiv.style.display = 'flex';
+                    return;
+                }
+
+                // Deshabilitar botón durante la petición
+                loginBtn.disabled = true;
+                loginBtn.querySelector('span').textContent = 'Ingresando...';
+
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mail: mail, password: password })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+
+                        // Guardar JWT en sessionStorage (INDEPENDIENTE por pestaña)
+                        sessionStorage.setItem('rskitchen_jwt', data.token);
+
+                        // Setear cookie para navegación de página completa
+                        document.cookie = 'rskitchen_jwt=' + data.token + '; path=/; SameSite=Strict';
+
+                        // Redirigir según rol
+                        if (data.role === 'CREATOR' || data.role === 'ROLE_CREATOR') {
+                            window.location.href = '/admin/restaurantes';
+                        } else {
+                            window.location.href = '/home';
+                        }
+                    } else {
+                        const errData = await response.json().catch(() => ({}));
+                        errorMsg.textContent = errData.error || 'Credenciales inválidas. Revisa tu correo o contraseña.';
+                        errorDiv.style.display = 'flex';
+                        if (window.lucide) window.lucide.createIcons();
+                    }
+                } catch (err) {
+                    errorMsg.textContent = 'Error de conexión con el servidor. Intenta de nuevo.';
+                    errorDiv.style.display = 'flex';
+                    if (window.lucide) window.lucide.createIcons();
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.querySelector('span').textContent = 'Ingresar al Sistema';
+                }
+            });
         });
     </script>
 

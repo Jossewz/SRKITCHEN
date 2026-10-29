@@ -8,10 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle != null ? pageTitle + ' – SR Kitchen' : 'SR Kitchen'}">SR Kitchen</title>
 
-    <!-- Metadatos de seguridad CSRF para peticiones Fetch / HTMX / AJAX -->
-    <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
-
     <!-- Tipografía: Plus Jakarta Sans & Work Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,14 +40,81 @@
     <!-- Scripts de interactividad y componentes (100% Locales) -->
     <script th:src="@{/js/htmx.min.js}"></script>
     <script>
-        // Inyectar automáticamente el token CSRF en peticiones HTMX
-        document.addEventListener('htmx:configRequest', function(evt) {
-            const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-            const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-            if (token && header) {
-                evt.detail.headers[header] = token;
+        // ===== JWT Auth: Sincronización per-tab =====
+        function rskSyncCookie() {
+            var jwt = sessionStorage.getItem('rskitchen_jwt');
+            if (jwt) {
+                document.cookie = 'rskitchen_jwt=' + jwt + '; path=/; SameSite=Strict';
+            }
+        }
+
+        (function() {
+            var jwt = sessionStorage.getItem('rskitchen_jwt');
+            if (jwt) {
+                // Sincronizar JWT de sessionStorage a cookie para esta navegación
+                document.cookie = 'rskitchen_jwt=' + jwt + '; path=/; SameSite=Strict';
+            } else {
+                // Sin JWT en sessionStorage: borrar cookie residual y redirigir al login si es ruta protegida
+                document.cookie = 'rskitchen_jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+                var path = window.location.pathname;
+                var publicPaths = ['/', '/landing', '/login'];
+                if (publicPaths.indexOf(path) === -1) {
+                    window.location.href = '/login';
+                }
+            }
+        })();
+
+        // Re-sincronizar cookie cuando el usuario enfoca o vuelve a esta pestaña
+        window.addEventListener('focus', rskSyncCookie);
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                rskSyncCookie();
             }
         });
+
+        // Inyectar JWT en peticiones HTMX via header Authorization (100% per-tab)
+        document.addEventListener('htmx:configRequest', function(evt) {
+            var jwt = sessionStorage.getItem('rskitchen_jwt');
+            if (jwt) {
+                evt.detail.headers['Authorization'] = 'Bearer ' + jwt;
+            }
+        });
+
+        // Interceptar window.fetch para añadir Authorization: Bearer <jwt>
+        (function() {
+            var originalFetch = window.fetch;
+            window.fetch = function(input, init) {
+                init = init || {};
+                var jwt = sessionStorage.getItem('rskitchen_jwt');
+                if (jwt) {
+                    init.headers = new Headers(init.headers || {});
+                    if (!init.headers.has('Authorization')) {
+                        init.headers.set('Authorization', 'Bearer ' + jwt);
+                    }
+                }
+                return originalFetch(input, init);
+            };
+        })();
+
+        // Sincronizar cookie antes de cada navegación de link
+        document.addEventListener('click', function(e) {
+            var link = e.target.closest('a[href]');
+            if (link && link.href && !link.href.startsWith('javascript:') && !link.href.startsWith('#')) {
+                rskSyncCookie();
+            }
+        }, true);
+
+        // Sincronizar cookie antes de cada envío de formulario
+        document.addEventListener('submit', function(e) {
+            rskSyncCookie();
+        }, true);
+
+        // Función global de Logout per-tab (solo cierra sesión en esta pestaña)
+        window.rskLogout = function() {
+            sessionStorage.removeItem('rskitchen_jwt');
+            document.cookie = 'rskitchen_jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+            window.location.href = '/login?logout=true';
+        };
     </script>
     <script th:src="@{/js/lucide.min.js}"></script>
     <script defer th:src="@{/js/alpine.min.js}"></script>
