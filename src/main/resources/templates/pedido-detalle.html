@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comanda #<span th:text="${pedido.id}">1</span> | SR Kitchen</title>
+    <link rel="stylesheet" th:href="@{/css/facturaimp.css}">
+    <style>
+        /* Estilos específicos complementarios para la vista de comanda */
+        .comanda-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+        .badge-pendiente {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .badge-pagado {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .header-box {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #b3d1ff;
+            padding-bottom: 15px;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+                color: #000 !important;
+            }
+            .info, table {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+            .acciones {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-box">
+        <h1>SR KITCHEN</h1>
+        <h2>Ticket de Comanda</h2>
+        <span th:if="${!pedido.pagado}" class="comanda-badge badge-pendiente">Comanda en Cocina / Pendiente</span>
+        <span th:if="${pedido.pagado}" class="comanda-badge badge-pagado">Comanda Liquidada / Pagada</span>
+    </div>
+
+    <div class="info" th:if="${pedido != null}">
+        <div class="meta-grid">
+            <p><strong>Comanda #:</strong> <span th:text="${pedido.id}">1</span></p>
+            <p><strong>Mesa:</strong> <span th:text="'Mesa ' + ${pedido.mesaNum}">1</span></p>
+            <p><strong>Mesero a Cargo:</strong> <span th:text="${pedido.meseroName ?: 'No asignado'}">Carlos</span></p>
+            <p><strong>Fecha y Hora:</strong> <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}">10/10/2026 12:30</span></p>
+            <p><strong>Estado:</strong> <span th:text="${pedido.pagado ? 'PAGADO' : 'PENDIENTE DE COBRO'}">PENDIENTE</span></p>
+            <p><strong>Cantidad de Items:</strong> <span th:text="${pedido.items != null ? pedido.items.size() : 0}">0</span></p>
+        </div>
+    </div>
+
+    <table th:if="${pedido != null and pedido.items != null}">
+        <thead>
+            <tr>
+                <th>Platillo / Ítem</th>
+                <th>Cantidad</th>
+                <th>Precio Unit.</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${pedido.items}">
+                <td style="text-align: left; font-weight: 600;" th:text="${item.name}">Lomo Saltado</td>
+                <td th:text="${item.unidades != null ? item.unidades : (item.cant ?: '1')}">1</td>
+                <td th:text="'$' + ${#numbers.formatDecimal(item.price != null ? item.price : 0.0, 1, 'POINT', 2, 'COMMA')}">$0.00</td>
+                <td th:text="'$' + ${#numbers.formatDecimal((item.unidades != null ? item.unidades : 1) * (item.price != null ? item.price : 0.0), 1, 'POINT', 2, 'COMMA')}">$0.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total" th:if="${pedido != null}">
+        Total Comanda: $<span th:text="${#numbers.formatDecimal(pedido.total, 1, 'POINT', 2, 'COMMA')}">0.00</span>
+    </div>
+
+    <div class="acciones">
+        <button onclick="window.print()">🖨️ Imprimir Ticket / Comanda</button>
+        <button onclick="window.history.back()" style="background-color: #6c757d;">Volver</button>
+    </div>
+
+</body>
+</html>
+

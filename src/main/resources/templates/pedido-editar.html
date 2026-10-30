@@ -21,11 +21,19 @@
                 <p class="text-xs text-slate-500">Ajusta cantidades de platillos o agrega nuevos ítems al pedido</p>
             </div>
             
-            <a href="/pedidos"
-               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer">
-                <i data-lucide="arrow-left" class="size-4"></i>
-                <span>Volver a Pedidos</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <a th:href="@{'/pedidos/detalle/' + ${pedido.id}}"
+                   target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#0c6780] border border-sky-200 font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                    <i data-lucide="receipt" class="size-4"></i>
+                    <span>Ver Detalle / Imprimir</span>
+                </a>
+                <a href="/pedidos"
+                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                    <i data-lucide="arrow-left" class="size-4"></i>
+                    <span>Volver</span>
+                </a>
+            </div>
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">

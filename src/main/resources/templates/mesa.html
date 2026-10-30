@@ -195,7 +195,7 @@
 
                     <!-- Si está disponible: Botón de tomar comanda -->
                     <a th:unless="${mesa.pedidosId != null and !#lists.isEmpty(mesa.pedidosId)}"
-                       th:href="@{/pedidos}"
+                       th:href="@{/pedidos(mesaId=${mesa.id})}"
                        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer">
                         <i data-lucide="plus-circle" class="w-4 h-4 text-[#0c6780]"></i>
                         <span>Tomar Comanda</span>

@@ -30,7 +30,10 @@ public class PedidoController {
     private FacturaRep facturaRep;
 
     @GetMapping
-    public String mostrarFormularioPedido(@RequestParam(name = "id", required = false) String id, Model model) {
+    public String mostrarFormularioPedido(
+            @RequestParam(name = "id", required = false) String id,
+            @RequestParam(name = "mesaId", required = false) String mesaIdParam,
+            Model model) {
         try {
             Pedido pedido;
             boolean modoEdicion = false;
@@ -41,6 +44,22 @@ public class PedidoController {
                 modoEdicion = true;
             } else {
                 pedido = new Pedido();
+                if (mesaIdParam != null && !mesaIdParam.trim().isEmpty()) {
+                    pedido.setMesaId(mesaIdParam.trim());
+                    mesaRep.findById(mesaIdParam.trim()).ifPresent(m -> pedido.setMesaNum(m.getNum()));
+                }
+
+                // Autocompletar con el mesero autenticado si el usuario conectado tiene rol ROLE_MESERO
+                org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.getPrincipal() instanceof com.example.rskitchen5.Security.UserPrincipal up) {
+                    if ("ROLE_MESERO".equalsIgnoreCase(up.getRole()) || up.getRole().toUpperCase().endsWith("MESERO")) {
+                        userRep.findByMail(up.getUsername()).ifPresent(u -> {
+                            pedido.setMeseroId(String.valueOf(u.getId()));
+                            pedido.setMeseroName(u.getName());
+                            model.addAttribute("meseroFijo", u);
+                        });
+                    }
+                }
             }
 
             Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
@@ -67,6 +86,25 @@ public class PedidoController {
             model.addAttribute("meseros", Collections.emptyList());
             model.addAttribute("pedidosRecientes", Collections.emptyList());
             return "pedido";
+        }
+    }
+
+    @GetMapping("/detalle/{id}")
+    public String verDetalleComanda(@PathVariable("id") String id, Model model) {
+        try {
+            Pedido pedido = pedidoRep.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + id));
+
+            if (pedido.getMeseroName() == null || pedido.getMeseroName().isBlank()) {
+                if (pedido.getMeseroId() != null) {
+                    userRep.findById(pedido.getMeseroId()).ifPresent(m -> pedido.setMeseroName(m.getName()));
+                }
+            }
+
+            model.addAttribute("pedido", pedido);
+            return "pedido-detalle";
+        } catch (Exception e) {
+            return "redirect:/pedidos?error=" + e.getMessage();
         }
     }
 

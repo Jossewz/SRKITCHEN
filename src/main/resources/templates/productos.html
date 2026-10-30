@@ -51,6 +51,38 @@
             </button>
         </div>
 
+        <!-- NOTIFICACIÓN DE INVENTARIO PARA ADMINISTRADORES -->
+        <div x-data="{ visible: true }" 
+             x-show="visible" 
+             x-transition
+             class="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-teal-50 to-emerald-50 border border-[#0c6780]/20 shadow-xs flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-xl bg-[#0c6780] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <i data-lucide="boxes" class="size-5"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <span>Panel de Gestión de Inventario</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0c6780]/10 text-[#0c6780]">Modo Administrador</span>
+                    </h4>
+                    <p class="text-xs text-slate-600 mt-0.5">
+                        <span th:if="${criticosCount != null and criticosCount > 0}">
+                            <strong class="text-rose-600 font-bold" th:text="${criticosCount}">0</strong> insumo(s) tienen stock bajo (5 o menos unidades) y requieren reabastecimiento.
+                        </span>
+                        <span th:unless="${criticosCount != null and criticosCount > 0}">
+                            Todos los insumos del restaurante se encuentran en niveles estables de abastecimiento.
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <button type="button" 
+                    @click="visible = false" 
+                    class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-white/60 transition-colors cursor-pointer shrink-0" 
+                    title="Cerrar notificación">
+                <i data-lucide="x" class="size-4"></i>
+            </button>
+        </div>
+
         <!-- ══════════════════════════════════════════════════════════
              2. BUSCADOR
              ══════════════════════════════════════════════════════════ -->

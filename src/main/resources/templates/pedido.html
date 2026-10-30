@@ -118,13 +118,27 @@
                             <span>Mesero Responsable</span>
                             <span class="text-rose-500">*</span>
                         </label>
-                        <select id="meseroId" th:field="*{meseroId}" required
-                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all cursor-pointer">
-                            <option value="">-- Seleccionar Mesero --</option>
-                            <option th:each="mesero : ${meseros}" 
-                                    th:value="${mesero.id}" 
-                                    th:text="${mesero.name}"></option>
-                        </select>
+
+                        <!-- Si es Mesero autenticado: campo fijado automáticamente -->
+                        <div th:if="${meseroFijo != null}" class="relative">
+                            <input type="hidden" name="meseroId" th:value="${meseroFijo.id}" />
+                            <div class="w-full px-3.5 py-2.5 text-sm bg-sky-50/80 border border-[#0c6780]/30 text-[#0c6780] font-bold rounded-xl flex items-center justify-between">
+                                <span th:text="${meseroFijo.name}">Nombre Mesero</span>
+                                <span class="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-[#0c6780] text-white">Tu Sesión</span>
+                            </div>
+                        </div>
+
+                        <!-- Si es Administrador: selector libre de cualquier mesero -->
+                        <div th:unless="${meseroFijo != null}">
+                            <select id="meseroId" th:field="*{meseroId}" required
+                                    class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all cursor-pointer">
+                                <option value="">-- Seleccionar Mesero --</option>
+                                <option th:each="mesero : ${meseros}" 
+                                        th:value="${mesero.id}" 
+                                        th:text="${mesero.name}"></option>
+                            </select>
+                        </div>
+
                         <span class="text-[10px] text-slate-400 mt-1 block">Atención registrada para control de propinas y turno</span>
                     </div>
 
@@ -313,8 +327,15 @@
                         </div>
 
                         <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+                            <a th:href="@{'/pedidos/detalle/' + ${pedido.id}}"
+                               target="_blank"
+                               class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#0c6780] border border-sky-200/80 text-xs font-bold transition-colors cursor-pointer"
+                               title="Ver a detalle e imprimir ticket de comanda">
+                                <i data-lucide="receipt" class="size-3.5"></i>
+                                <span>Detalle</span>
+                            </a>
                             <a th:href="@{'/pedidos/editar/' + ${pedido.id}}"
-                               class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer">
+                               class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer">
                                 <i data-lucide="edit-3" class="size-3.5"></i>
                                 <span>Editar</span>
                             </a>

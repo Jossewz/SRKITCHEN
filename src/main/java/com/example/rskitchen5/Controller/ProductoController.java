@@ -26,6 +26,9 @@ public class ProductoController {
                 ? productoRep.findByRestaurantId(restaurantId) 
                 : java.util.Collections.emptyList();
         model.addAttribute("productos", productos);
+
+        long criticosCount = productos.stream().filter(p -> p.getStock() <= 5).count();
+        model.addAttribute("criticosCount", criticosCount);
         if (!model.containsAttribute("productoForm")) {
             model.addAttribute("productoForm", new Producto());
         }
