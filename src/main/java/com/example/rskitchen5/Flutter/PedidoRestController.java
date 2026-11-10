@@ -119,6 +119,11 @@ public class PedidoRestController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Pedido no encontrado en este restaurante"));
 
+        if (pedido.isPagado()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "No se puede eliminar un pedido que ya ha sido pagado"));
+        }
+
         pedidoRep.delete(pedido);
         return ResponseEntity.ok(Map.of("mensaje", "Pedido eliminado correctamente"));
     }

@@ -31,7 +31,8 @@ public class Pedido {
         this.fecha = LocalDateTime.now();
     }
 
-    public Pedido(LocalDateTime fecha, Long id, List<ItemPedido> items, int mesaNum, String mesaId, String meseroId, boolean pagado, double total, String meseroName) {
+    public Pedido(LocalDateTime fecha, Long id, List<ItemPedido> items, int mesaNum, String mesaId, String meseroId,
+            boolean pagado, double total, String meseroName) {
         this.fecha = fecha != null ? fecha : LocalDateTime.now();
         this.id = id;
         this.setItems(items);
@@ -59,7 +60,8 @@ public class Pedido {
         if (id != null && !id.trim().isEmpty()) {
             try {
                 this.id = Long.parseLong(id);
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
         }
     }
 
@@ -118,6 +120,10 @@ public class Pedido {
     }
 
     public boolean isPagado() {
+        return pagado;
+    }
+
+    public boolean getPagado() {
         return pagado;
     }
 

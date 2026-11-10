@@ -26,13 +26,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
+        if (mail == null || mail.trim().isEmpty()) {
+            throw new UsernameNotFoundException("El correo no puede estar vacío");
+        }
+
+        String trimmedMail = mail.trim();
+        String lowerMail = trimmedMail.toLowerCase();
+
         // 1. Verificar si es una cuenta de Restaurant (Admin del restaurante)
         if (restaurantRep != null) {
-            Optional<Restaurant> restaurantOpt = restaurantRep.findByCorreo(mail);
+            Optional<Restaurant> restaurantOpt = restaurantRep.findByCorreo(lowerMail);
+            if (restaurantOpt.isEmpty() && !trimmedMail.equals(lowerMail)) {
+                restaurantOpt = restaurantRep.findByCorreo(trimmedMail);
+            }
             if (restaurantOpt.isPresent()) {
                 Restaurant r = restaurantOpt.get();
                 if (!r.isActivo()) {
-                    throw new org.springframework.security.authentication.DisabledException("El restaurante se encuentra desactivado.");
+                    throw new org.springframework.security.authentication.DisabledException(
+                            "El restaurante se encuentra desactivado.");
                 }
                 return new UserPrincipal(
                         r.getCorreo(),
@@ -40,20 +51,39 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         "ADMIN",
                         r.getId(),
                         r.getNombre(),
-                        Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"))
-                );
+                        Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
             }
         }
 
         // 2. Verificar si es un Usuario (CREATOR o empleado como MESERO)
-        User user = userRep.findByMail(mail)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario o restaurante no encontrado con mail: " + mail));
+        Optional<User> userOpt = userRep.findByMail(lowerMail);
+        if (userOpt.isEmpty() && !trimmedMail.equals(lowerMail)) {
+            userOpt = userRep.findByMail(trimmedMail);
+        }
+        User user = userOpt.orElseThrow(
+                () -> new UsernameNotFoundException("Usuario o restaurante no encontrado con mail: " + mail));
 
-        if (!user.isActivo()) {
-            throw new org.springframework.security.authentication.DisabledException("El usuario o empleado se encuentra desactivado.");
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new UsernameNotFoundException("Credenciales no configuradas para el usuario: " + mail);
         }
 
-        String roleStr = user.getRol() != null ? user.getRol().toUpperCase() : "MESERO";
+        if (!user.isActivo()) {
+            throw new org.springframework.security.authentication.DisabledException(
+                    "El usuario o empleado se encuentra desactivado.");
+        }
+
+        // Si el usuario pertenece a un restaurante (ej. mesero u operativo), verificar
+        // que el restaurante esté activo
+        if (user.getRestaurantId() != null && restaurantRep != null) {
+            Optional<Restaurant> restaurantOpt = restaurantRep.findById(user.getRestaurantId());
+            if (restaurantOpt.isEmpty() || !restaurantOpt.get().isActivo()) {
+                throw new org.springframework.security.authentication.DisabledException(
+                        "El restaurante se encuentra desactivado.");
+            }
+        }
+
+        String roleStr = user.getRol() != null && !user.getRol().trim().isEmpty() ? user.getRol().toUpperCase()
+                : "USER";
         String authority = roleStr.startsWith("ROLE_") ? roleStr : "ROLE_" + roleStr;
         String rawRole = roleStr.startsWith("ROLE_") ? roleStr.substring(5) : roleStr;
 
@@ -63,7 +93,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 rawRole,
                 user.getRestaurantId(),
                 user.getName(),
-                Collections.singleton(new SimpleGrantedAuthority(authority))
-        );
+                Collections.singleton(new SimpleGrantedAuthority(authority)));
     }
 }

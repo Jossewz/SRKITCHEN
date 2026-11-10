@@ -1,6 +1,8 @@
 package com.example.rskitchen5.service;
 
+import com.example.rskitchen5.Model.Restaurant;
 import com.example.rskitchen5.Model.User;
+import com.example.rskitchen5.Repository.RestaurantRep;
 import com.example.rskitchen5.Repository.UserRep;
 import com.example.rskitchen5.Service.UserDetailsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -25,7 +28,7 @@ class UserDetailsServiceImplTest {
     private UserRep userRep;
 
     @Mock
-    private com.example.rskitchen5.Repository.RestaurantRep restaurantRep;
+    private RestaurantRep restaurantRep;
 
     @InjectMocks
     private UserDetailsServiceImpl userDetailsService;
@@ -40,6 +43,7 @@ class UserDetailsServiceImplTest {
         sampleUser.setMail("juan@rskitchen.com");
         sampleUser.setPassword("$2a$10$hashedpassword");
         sampleUser.setRol("ROLE_ADMIN");
+        sampleUser.setActivo(true);
     }
 
     @Test
@@ -103,5 +107,59 @@ class UserDetailsServiceImplTest {
         assertThrows(UsernameNotFoundException.class, () -> {
             userDetailsService.loadUserByUsername("juan@rskitchen.com");
         });
+    }
+
+    @Test
+    @DisplayName("Mesero con restaurante activo debe iniciar sesión exitosamente")
+    void testLoadUserByUsername_MeseroRestauranteActivo() {
+        sampleUser.setRol("ROLE_MESERO");
+        sampleUser.setRestaurantId(5L);
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(5L);
+        restaurant.setNombre("Restaurante Activo");
+        restaurant.setActivo(true);
+
+        when(userRep.findByMail("juan@rskitchen.com")).thenReturn(Optional.of(sampleUser));
+        when(restaurantRep.findById(5L)).thenReturn(Optional.of(restaurant));
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername("juan@rskitchen.com");
+        assertNotNull(userDetails);
+        assertEquals("juan@rskitchen.com", userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("Mesero con restaurante desactivado NO debe poder iniciar sesión (DisabledException)")
+    void testLoadUserByUsername_MeseroRestauranteDesactivado() {
+        sampleUser.setRol("ROLE_MESERO");
+        sampleUser.setRestaurantId(5L);
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(5L);
+        restaurant.setNombre("Restaurante Desactivado");
+        restaurant.setActivo(false);
+
+        when(userRep.findByMail("juan@rskitchen.com")).thenReturn(Optional.of(sampleUser));
+        when(restaurantRep.findById(5L)).thenReturn(Optional.of(restaurant));
+
+        DisabledException ex = assertThrows(DisabledException.class, () -> {
+            userDetailsService.loadUserByUsername("juan@rskitchen.com");
+        });
+        assertTrue(ex.getMessage().contains("desactivado"));
+    }
+
+    @Test
+    @DisplayName("Mesero con restaurante inexistente NO debe poder iniciar sesión (DisabledException)")
+    void testLoadUserByUsername_MeseroRestauranteInexistente() {
+        sampleUser.setRol("ROLE_MESERO");
+        sampleUser.setRestaurantId(999L);
+
+        when(userRep.findByMail("juan@rskitchen.com")).thenReturn(Optional.of(sampleUser));
+        when(restaurantRep.findById(999L)).thenReturn(Optional.empty());
+
+        DisabledException ex = assertThrows(DisabledException.class, () -> {
+            userDetailsService.loadUserByUsername("juan@rskitchen.com");
+        });
+        assertTrue(ex.getMessage().contains("desactivado"));
     }
 }

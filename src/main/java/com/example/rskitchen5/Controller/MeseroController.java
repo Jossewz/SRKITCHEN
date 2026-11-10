@@ -121,6 +121,16 @@ public class MeseroController {
                 return "redirect:/mesero/registro";
             }
 
+            if (name == null || name.trim().isEmpty()) {
+                redirect.addFlashAttribute("mensajeError", "El nombre del empleado es obligatorio.");
+                return "redirect:/mesero/registro";
+            }
+
+            if (mail == null || mail.trim().isEmpty()) {
+                redirect.addFlashAttribute("mensajeError", "El correo electrónico es obligatorio.");
+                return "redirect:/mesero/registro";
+            }
+
             Optional<User> optionalUser = userRep.findByIdAndRestaurantId(id, restaurantId);
             if (optionalUser.isEmpty()) {
                 redirect.addFlashAttribute("mensajeError", "Empleado no encontrado en su restaurante.");

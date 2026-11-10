@@ -2,6 +2,8 @@ package com.example.rskitchen5.Controller;
 
 import com.example.rskitchen5.Model.*;
 import com.example.rskitchen5.Repository.*;
+import com.example.rskitchen5.Security.TenantContext;
+import com.example.rskitchen5.Security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,8 +41,12 @@ public class PedidoController {
             boolean modoEdicion = false;
 
             if (id != null && !id.isEmpty()) {
-                pedido = pedidoRep.findById(id)
+                Pedido pedidoExistente = pedidoRep.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+                if (pedidoExistente.isPagado()) {
+                    return "redirect:/pedidos?error=No+se+puede+editar+un+pedido+que+ya+ha+sido+pagado";
+                }
+                pedido = pedidoExistente;
                 modoEdicion = true;
             } else {
                 pedido = new Pedido();
@@ -51,7 +57,7 @@ public class PedidoController {
 
                 // Autocompletar con el mesero autenticado si el usuario conectado tiene rol ROLE_MESERO
                 org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-                if (auth != null && auth.getPrincipal() instanceof com.example.rskitchen5.Security.UserPrincipal up) {
+                if (auth != null && auth.getPrincipal() instanceof UserPrincipal up) {
                     if ("ROLE_MESERO".equalsIgnoreCase(up.getRole()) || up.getRole().toUpperCase().endsWith("MESERO")) {
                         userRep.findByMail(up.getUsername()).ifPresent(u -> {
                             pedido.setMeseroId(String.valueOf(u.getId()));
@@ -62,7 +68,7 @@ public class PedidoController {
                 }
             }
 
-            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            Long restaurantId = TenantContext.getCurrentRestaurantId();
             model.addAttribute("pedido", pedido);
             model.addAttribute("modoEdicion", modoEdicion);
             model.addAttribute("mesas", (restaurantId != null) ? mesaRep.findByRestaurantIdAndOcupadoFalse(restaurantId)
@@ -109,10 +115,17 @@ public class PedidoController {
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioEdicion(@PathVariable("id") String id, Model model) {
+
+    public String mostrarFormularioEdicion(@PathVariable("id") String id, Model model,
+            RedirectAttributes redirectAttributes) {
         try {
             Pedido pedido = pedidoRep.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+
+            if (pedido.isPagado()) {
+                redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido que ya ha sido pagado.");
+                return "redirect:/pedidos";
+            }
 
             if (pedido.getMeseroId() != null) {
                 User mesero = userRep.findById(pedido.getMeseroId()).orElse(new User());
@@ -124,7 +137,7 @@ public class PedidoController {
                 mesaActual = mesaRep.findById(pedido.getMesaId()).orElse(null);
             }
 
-            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            Long restaurantId = TenantContext.getCurrentRestaurantId();
             List<Mesa> mesas = (restaurantId != null) ? mesaRep.findByRestaurantId(restaurantId)
                     : Collections.emptyList();
 
@@ -160,10 +173,16 @@ public class PedidoController {
             @RequestParam(value = "cantidadesExistentes", required = false) List<Integer> cantidadesExistentes,
             @RequestParam(value = "nuevosPlatillos", required = false) List<String> platillosNuevosIds,
             @RequestParam(value = "nuevasCantidades", required = false) List<Integer> cantidadesNuevas,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         try {
             Pedido pedido = pedidoRep.findById(pedidoId)
                     .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + pedidoId));
+
+            if (pedido.isPagado()) {
+                redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido que ya ha sido pagado.");
+                return "redirect:/pedidos";
+            }
 
             Mesa mesa = mesaRep.findById(mesaId)
                     .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada con ID: " + mesaId));
@@ -250,7 +269,7 @@ public class PedidoController {
         } else {
             model.addAttribute("mesaActual", null);
         }
-        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
         model.addAttribute("mesas",
                 (restaurantId != null) ? mesaRep.findByRestaurantId(restaurantId) : Collections.emptyList());
         model.addAttribute("platillosDisponibles",
@@ -317,7 +336,7 @@ public class PedidoController {
     }
 
     private List<Pedido> getPedidosConDetalles() {
-        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
         List<Pedido> pedidos = (restaurantId != null)
                 ? pedidoRep.findTop5ByRestaurantIdOrderByFechaDesc(restaurantId)
                 : Collections.emptyList();
@@ -422,7 +441,7 @@ public class PedidoController {
     private String crearNuevoPedido(Pedido pedidoData, Mesa mesa, User mesero,
             List<String> platillosIds, Map<String, String> allParams, Model model) {
         Pedido nuevoPedido = new Pedido();
-        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
         nuevoPedido.setRestaurantId(restaurantId);
         nuevoPedido.setMesaId(mesa.getId());
         nuevoPedido.setMesaNum(mesa.getNum());
@@ -462,7 +481,7 @@ public class PedidoController {
 
     private String cargarDatosModelo(Model model, Pedido pedido) {
         model.addAttribute("pedido", pedido);
-        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
         if (pedido.getId() == null || pedido.getId().isEmpty()) {
             model.addAttribute("mesas", (restaurantId != null) ? mesaRep.findByRestaurantIdAndOcupadoFalse(restaurantId)
                     : Collections.emptyList());
@@ -490,10 +509,15 @@ public class PedidoController {
             @RequestParam(value = "cantidadesExistentes", required = false) List<Integer> cantidades,
             @RequestParam(value = "nuevosPlatillos", required = false) List<String> nuevosPlatillosIds,
             @RequestParam(value = "nuevasCantidades", required = false) List<Integer> nuevasCantidades,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         try {
             Pedido pedido = pedidoRep.findById(pedidoId)
                     .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+            if (pedido.isPagado()) {
+                redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido que ya ha sido pagado.");
+                return "redirect:/pedidos";
+            }
             Mesa mesa = mesaRep.findById(mesaId)
                     .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada"));
             pedido.setMesaId(mesa.getId());
@@ -583,6 +607,11 @@ public class PedidoController {
             return "redirect:/pedidos";
         }
 
+        if (pedido.isPagado()) {
+            redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido que ya ha sido pagado.");
+            return "redirect:/pedidos";
+        }
+
         Mesa mesaDelPedido = mesaRep.findById(pedido.getMesaId()).orElse(null);
         Mesa mesaParaActualizar = mesaRep.findById(mesaId).orElse(mesaDelPedido);
 
@@ -666,6 +695,11 @@ public class PedidoController {
         try {
             Pedido pedido = pedidoRep.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+
+            if (pedido.isPagado()) {
+                redirectAttributes.addFlashAttribute("error", "No se puede eliminar un pedido que ya ha sido pagado.");
+                return "redirect:/pedidos";
+            }
 
             Mesa mesa = mesaRep.findById(pedido.getMesaId()).orElse(null);
             if (mesa != null && mesa.getPedidosId() != null) {

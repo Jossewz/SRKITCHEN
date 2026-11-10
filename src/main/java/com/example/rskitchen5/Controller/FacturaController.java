@@ -2,6 +2,7 @@ package com.example.rskitchen5.Controller;
 
 import com.example.rskitchen5.Model.Factura;
 import com.example.rskitchen5.Repository.FacturaRep;
+import com.example.rskitchen5.Security.TenantContext;
 import com.example.rskitchen5.Service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,9 +30,9 @@ public class FacturaController {
             Model model) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "fecha"));
-        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
-        Page<Factura> facturasPage = (restaurantId != null) 
-                ? facturaRep.findByRestaurantId(restaurantId, pageable) 
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        Page<Factura> facturasPage = (restaurantId != null)
+                ? facturaRep.findByRestaurantId(restaurantId, pageable)
                 : Page.empty();
 
         model.addAttribute("facturas", facturasPage.getContent());
@@ -40,7 +41,8 @@ public class FacturaController {
 
         if (id != null) {
             if (restaurantId != null) {
-                facturaRep.findByIdAndRestaurantId(Long.parseLong(id), restaurantId).ifPresent(f -> model.addAttribute("factura", f));
+                facturaRep.findByIdAndRestaurantId(Long.parseLong(id), restaurantId)
+                        .ifPresent(f -> model.addAttribute("factura", f));
             } else {
                 facturaRep.findById(id).ifPresent(f -> model.addAttribute("factura", f));
             }

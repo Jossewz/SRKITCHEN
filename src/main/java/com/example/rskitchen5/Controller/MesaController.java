@@ -7,6 +7,7 @@ import com.example.rskitchen5.Model.ItemPedido;
 import com.example.rskitchen5.Model.Mesa;
 import com.example.rskitchen5.Model.Pedido;
 import com.example.rskitchen5.Repository.*;
+import com.example.rskitchen5.Security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class MesaController {
 
     @Autowired
     public MesaController(MesaRep mesaRepository, PedidoRep pedidoRep,
-                          UserRep userRep, PlatilloRep platilloRep, FacturaRep facturaRep) {
+            UserRep userRep, PlatilloRep platilloRep, FacturaRep facturaRep) {
         this.mesaRepository = mesaRepository;
         this.pedidoRep = pedidoRep;
         this.userRep = userRep;
@@ -40,9 +41,9 @@ public class MesaController {
 
     @GetMapping("")
     public String mostrarVistaMesa(Model model) {
-        Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
-        List<Mesa> mesas = (restaurantId != null) 
-                ? mesaRepository.findByRestaurantId(restaurantId) 
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        List<Mesa> mesas = (restaurantId != null)
+                ? mesaRepository.findByRestaurantId(restaurantId)
                 : Collections.emptyList();
 
         Map<String, String> nombresMeseros = new HashMap<>();
@@ -76,7 +77,7 @@ public class MesaController {
     @PostMapping("/crear")
     public String crearMesa(@ModelAttribute Mesa mesa, RedirectAttributes redirect) {
         try {
-            Long restaurantId = com.example.rskitchen5.Security.TenantContext.getCurrentRestaurantId();
+            Long restaurantId = TenantContext.getCurrentRestaurantId();
             if (restaurantId == null) {
                 redirect.addFlashAttribute("mensajeError", "No se puede crear mesa sin un restaurante activo");
                 return "redirect:/mesa";

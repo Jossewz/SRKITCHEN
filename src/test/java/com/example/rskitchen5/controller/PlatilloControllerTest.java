@@ -90,5 +90,33 @@ class PlatilloControllerTest {
         assertEquals(carne, nuevo.getIngredientes().get(0).getProducto());
         verify(platilloRep).save(nuevo);
     }
+
+    @Test
+    @DisplayName("updatePlatillo debe actualizar nombre, precio e ingredientes")
+    void testUpdatePlatilloConIngredientes() {
+        Platillo existente = new Platillo();
+        existente.setId("1");
+        existente.setName("Hamburguesa Simple");
+        existente.setPrice(10.0);
+
+        when(platilloRep.findById("1")).thenReturn(Optional.of(existente));
+
+        Producto carne = new Producto("unidades", 10L, "Carne", 3.0, 50);
+        when(productoRep.findById(10L)).thenReturn(Optional.of(carne));
+
+        Platillo modificado = new Platillo();
+        modificado.setName("Hamburguesa Especial");
+        modificado.setPrice(15.0);
+
+        String view = platilloController.updatePlatillo("1", modificado, List.of(10L), List.of(1.5));
+
+        assertEquals("redirect:/platillos", view);
+        assertEquals("Hamburguesa Especial", existente.getName());
+        assertEquals(15.0, existente.getPrice());
+        assertEquals(1, existente.getIngredientes().size());
+        assertEquals(1.5, existente.getIngredientes().get(0).getCantidad());
+        assertEquals(carne, existente.getIngredientes().get(0).getProducto());
+        verify(platilloRep).save(existente);
+    }
 }
 

@@ -1,5 +1,7 @@
 package com.example.rskitchen5.Security;
 
+import com.example.rskitchen5.Model.Restaurant;
+import com.example.rskitchen5.Repository.RestaurantRep;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private RestaurantRep restaurantRep;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -58,6 +63,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String role = jwtService.extractRole(jwt);
                 Long restaurantId = jwtService.extractRestaurantId(jwt);
                 String nombre = (String) jwtService.extractAllClaims(jwt).get("nombre");
+
+                // Si está asociado a un restaurante y no es CREATOR, validar que el restaurante siga activo
+                if (restaurantId != null && !"CREATOR".equalsIgnoreCase(role) && !"ROLE_CREATOR".equalsIgnoreCase(role) && restaurantRep != null) {
+                    java.util.Optional<Restaurant> restOpt = restaurantRep.findById(restaurantId);
+                    if (restOpt.isEmpty() || !restOpt.get().isActivo()) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
+                }
 
                 if (role == null) {
                     role = "USER";

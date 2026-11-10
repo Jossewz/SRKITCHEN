@@ -38,12 +38,13 @@ public class Security {
         return new AuthenticationEntryPoint() {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response,
-                                 org.springframework.security.core.AuthenticationException authException) throws IOException {
+                    org.springframework.security.core.AuthenticationException authException) throws IOException {
                 String path = request.getRequestURI();
                 if (path != null && path.startsWith("/api/")) {
                     response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("{\"error\": \"No autorizado\", \"message\": \"" + authException.getMessage() + "\"}");
+                    response.getWriter().write(
+                            "{\"error\": \"No autorizado\", \"message\": \"" + authException.getMessage() + "\"}");
                 } else {
                     response.sendRedirect("/login");
                 }
@@ -71,7 +72,9 @@ public class Security {
                                 "/img/**",
                                 "/images/**",
                                 "/weka/**",
-                                "/api/auth/**"
+                                "/api/auth/**",
+                                "/api/mobile/login",
+                                "/api/mobile/auth/**"
                         ).permitAll()
                         // Exclusivo para CREATOR (Super Admin maestro)
                         .requestMatchers("/api/restaurantes", "/api/restaurantes/**", "/admin/restaurantes", "/admin/restaurantes/**").hasAuthority("ROLE_CREATOR")
@@ -133,9 +136,9 @@ public class Security {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http,
-                                                       BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+            BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http
+                .getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder);
         return authenticationManagerBuilder.build();
