@@ -1,0 +1,213 @@
+/* estilo azul que escogimos */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #b3e5fc, #ffffff);
+  color: #1a1a1a;
+  overflow-x: hidden;
+  min-height: 100vh;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* barra de navegacion */
+.menu-bar {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 15px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+
+.menu-bar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.menu-bar ul li a {
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  color: white;
+  display: inline-block;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu-bar ul li a:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+/* boton activo al estar en la pagina */
+.menu-bar ul li a.active {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+.logout-nav form {
+  display: inline-block;
+}
+.logout-nav button {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+.logout-nav button:hover {
+  background: #ff6b6b;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* contenido principal */
+.content {
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+h1 {
+  font-size: 42px;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* formulario de registro */
+.form-container {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 1s ease;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #87CEEB;
+  background-color: white; /* Fondo sólido al enfocar */
+  box-shadow: 0 0 8px rgba(135, 206, 235, 0.5);
+}
+
+.btn-submit {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* tabla de mesero*/
+.table-container {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 60px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 1s ease;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+tr:hover {
+  background-color: rgba(135, 206, 235, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+/* animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* responsibilidad */
+@media (max-width: 768px) {
+  .menu-bar ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .form-container, .table-container {
+    width: 95%;
+  }
+}

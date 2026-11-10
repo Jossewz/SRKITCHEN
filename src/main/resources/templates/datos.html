@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'datos', 'Optimización Operativa')}">
+
+<head>
+    <title>Analítica y Optimización – SR Kitchen</title>
+</head>
+
+<body>
+
+<th:block th:fragment="content">
+    
+    <div class="space-y-8">
+
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA
+             ══════════════════════════════════════════════════════════ -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <div>
+                <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Optimización Operativa y Modelos</h1>
+                <p class="text-xs sm:text-sm text-slate-500">Programación lineal, predicción de rentabilidad y rotación de cocina</p>
+            </div>
+            
+            <a href="https://app.powerbi.com/view?r=eyJrIjoiZGVhODExZDQtOWEyMi00ODdlLWIzMDQtMWM5Yjc2ZmY4MDZiIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer shrink-0">
+                <i data-lucide="bar-chart-2" class="size-4 text-[#0c6780]"></i>
+                <span>Ver Power BI Embebido</span>
+            </a>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             2. HERO CARD PARA DISPARAR EL ANÁLISIS MATEMÁTICO
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-8 sm:p-10 shadow-sm text-center relative overflow-hidden">
+            <div class="size-16 rounded-2xl bg-[#0c6780]/10 text-[#0c6780] flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="brain-circuit" class="size-8 stroke-[1.75]"></i>
+            </div>
+            
+            <h2 class="text-xl sm:text-2xl font-extrabold font-jakarta text-slate-800 mb-2">
+                Resolución del Modelo de Rentabilidad Máxima
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mb-6">
+                El motor analiza las comandas reales de la base de datos relacional y calcula la combinación óptima de producción entre platos fuertes y platos sencillos con restricciones de insumos.
+            </p>
+
+            <button id="btnPrediccion" 
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-sm shadow-md transition-all hover:scale-102 cursor-pointer">
+                <i data-lucide="play" class="size-4.5 fill-current"></i>
+                <span>Ejecutar Modelo de Optimización</span>
+            </button>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             3. SPINNER DE CARGA
+             ══════════════════════════════════════════════════════════ -->
+        <div id="loading" class="hidden p-10 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+            <div class="size-12 rounded-full border-4 border-slate-200 border-t-[#0c6780] animate-spin mx-auto mb-3"></div>
+            <h3 class="text-sm font-bold text-slate-800">Resolviendo Sistema de Ecuaciones...</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Consultando PostgreSQL y optimizando función objetivo Simplex.</p>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             4. CONTENEDOR DE RESULTADOS DINÁMICOS
+             ══════════════════════════════════════════════════════════ -->
+        <div id="resultado" class="space-y-6"></div>
+
+    </div>
+
+    <!-- Script de análisis matemático -->
+    <script th:src="@{/js/datos-analysis.js}"></script>
+
+</th:block>
+
+</body>
+</html>

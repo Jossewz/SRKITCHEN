@@ -1,0 +1,233 @@
+/* estilo */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #b3e5fc, #ffffff);
+  color: #1a1a1a;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/*barra de navegacion*/
+.menu-bar {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 15px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+
+.menu-bar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.menu-bar ul li a {
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  color: white;
+  display: inline-block;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu-bar ul li a:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+/* boton activo al estar en la pagina */
+.menu-bar ul li a.active {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+
+/* boton de cerrar seccion */
+.logout-nav form {
+  display: inline-block;
+}
+.logout-nav button {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+.logout-nav button:hover {
+  background: #ff6b6b;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* titulo y busqueda */
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin-top: 50px;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+#barraBusqueda {
+  display: block;
+  margin: 30px auto;
+  width: 70%;
+  max-width: 500px;
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+#barraBusqueda:focus {
+  outline: none;
+  border-color: #87CEEB;
+  box-shadow: 0 0 10px rgba(135, 206, 235, 0.6);
+  background-color: white; /* Fondo sólido al enfocar */
+}
+
+/* tarjeta de mesa */
+.mesa-card {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 25px;
+  margin: 30px auto;
+  width: 90%;
+  max-width: 600px;
+  animation: fadeIn 0.8s ease-in-out;
+  backdrop-filter: blur(5px);
+}
+
+.mesa-card h2, .mesa-card h3 {
+  margin-top: 0;
+  color: #1a1a1a;
+}
+.mesa-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* inputs */
+input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+input[type="number"]:focus, input[type="text"]:focus {
+  outline: none;
+  border-color: #87CEEB;
+  background-color: white;
+}
+
+/* botones */
+button {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+button:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* mensaje */
+.mensaje-exito, .mensaje-error {
+  text-align: center;
+  font-weight: 600;
+  margin-top: 20px;
+  animation: fadeIn 1s ease;
+}
+.mensaje-exito { color: green; }
+.mensaje-error { color: red; }
+
+/* lista de mesas */
+#listaMesas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  margin-bottom: 60px;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+/* tarjetas de pedido*/
+.pedido-card {
+  background-color: rgba(248, 249, 250, 0.8);
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.pedido-card p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+/* platillos */
+.platillo-item {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+.platillo-item p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+/* animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Partículas decorativas a no espera jose dijo que no :(*/
+
+/* responsividad */
+@media (max-width: 768px) {
+  .menu-bar ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  #barraBusqueda {
+    width: 85%;
+  }
+}

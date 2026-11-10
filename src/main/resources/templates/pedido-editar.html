@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:replace="~{layouts/base :: html(~{::content}, 'pedidos', 'Editar Pedido')}">
+
+<head>
+    <title>Editar Pedido – SR Kitchen</title>
+</head>
+
+<body>
+
+    <th:block th:fragment="content">
+
+        <div class="max-w-3xl mx-auto space-y-6">
+
+            <!-- Cabecera -->
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                <div>
+                    <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Modificar Comanda
+                    </h1>
+                    <p class="text-xs text-slate-500">Ajusta cantidades de platillos o agrega nuevos ítems al pedido</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <a th:href="@{'/pedidos/detalle/' + ${pedido.id}}" target="_blank"
+                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#0c6780] border border-sky-200 font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                        <i data-lucide="receipt" class="size-4"></i>
+                        <span>Ver Detalle / Imprimir</span>
+                    </a>
+                    <a href="/pedidos"
+                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                        <i data-lucide="arrow-left" class="size-4"></i>
+                        <span>Volver</span>
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${pedido != null and pedido.pagado}"
+                class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-2.5">
+                <i data-lucide="shield-alert" class="size-4 shrink-0 text-amber-600"></i>
+                <span>Este pedido ya se encuentra pagado. Por seguridad contable, los pedidos pagados no se pueden
+                    modificar.</span>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">
+                <form id="editarPedidoForm" th:action="@{/pedidos/editar}" method="post" class="space-y-6">
+                    <input type="hidden" name="id" th:value="${pedido.id}" />
+                    <input type="hidden" name="mesaId" th:value="${pedido.mesaId}" />
+
+                    <!-- Datos de la Mesa -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Mesa
+                                Asignada</span>
+                            <strong class="text-base font-bold font-jakarta text-slate-800"
+                                th:text="${mesaActual != null ? 'Mesa ' + mesaActual.num : 'Mesa ' + pedido.mesaNum}">Mesa</strong>
+                        </div>
+                        <div class="text-right">
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Identificador</span>
+                            <span class="text-xs font-mono font-bold text-sky-700"
+                                th:text="'#' + (${pedido.id != null and pedido.id.length() >= 6 ? pedido.id.substring(0,6) : pedido.id})">#</span>
+                        </div>
+                    </div>
+
+                    <!-- Platillos Existentes -->
+                    <div class="space-y-3">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <i data-lucide="utensils" class="size-3.5 text-slate-400"></i>
+                            <span>Platillos en Comanda</span>
+                        </h2>
+
+                        <div class="space-y-2.5">
+                            <div th:each="item : ${pedido.items}"
+                                class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <input type="hidden" name="itemsExistentes" th:value="${item.productId}" />
+                                <div>
+                                    <strong class="text-sm font-bold text-slate-800 block"
+                                        th:text="${item.name}">Platillo</strong>
+                                    <span class="text-xs text-slate-400 font-medium"
+                                        th:text="'Precio: $' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs font-bold text-slate-600">Cant:</label>
+                                    <input type="number" name="cantidadesExistentes" th:value="${item.unidades}" min="1"
+                                        required
+                                        class="w-16 px-2.5 py-1.5 text-sm font-bold text-center bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agregar Nuevos Platillos -->
+                    <div class="space-y-3 pt-4 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <h2
+                                class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                <i data-lucide="plus-circle" class="size-3.5 text-slate-400"></i>
+                                <span>Agregar Platillos Adicionales</span>
+                            </h2>
+                            <span class="text-[11px] text-slate-400">Hasta 3 ítems extra</span>
+                        </div>
+
+                        <div class="space-y-3" th:each="i : ${#numbers.sequence(0, 2)}">
+                            <div
+                                class="grid grid-cols-1 sm:grid-cols-[1fr,100px] gap-3 items-center p-3 rounded-2xl bg-slate-50/70 border border-slate-100">
+                                <div>
+                                    <input type="text"
+                                        class="platillo-busqueda w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]"
+                                        list="platillosList" placeholder="Escribe el nombre del platillo...">
+                                </div>
+                                <div>
+                                    <input type="number" name="nuevasCantidades" min="1" value="1" required
+                                        class="w-full px-3 py-2 text-xs text-center font-bold bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780]">
+                                </div>
+                                <input type="hidden" name="nuevosPlatillos">
+                            </div>
+                        </div>
+                    </div>
+
+                    <datalist id="platillosList">
+                        <option th:each="platillo : ${platillosDisponibles}" th:data-id="${platillo.id}"
+                            th:value="${platillo.name}"></option>
+                    </datalist>
+
+                    <!-- Acciones -->
+                    <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
+                        <button th:unless="${pedido.pagado}" type="submit"
+                            class="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                            <i data-lucide="check" class="size-4"></i>
+                            <span>Guardar Cambios</span>
+                        </button>
+                            class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
+                            th:classappend="${pedido.pagado} ? 'w-full text-center' : ''">
+                            <span th:text="${pedido.pagado} ? 'Volver a Pedidos' : 'Cancelar'">Cancelar</span>
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Script de enlace de datalist -->
+        <script th:src="@{/js/pedido-edit.js}"></script>
+
+    </th:block>
+
+</body>
+
+</html>

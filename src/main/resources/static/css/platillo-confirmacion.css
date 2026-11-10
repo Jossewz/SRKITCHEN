@@ -1,0 +1,97 @@
+/* 🎨 MODAL DE CONFIRMACIÓN — platillo-confirmacion.css */
+
+.modal-confirmacion {
+  position: fixed;
+  inset: 0; /* top, right, bottom, left en una sola línea */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.modal-confirmacion.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 📦 Caja del contenido */
+.modal-contenido {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 35px 45px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: aparecer 0.35s ease;
+}
+
+/* 📝 Título y texto */
+.modal-contenido h3 {
+  font-size: 1.4rem;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.modal-contenido p {
+  color: #555;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+/* 🔘 Botones */
+.modal-botones {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-si,
+.btn-no {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-si {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+.btn-si:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #ff6b5a, #e74c3c);
+}
+
+.btn-no {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(149, 165, 166, 0.3);
+}
+
+.btn-no:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #b0bfc0, #95a5a6);
+}
+
+/* ✨ Animación de entrada */
+@keyframes aparecer {
+  from {
+    transform: translateY(-15px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,159 @@
+/* ===== ESTILO GENERAL ===== */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #b3e5fc, #ffffff);
+  color: #1a1a1a;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.container {
+  max-width: 700px;
+  margin: 60px auto;
+  padding: 35px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* ===== BOTÓN VOLVER ===== */
+.volver {
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+  transition: 0.3s ease;
+}
+
+.volver:hover {
+  color: #87CEEB;
+}
+
+/* ===== TITULO ===== */
+h2 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 25px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== FORMULARIO ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ===== LABELS ===== */
+label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+/* ===== MESA ACTUAL ===== */
+.mesa-actual {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ===== ITEMS EXISTENTES ===== */
+.item-existente {
+  background-color: rgba(248, 249, 250, 0.8);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.flex-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.flex-row input[type="text"] {
+  flex: 2;
+}
+
+.flex-row input[type="number"] {
+  flex: 1;
+}
+
+/* ===== BUSQUEDA NUEVOS PLATILLOS ===== */
+.search-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+/* ===== INPUTS ===== */
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #87CEEB;
+  background-color: white;
+  box-shadow: 0 0 8px rgba(135, 206, 235, 0.5);
+}
+
+/* ===== BOTÓN PRINCIPAL ===== */
+button {
+  margin-top: 10px;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* ===== ANIMACION ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    margin: 30px 15px;
+    padding: 25px;
+  }
+
+  .flex-row,
+  .search-row {
+    flex-direction: column;
+  }
+
+  h2 {
+    font-size: 26px;
+  }
+}

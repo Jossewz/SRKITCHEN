@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="html(content, activePage, pageTitle)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' – SR Kitchen' : 'SR Kitchen'}">SR Kitchen</title>
+
+    <!-- Tipografía: Plus Jakarta Sans & Work Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS compilado localmente (100% offline) -->
+    <link rel="stylesheet" th:href="@{/css/globals.css}">
+
+    <!-- Estilos defensivos para Alpine x-cloak y animación fluida -->
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Personalización de scrollbars moderna y discreta */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+
+    <!-- Scripts de interactividad y componentes (100% Locales) -->
+    <script th:src="@{/js/htmx.min.js}"></script>
+    <script>
+        // ===== JWT Auth: Sincronización per-tab =====
+        function rskSyncCookie() {
+            var jwt = sessionStorage.getItem('rskitchen_jwt');
+            if (jwt) {
+                document.cookie = 'rskitchen_jwt=' + jwt + '; path=/; SameSite=Strict';
+            }
+        }
+
+        (function() {
+            var jwt = sessionStorage.getItem('rskitchen_jwt');
+            if (jwt) {
+                // Sincronizar JWT de sessionStorage a cookie para esta navegación
+                document.cookie = 'rskitchen_jwt=' + jwt + '; path=/; SameSite=Strict';
+            } else {
+                // Sin JWT en sessionStorage: borrar cookie residual y redirigir al login si es ruta protegida
+                document.cookie = 'rskitchen_jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+                var path = window.location.pathname;
+                var publicPaths = ['/', '/landing', '/login'];
+                if (publicPaths.indexOf(path) === -1) {
+                    window.location.href = '/login';
+                }
+            }
+        })();
+
+        // Re-sincronizar cookie cuando el usuario enfoca o vuelve a esta pestaña
+        window.addEventListener('focus', rskSyncCookie);
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                rskSyncCookie();
+            }
+        });
+
+        // Inyectar JWT en peticiones HTMX via header Authorization (100% per-tab)
+        document.addEventListener('htmx:configRequest', function(evt) {
+            var jwt = sessionStorage.getItem('rskitchen_jwt');
+            if (jwt) {
+                evt.detail.headers['Authorization'] = 'Bearer ' + jwt;
+            }
+        });
+
+        // Interceptar window.fetch para añadir Authorization: Bearer <jwt>
+        (function() {
+            var originalFetch = window.fetch;
+            window.fetch = function(input, init) {
+                init = init || {};
+                var jwt = sessionStorage.getItem('rskitchen_jwt');
+                if (jwt) {
+                    init.headers = new Headers(init.headers || {});
+                    if (!init.headers.has('Authorization')) {
+                        init.headers.set('Authorization', 'Bearer ' + jwt);
+                    }
+                }
+                return originalFetch(input, init);
+            };
+        })();
+
+        // Sincronizar cookie antes de cada navegación de link
+        document.addEventListener('click', function(e) {
+            var link = e.target.closest('a[href]');
+            if (link && link.href && !link.href.startsWith('javascript:') && !link.href.startsWith('#')) {
+                rskSyncCookie();
+            }
+        }, true);
+
+        // Sincronizar cookie antes de cada envío de formulario
+        document.addEventListener('submit', function(e) {
+            rskSyncCookie();
+        }, true);
+
+        // Función global de Logout per-tab (solo cierra sesión en esta pestaña)
+        window.rskLogout = function() {
+            sessionStorage.removeItem('rskitchen_jwt');
+            document.cookie = 'rskitchen_jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+            window.location.href = '/login?logout=true';
+        };
+    </script>
+    <script th:src="@{/js/lucide.min.js}"></script>
+    <script defer th:src="@{/js/alpine.min.js}"></script>
+</head>
+
+<body class="bg-slate-50 font-work text-slate-900 antialiased selection:bg-[#0c6780] selection:text-white">
+
+<div class="flex min-h-screen max-md:flex-col"
+     x-data="{
+         sidebarOpen: (function() {
+             try {
+                 var val = localStorage.getItem('rskitchen_sidebar_open');
+                 return val !== null ? val === 'true' : (window.innerWidth >= 1024);
+             } catch(e) {
+                 return true;
+             }
+         })(),
+         mobileOpen: false,
+         toggleSidebar() {
+             this.sidebarOpen = !this.sidebarOpen;
+             try {
+                 localStorage.setItem('rskitchen_sidebar_open', this.sidebarOpen);
+             } catch(e) {}
+         }
+     }">
+
+    <!-- SIDEBAR MAESTRO -->
+    <th:block th:replace="~{layouts/sidebar :: sidebar(activePage=${activePage ?: ''})}"></th:block>
+
+    <!-- CONTENEDOR CENTRAL -->
+    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+
+        <!-- NAVBAR SUPERIOR -->
+        <div th:replace="~{layouts/navbar :: navbar}"></div>
+
+        <!-- CONTENIDO DE PÁGINA -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto flex flex-col">
+
+            <!-- Mensaje de Éxito / Alerta Flash -->
+            <div th:if="${mensajeExito != null or msg != null or message != null}"
+                 x-data="{ show: true }" x-show="show" x-transition
+                 class="mb-6 p-4 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-950 text-sm font-semibold flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-md bg-emerald-500/15 text-emerald-700 flex items-center justify-center shrink-0">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 stroke-[2]"></i>
+                    </div>
+                    <span th:text="${mensajeExito ?: (msg ?: message)}">Operación realizada con éxito.</span>
+                </div>
+                <button @click="show = false" type="button" class="text-emerald-700 hover:text-emerald-950 p-1 rounded-md cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Mensaje de Error / Alerta Flash -->
+            <div th:if="${mensajeError != null or error != null}"
+                 x-data="{ show: true }" x-show="show" x-transition
+                 class="mb-6 p-4 rounded-lg bg-rose-50 border border-rose-300 text-rose-950 text-sm font-semibold flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-md bg-rose-500/15 text-rose-700 flex items-center justify-center shrink-0">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 stroke-[2]"></i>
+                    </div>
+                    <span th:text="${mensajeError ?: error}">Ocurrió un error al procesar la operación.</span>
+                </div>
+                <button @click="show = false" type="button" class="text-rose-700 hover:text-rose-950 p-1 rounded-md cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Inserción del Contenido Específico de la Vista -->
+            <th:block th:replace="${content}"></th:block>
+
+        </main>
+
+        <!-- Footer Discreto Institucional -->
+        <footer class="mt-auto py-4 px-6 border-t border-slate-200/70 text-center text-xs text-slate-400">
+            <span>&copy; 2026 SR Kitchen. Sistema de Operación Restaurantera. Desarrollado con tecnología de alta disponibilidad.</span>
+        </footer>
+
+    </div>
+
+</div>
+
+<!-- ASISTENTE INTELIGENTE CHATBOT FLOTANTE -->
+<th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
+
+<!-- Inicialización de Iconos Lucide y Reactividad -->
+<script>
+    function refreshIcons() {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    }
+    document.addEventListener('DOMContentLoaded', refreshIcons);
+    document.addEventListener('htmx:afterSwap', refreshIcons);
+    // Ejecución inicial por si el DOM ya está listo
+    refreshIcons();
+</script>
+
+</body>
+</html>

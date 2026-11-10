@@ -1,0 +1,496 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #b3e5fc, #ffffff);
+  color: #1a1a1a;
+  overflow-x: hidden;
+  min-height: 100vh;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.menu-bar {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 15px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+
+.menu-bar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.menu-bar ul li a {
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  color: white;
+  display: inline-block;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu-bar ul li a:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+/* boton activo al estar en la pagina */
+.menu-bar ul li a.active {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.logout-nav button {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+.logout-nav button:hover {
+  background: #ff6b6b;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* --- CONTENIDO PRINCIPAL --- */
+main {
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+h1 {
+  font-size: 42px;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- TABLA PRINCIPAL --- */
+.table-container {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 25px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto 50px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 1s ease;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+tr:hover {
+  background-color: rgba(135, 206, 235, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.action-link {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-link:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* --- DETALLE DE FACTURA --- */
+.detalle-factura {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto 60px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 1.1s ease;
+}
+
+.detalle-factura h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.detalle-factura p {
+  font-size: 18px;
+  margin: 8px 0;
+}
+
+.detalle-factura table {
+  margin-top: 20px;
+}
+
+.total {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.detalle-factura button {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.detalle-factura button:hover {
+  background-color: #87CEEB;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/* --- MODAL DETALLE FACTURA --- */
+#modal-detalle {
+    display: none; /* oculto por defecto */
+    position: fixed;
+    z-index: 10000; /* encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+#modal-detalle .modal-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    animation: fadeIn 0.3s ease;
+    position: relative;
+}
+
+#modal-detalle .close {
+    color: #1a1a1a;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10001;
+}
+
+#modal-detalle .close:hover {
+    color: #87CEEB;
+}
+
+/* Estilos para la tabla dentro del modal */
+#modal-detalle table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+#modal-detalle th,
+#modal-detalle td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+#modal-detalle th {
+    background-color: #1a1a1a;
+    color: white;
+}
+
+#modal-detalle .total {
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: right;
+    margin-top: 20px;
+    color: #1a1a1a;
+}
+
+/* Botones dentro del modal */
+#modal-detalle .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    margin: 5px;
+}
+
+#modal-detalle .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+#modal-detalle .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+#modal-detalle .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+#modal-detalle .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* --- PAGINACIÓN --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+    gap: 15px;
+    font-size: 1rem;
+}
+
+.page-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+.page-btn:hover {
+    background-color: #0056b3;
+}
+
+/* --- ANIMACIÓN GENERAL --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .menu-bar ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .table-container,
+  .detalle-factura {
+    width: 95%;
+  }
+
+  .pagination {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .page-btn {
+      padding: 10px 15px;
+  }
+
+  /* Estilos responsive específicos para el modal */
+  #modal-detalle .modal-content {
+      width: 95%;
+      padding: 20px;
+      margin: 10px;
+  }
+
+  #modal-detalle table {
+      font-size: 14px;
+  }
+
+  #modal-detalle th,
+  #modal-detalle td {
+      padding: 8px 5px;
+  }
+
+  #modal-detalle .btn {
+      padding: 8px 15px;
+      font-size: 14px;
+  }
+
+  /* --- ESTILOS PARA IMPRESIÓN TICKET --- */
+  .ticket-impresion {
+      display: none; /* Oculto en vista normal */
+  }
+
+  /* Estilos específicos para impresión */
+  @media print {
+      /* Ocultar todo excepto el ticket */
+      body * {
+          visibility: hidden;
+      }
+
+      #ticket-impresion,
+      #ticket-impresion * {
+          visibility: visible;
+      }
+
+      #ticket-impresion {
+          display: block !important;
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 80mm; /* Ancho estándar para tickets */
+          margin: 0;
+          padding: 10px;
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          background: white;
+          box-shadow: none;
+      }
+
+      /* Ocultar elementos no necesarios en impresión */
+      .vista-normal,
+      .modal,
+      .menu-bar,
+      .pagination,
+      .btn {
+          display: none !important;
+      }
+
+      /* Estilos específicos del ticket */
+      .ticket-header {
+          text-align: center;
+          margin-bottom: 10px;
+      }
+
+      .ticket-header h2 {
+          font-size: 16px;
+          margin: 5px 0;
+          font-weight: bold;
+      }
+
+      .ticket-header p {
+          margin: 2px 0;
+          font-size: 10px;
+      }
+
+      .ticket-info p {
+          margin: 3px 0;
+          font-size: 10px;
+      }
+
+      .ticket-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 10px;
+          margin: 8px 0;
+      }
+
+      .ticket-table th {
+          text-align: left;
+          border-bottom: 1px dashed #000;
+          padding: 3px 2px;
+          font-weight: bold;
+      }
+
+      .ticket-table td {
+          padding: 2px;
+          border-bottom: 1px dashed #ccc;
+      }
+
+      .ticket-total {
+          text-align: center;
+          margin: 10px 0;
+          font-size: 12px;
+      }
+
+      .ticket-footer {
+          text-align: center;
+          margin-top: 15px;
+          font-size: 9px;
+      }
+
+      /* Eliminar márgenes y padding no necesarios */
+      body {
+          margin: 0;
+          padding: 0;
+          background: white;
+      }
+
+      /* Asegurar que no haya saltos de página dentro del ticket */
+      .ticket-impresion {
+          page-break-inside: avoid;
+          break-inside: avoid;
+      }
+  }
+
+  /* Vista previa del ticket en pantalla (opcional) */
+  .vista-previa-ticket {
+      display: none;
+      background: white;
+      width: 80mm;
+      margin: 20px auto;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+}

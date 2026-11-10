@@ -1,0 +1,100 @@
+<div th:fragment="chat">
+  <link rel="stylesheet" th:href="@{/css/chat.css}" />
+  
+  <!-- BOTÓN FLOTANTE -->
+  <button class="chat-fab" onclick="toggleChat()" id="chatFab">
+    <span class="material-symbols-outlined">chat</span>
+  </button>
+
+  <!-- VENTANA DEL CHAT -->
+  <div class="chat-window" id="chatWindow">
+    
+    <!-- HEADER -->
+    <div class="chat-header">
+      <div class="chat-header-content">
+        <div class="chat-title">
+          <span class="chat-icon">💬</span> Asistente
+        </div>
+        <button class="chat-close" onclick="toggleChat()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ÁREA DE MENSAJES -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">
+        <div class="message-content">Hola 👋 ¿En qué puedo ayudarte?</div>
+      </div>
+    </div>
+
+    <!-- INPUT DE TEXTO -->
+    <div class="chat-input-area">
+      <input type="text" id="chatInputText" placeholder="Escribe tu mensaje...">
+      <button class="chat-send-btn" onclick="sendChatMessage()">
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+    
+  </div>
+
+  <script>
+    function toggleChat() {
+        const chatWindow = document.getElementById("chatWindow");
+        chatWindow.classList.toggle("open");
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById("chatInputText");
+        const messagesContainer = document.getElementById("chatMessages");
+        
+        const mensaje = input.value.trim();
+        if (mensaje === "") return;
+
+        // Agregar mensaje del usuario
+        const userMsg = document.createElement("div");
+        userMsg.className = "message user";
+        userMsg.innerHTML = `<div class="message-content">${mensaje}</div>`;
+        messagesContainer.appendChild(userMsg);
+
+        input.value = "";
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Agregar mensaje temporal del bot (pensando...)
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        botMsg.innerHTML = `<div class="message-content typing">Pensando<span>.</span><span>.</span><span>.</span></div>`;
+        messagesContainer.appendChild(botMsg);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Llamada al backend
+        fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: mensaje
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Error en servidor");
+            return response.text();
+        })
+        .then(data => {
+            botMsg.innerHTML = `<div class="message-content">${data}</div>`;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        })
+        .catch(error => {
+            botMsg.innerHTML = `<div class="message-content error">Error al conectar 😢</div>`;
+            console.error(error);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("chatInputText");
+        input.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+    });
+  </script>
+</div>

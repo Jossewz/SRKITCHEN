@@ -1,0 +1,90 @@
+/*pertenece a A no usar este para nada aqui se experimenta, encerio no tocar */
+  <style>
+    /* RESET */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        padding-top: 60px;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(120deg, #78bcff, #ffffff);
+        color: #002244;
+        margin: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    /* --- BARRA IDÉNTICA A MESA --- */
+    nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .nav-container {
+        width: 100%;
+        max-width: 1400px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0;
+    }
+
+    .nav-links a {
+        color: #003366; /* 🔹 MISMO COLOR de texto que mesa */
+        text-decoration: none;
+        margin: 0 18px; /* 🔹 MISMO MARGIN que mesa */
+        font-weight: 600;
+        font-size: 1rem; /* 🔹 MISMO TAMAÑO que mesa */
+        padding: 10px 6px; /* 🔹 MISMO PADDING que mesa */
+        transition: background-color 0.3s ease;
+        border-radius: 4px; /* 🔹 MISMO BORDER-RADIUS */
+    }
+
+    .nav-links a:hover {
+        background-color: #00509e; /* 🔹 MISMO HOVER que mesa */
+        color: white;
+    }
+
+    /* 🔹 BOTÓN CERRAR SESIÓN IDÉNTICO AL DE MESA */
+    .btn-logout {
+        background-color: #3399ff; /* 🔹 MISMO COLOR que botones mesa */
+        color: white;
+        border: none;
+        padding: 10px 15px; /* 🔹 MISMO PADDING que botones mesa */
+        border-radius: 6px; /* 🔹 MISMO BORDER-RADIUS */
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-logout:hover {
+        background-color: #007acc; /* 🔹 MISMO HOVER que botones mesa */
+    }
+
+    /* --- CONTENIDO PRINCIPAL --- */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
