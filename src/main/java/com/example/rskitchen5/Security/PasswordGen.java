@@ -11,3 +11,4 @@ public class PasswordGen {
         System.out.println("Contraseña encriptada: " + encodedPassword);
     }
 }
+
