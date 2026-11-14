@@ -130,6 +130,15 @@
                     <i data-lucide="trending-up" class="w-5 h-5 shrink-0 stroke-[1.75]"></i>
                     <span x-show="sidebarOpen" x-cloak class="truncate">Optimización</span>
                 </a>
+
+                <!-- Predicción de Ventas (Machine Learning) -->
+                <a href="/prediccion"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group"
+                   th:classappend="${activePage == 'prediccion'} ? 'bg-white/20 text-white font-bold shadow-xs' : 'text-sky-100 hover:bg-white/10 hover:text-white'"
+                   title="Predicción de ventas">
+                    <i data-lucide="brain-circuit" class="w-5 h-5 shrink-0 stroke-[1.75]"></i>
+                    <span x-show="sidebarOpen" x-cloak class="truncate">Predicción Ventas</span>
+                </a>
             </div>
 
             <!-- Sección Super Admin (ÚNICAMENTE ROLE_CREATOR) -->
@@ -145,6 +154,15 @@
                    title="Gestión de Restaurantes">
                     <i data-lucide="store" class="w-5 h-5 shrink-0 stroke-[1.75]"></i>
                     <span x-show="sidebarOpen" x-cloak class="truncate">Restaurantes</span>
+                </a>
+
+                <!-- Predicción de Ventas (Machine Learning) -->
+                <a href="/prediccion"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group"
+                   th:classappend="${activePage == 'prediccion'} ? 'bg-white/20 text-white font-bold shadow-xs' : 'text-sky-100 hover:bg-white/10 hover:text-white'"
+                   title="Predicción de ventas">
+                    <i data-lucide="brain-circuit" class="w-5 h-5 shrink-0 stroke-[1.75]"></i>
+                    <span x-show="sidebarOpen" x-cloak class="truncate">Predicción Ventas</span>
                 </a>
             </div>
 
@@ -272,6 +290,11 @@
                             <i data-lucide="trending-up" class="w-5 h-5 stroke-[1.75]"></i>
                             <span>Optimización</span>
                         </a>
+                        <a href="/prediccion" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium"
+                           th:classappend="${activePage == 'prediccion'} ? 'bg-white/20 text-white font-bold' : 'text-sky-100 hover:bg-white/10'">
+                            <i data-lucide="brain-circuit" class="w-5 h-5 stroke-[1.75]"></i>
+                            <span>Predicción Ventas</span>
+                        </a>
                     </div>
 
                     <div sec:authorize="hasAuthority('ROLE_CREATOR')" class="pt-3 border-t border-white/10 space-y-1">
@@ -279,6 +302,11 @@
                            th:classappend="${activePage == 'restaurantes'} ? 'bg-white/20 text-white font-bold' : 'text-sky-100 hover:bg-white/10'">
                             <i data-lucide="store" class="w-5 h-5 stroke-[1.75]"></i>
                             <span>Restaurantes</span>
+                        </a>
+                        <a href="/prediccion" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium"
+                           th:classappend="${activePage == 'prediccion'} ? 'bg-white/20 text-white font-bold' : 'text-sky-100 hover:bg-white/10'">
+                            <i data-lucide="brain-circuit" class="w-5 h-5 stroke-[1.75]"></i>
+                            <span>Predicción Ventas</span>
                         </a>
                     </div>
 
