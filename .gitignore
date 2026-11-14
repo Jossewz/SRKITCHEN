@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Screenshots & Test Artifacts ###
+screenshot*.png
+*.screenshot.png
+.playwright-mcp/
+scratch/

@@ -1,100 +1,99 @@
 /* --- parte de factura  --- */
-<style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(120deg, #78bcff, #ffffff);
-            color: #002244;
-            padding: 30px;
-            max-width: 800px;
-            margin: auto;
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #78bcff, #ffffff);
+    color: #002244;
+    padding: 30px;
+    max-width: 800px;
+    margin: auto;
+}
 
-        h1, h2 {
-            text-align: center;
-            color: #003366;
-        }
+h1, h2 {
+    text-align: center;
+    color: #003366;
+}
 
-        .info {
-            margin-bottom: 20px;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 51, 102, 0.1);
-        }
+.info {
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 51, 102, 0.1);
+}
 
-        .info p {
-            margin: 5px 0;
-            font-size: 16px;
-        }
+.info p {
+    margin: 5px 0;
+    font-size: 16px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 51, 102, 0.1);
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 51, 102, 0.1);
+}
 
-        th, td {
-            border: 1px solid #b3d1ff;
-            padding: 10px;
-            text-align: center;
-        }
+th, td {
+    border: 1px solid #b3d1ff;
+    padding: 10px;
+    text-align: center;
+}
 
-        th {
-            background-color: #cce6ff;
-            color: #002244;
-        }
+th {
+    background-color: #cce6ff;
+    color: #002244;
+}
 
-        tbody tr:nth-child(even) {
-            background-color: #e6f0ff;
-        }
+tbody tr:nth-child(even) {
+    background-color: #e6f0ff;
+}
 
-        tbody tr:hover {
-            background-color: #d0e3ff;
-        }
+tbody tr:hover {
+    background-color: #d0e3ff;
+}
 
-        .total {
-            font-weight: bold;
-            font-size: 18px;
-            text-align: right;
-            margin-top: 20px;
-            color: #003366;
-        }
+.total {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: right;
+    margin-top: 20px;
+    color: #003366;
+}
 
-        .acciones {
-            text-align: center;
-            margin-top: 30px;
-        }
+.acciones {
+    text-align: center;
+    margin-top: 30px;
+}
 
-        button {
-            background-color: #007acc;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+button {
+    background-color: #007acc;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
-        button:hover {
-            background-color: #005c99;
-        }
+button:hover {
+    background-color: #005c99;
+}
 
-        @media print {
-            .acciones {
-                display: none;
-            }
+@media print {
+    .acciones {
+        display: none;
+    }
 
-            body {
-                background-color: white;
-                color: black;
-            }
+    body {
+        background-color: white;
+        color: black;
+        padding: 0;
+    }
 
-            .info, table {
-                box-shadow: none;
-                border: none;
-            }
-        }
-    </style>
+    .info, table {
+        box-shadow: none;
+        border: none;
+    }
+}

@@ -1,116 +1,79 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'datos', 'Optimización Operativa')}">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Análisis de Ganancias - Modelo Weka</title>
-    <link rel="stylesheet" th:href="@{/css/datos.css}" />
-    <link rel="stylesheet" th:href="@{/css/chat.css}">
-
-
+    <title>Analítica y Optimización – SR Kitchen</title>
 </head>
+
 <body>
-<nav class="menu-bar">
-    <ul>
-        <li><a href="/home" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Inicio</a></li>
-        <li><a href="/mesa"sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
-        <li><a href="/pedidos" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
-        <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
-        <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
-        <li><a href="/platillos" sec:authorize="hasAuthority('ROLE_ADMIN')">Platillos</a></li>
-        <li><a href="/datos"   class="active"  sec:authorize="hasAnyAuthority('ROLE_ADMIN')">Datos</a></li>
-        <li class="logout-nav">
-            <form th:action="@{/logout}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit">Cerrar Sesión</button>
-            </form>
-        </li>
-    </ul>
-</nav>
-<div class="container">
-    <div class="header">
-        <h1> Dashboard de Análisis de Ganancias</h1>
-        <p>Predicciones inteligentes basadas en Machine Learning</p>
-    </div>
 
-    <div class="controls">
-        <button class="btn-primary" id="btnPrediccion">
-             Ejecutar Análisis Predictivo
-        </button>
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Analizando datos y generando predicciones...</p>
-        </div>
-    </div>
+<th:block th:fragment="content">
+    
+    <div class="space-y-8">
 
-    <div class="result-container">
-        <div id="resultado">
-            <div style="text-align: center; padding: 50px; color: #6c757d;">
-                <h3> Presiona el botón para iniciar el análisis</h3>
-                <p>El sistema analizará los patrones de pago y predecirá el impacto en las ganancias</p>
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA
+             ══════════════════════════════════════════════════════════ -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <div>
+                <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Optimización Operativa y Modelos</h1>
+                <p class="text-xs sm:text-sm text-slate-500">Programación lineal, predicción de rentabilidad y rotación de cocina</p>
             </div>
+            
+            <a href="https://app.powerbi.com/view?r=eyJrIjoiZGVhODExZDQtOWEyMi00ODdlLWIzMDQtMWM5Yjc2ZmY4MDZiIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer shrink-0">
+                <i data-lucide="bar-chart-2" class="size-4 text-[#0c6780]"></i>
+                <span>Ver Power BI Embebido</span>
+            </a>
         </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             2. HERO CARD PARA DISPARAR EL ANÁLISIS MATEMÁTICO
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-8 sm:p-10 shadow-sm text-center relative overflow-hidden">
+            <div class="size-16 rounded-2xl bg-[#0c6780]/10 text-[#0c6780] flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="brain-circuit" class="size-8 stroke-[1.75]"></i>
+            </div>
+            
+            <h2 class="text-xl sm:text-2xl font-extrabold font-jakarta text-slate-800 mb-2">
+                Resolución del Modelo de Rentabilidad Máxima
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mb-6">
+                El motor analiza las comandas reales de la base de datos relacional y calcula la combinación óptima de producción entre platos fuertes y platos sencillos con restricciones de insumos.
+            </p>
+
+            <button id="btnPrediccion" 
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-sm shadow-md transition-all hover:scale-102 cursor-pointer">
+                <i data-lucide="play" class="size-4.5 fill-current"></i>
+                <span>Ejecutar Modelo de Optimización</span>
+            </button>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             3. SPINNER DE CARGA
+             ══════════════════════════════════════════════════════════ -->
+        <div id="loading" class="hidden p-10 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+            <div class="size-12 rounded-full border-4 border-slate-200 border-t-[#0c6780] animate-spin mx-auto mb-3"></div>
+            <h3 class="text-sm font-bold text-slate-800">Resolviendo Sistema de Ecuaciones...</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Consultando PostgreSQL y optimizando función objetivo Simplex.</p>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             4. CONTENEDOR DE RESULTADOS DINÁMICOS
+             ══════════════════════════════════════════════════════════ -->
+        <div id="resultado" class="space-y-6"></div>
+
     </div>
 
-    <div class="footer">
-        <p>Sistema de Predicción Weka ML | Powered by Spring Boot & AI</p>
-    </div>
-</div>
+    <!-- Script de análisis matemático -->
+    <script th:src="@{/js/datos-analysis.js}"></script>
 
-<script>
-    document.getElementById("btnPrediccion").addEventListener("click", async () => {
-        const btn = document.getElementById("btnPrediccion");
-        const loading = document.getElementById("loading");
-        const resultado = document.getElementById("resultado");
-
-        // Mostrar loading
-        btn.disabled = true;
-        btn.innerHTML = " Procesando...";
-        loading.style.display = 'block';
-        resultado.innerHTML = '';
-
-        try {
-            const response = await fetch("/weka");
-
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`);
-            }
-
-            const html = await response.text();
-            resultado.innerHTML = html;
-
-        } catch (error) {
-            resultado.innerHTML = `
-                    <div class="error-box">
-                        <h3> Error en la conexión</h3>
-                        <p>No se pudo conectar con el servidor. Error: ${error.message}</p>
-                        <p>Verifica que el servidor esté ejecutándose correctamente.</p>
-                    </div>
-                `;
-        } finally {
-            // Restaurar botón
-            btn.disabled = false;
-            btn.innerHTML = " Ejecutar Nuevo Análisis";
-            loading.style.display = 'none';
-
-            // Scroll suave al resultado
-            resultado.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-
-    // Efectos visuales adicionales
-    document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('btnPrediccion');
-
-        btn.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.05)';
-        });
-
-        btn.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
-</script>
-<div th:replace="chat :: chat"></div>
+</th:block>
 
 </body>
 </html>

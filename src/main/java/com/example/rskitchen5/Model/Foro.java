@@ -1,30 +1,50 @@
 package com.example.rskitchen5.Model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Document(collection = "foro")
+@Entity
+@Table(name = "foros")
 public class Foro {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String fnombre;
+
+    @Column(length = 2000)
     private String fcomentario;
+
     private LocalDateTime fecha;
+
+    public Foro() {
+        this.fecha = LocalDateTime.now();
+    }
 
     public Foro(String fnombre, String fcomentario, LocalDateTime fecha) {
         this.fnombre = fnombre;
         this.fcomentario = fcomentario;
-        this.fecha = fecha;
+        this.fecha = fecha != null ? fecha : LocalDateTime.now();
     }
 
     public String getId() {
-        return id;
+        return id != null ? String.valueOf(id) : null;
     }
 
     public void setId(String id) {
+        if (id != null && !id.trim().isEmpty()) {
+            try {
+                this.id = Long.parseLong(id);
+            } catch (NumberFormatException ignored) {}
+        }
+    }
+
+    public Long getIdLong() {
+        return id;
+    }
+
+    public void setIdLong(Long id) {
         this.id = id;
     }
 
@@ -52,4 +72,3 @@ public class Foro {
         this.fecha = fecha;
     }
 }
-

@@ -1,114 +1,381 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8" />
-    <title>Gestión de Pedidos | Kitchen</title>
-    <link rel="stylesheet" th:href="@{/css/pedido.css}">
-    <link rel="stylesheet" th:href="@{/css/platillo-confirmacion.css}">
-    <link rel="stylesheet" th:href="@{/css/chat.css}">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:replace="~{layouts/base :: html(~{::content}, 'pedidos', 'Comandas y Pedidos')}">
 
+<head>
+    <title>Pedidos – SR Kitchen</title>
 </head>
 
 <body>
 
-<nav class="menu-bar">
-    <ul>
-        <li><a href="/home" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Inicio</a></li>
-        <li><a href="/mesa" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Mesa</a></li>
-        <li><a href="/pedidos" class="active"sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Pedidos</a></li>
-        <li><a href="/factura" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_MESERO')">Facturas</a></li>
-        <li><a href="/mesero" sec:authorize="hasAuthority('ROLE_ADMIN')">Mesero</a></li>
-        <li><a href="/platillos" sec:authorize="hasAuthority('ROLE_ADMIN')">Platillos</a></li>
-        <li><a href="/datos" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">Datos</a></li>
-        <li class="logout-nav">
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit" style="background:#d9534f; color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:all 0.3s ease;">Cerrar Sesión</button>
-            </form>
-        </li>
-    </ul>
-</nav>
+    <th:block th:fragment="content">
 
-<div class="container">
+        <div class="space-y-8" x-data="{
+             platilloSearch: '',
+             selectedCount: 0,
+             estimatedTotal: 0,
+             updateSummary() {
+                 let count = 0;
+                 let total = 0;
+                 document.querySelectorAll('.platillo-checkbox:checked').forEach(cb => {
+                     count++;
+                     const card = cb.closest('.platillo-card');
+                     const price = parseFloat(card.dataset.price || 0);
+                     const qtyInput = card.querySelector('.platillo-qty');
+                     const qty = parseInt(qtyInput ? qtyInput.value : 1);
+                     total += (price * qty);
+                 });
+                 this.selectedCount = count;
+                 this.estimatedTotal = total;
+             },
+             increment(btn) {
+                 const input = btn.parentElement.querySelector('.platillo-qty');
+                 if (input) {
+                     input.value = parseInt(input.value || 1) + 1;
+                     this.updateSummary();
+                 }
+             },
+             decrement(btn) {
+                 const input = btn.parentElement.querySelector('.platillo-qty');
+                 if (input && parseInt(input.value) > 1) {
+                     input.value = parseInt(input.value) - 1;
+                     this.updateSummary();
+                 }
+             }
+         }">
 
-    <h1>Gestión de Pedidos</h1>
+            <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA
+             ══════════════════════════════════════════════════════════ -->
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+                <div>
+                    <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Comandas y Pedidos
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-500">Apertura rápida de comanda por mesa y control de
+                        producción de cocina</p>
+                </div>
 
-    <div th:if="${error}" class="error" th:text="${error}"></div>
-    <div th:if="${param.exito}" class="success" th:text="${param.exito}"></div>
-
-    <form th:action="@{/pedidos}" method="post" th:object="${pedido}">
-        <label for="mesaId">Mesa:</label>
-        <select id="mesaId" th:field="*{mesaId}" required>
-            <option value="">-- Seleccione una mesa --</option>
-            <option th:each="mesa : ${mesas}" th:value="${mesa.id}"
-                    th:text="'Mesa ' + ${mesa.num} + (${mesa.ocupado} ? ' (Ocupada)' : '')"
-                    th:disabled="${mesa.ocupado}"></option>
-        </select>
-
-        <label for="meseroId">Mesero:</label>
-        <select id="meseroId" th:field="*{meseroId}" required>
-            <option value="">-- Seleccione un mesero --</option>
-            <option th:each="mesero : ${meseros}" th:value="${mesero.id}" th:text="${mesero.name}"></option>
-        </select>
-
-        <h3>Menú</h3>
-        <input type="text" id="busquedaPlatillo" placeholder="Buscar platillo...">
-
-        <div th:each="platillo : ${platillos}" class="platillo-item">
-            <input type="checkbox" name="platillosSeleccionados" th:value="${platillo.id}" id="platillo_${platillo.id}">
-            <label th:for="'platillo_' + ${platillo.id}">
-                <strong th:text="${platillo.name}"></strong>
-                <span th:text="${' - $' + #numbers.formatDecimal(platillo.price, 1, 2)}" style="color: #555;"></span>
-            </label>
-            <div>
-                <label>Cantidad:</label>
-                <input type="number" th:name="'cantidad_' + ${platillo.id}" min="1" value="1" class="cantidad-input">
+                <a href="#pedidos-recientes"
+                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer self-start sm:self-auto">
+                    <i data-lucide="history" class="size-4 text-slate-500"></i>
+                    <span>Ver Pedidos Recientes</span>
+                </a>
             </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+             2. FORMULARIO PRINCIPAL DE CREACIÓN DE PEDIDO
+             ══════════════════════════════════════════════════════════ -->
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden">
+
+                <div
+                    class="px-6 py-5 bg-gradient-to-r from-slate-50 to-white border-b border-slate-200/80 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="size-9 rounded-xl bg-[#0c6780]/10 text-[#0c6780] flex items-center justify-center">
+                            <i data-lucide="utensils-crossed" class="size-5 stroke-[2]"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-800 leading-tight">Nueva Comanda</h2>
+                            <span class="text-[11px] text-slate-400">Selecciona mesa, mesero y los platillos del
+                                cliente</span>
+                        </div>
+                    </div>
+
+                    <!-- Resumen Flotante Rápido en Encabezado -->
+                    <div class="flex items-center gap-3 text-xs" x-show="selectedCount > 0" x-cloak>
+                        <span class="px-2.5 py-1 rounded-full bg-sky-50 text-[#0c6780] font-bold border border-sky-200"
+                            x-text="selectedCount + ' seleccionados'">0</span>
+                        <span class="font-extrabold text-slate-800 text-sm font-jakarta"
+                            x-text="'$' + estimatedTotal.toFixed(2)">$0.00</span>
+                    </div>
+                </div>
+
+                <form th:action="@{/pedidos}" method="post" th:object="${pedido}" id="orderForm" class="p-6 space-y-6">
+
+                    <!-- Fila 1: Asignación de Mesa y Mesero -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Selección de Mesa -->
+                        <div>
+                            <label for="mesaId"
+                                class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="layout-grid" class="size-3.5 text-slate-400"></i>
+                                <span>Mesa de Salón</span>
+                                <span class="text-rose-500">*</span>
+                            </label>
+                            <select id="mesaId" th:field="*{mesaId}" required
+                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all cursor-pointer">
+                                <option value="">-- Seleccionar Mesa --</option>
+                                <option th:each="mesa : ${mesas}" th:value="${mesa.id}"
+                                    th:text="'Mesa ' + ${mesa.num} + (${mesa.ocupado} ? ' (En servicio)' : ' (Libre)')"
+                                    th:disabled="${mesa.ocupado}"></option>
+                            </select>
+                            <span class="text-[10px] text-slate-400 mt-1 block">Solo se muestran mesas disponibles sin
+                                comanda activa</span>
+                        </div>
+
+                        <!-- Selección de Mesero -->
+                        <div>
+                            <label for="meseroId"
+                                class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="user" class="size-3.5 text-slate-400"></i>
+                                <span>Mesero Responsable</span>
+                                <span class="text-rose-500">*</span>
+                            </label>
+
+                            <!-- Si es Mesero autenticado: campo fijado automáticamente -->
+                            <div th:if="${meseroFijo != null}" class="relative">
+                                <input type="hidden" name="meseroId" th:value="${meseroFijo.id}" />
+                                <div
+                                    class="w-full px-3.5 py-2.5 text-sm bg-sky-50/80 border border-[#0c6780]/30 text-[#0c6780] font-bold rounded-xl flex items-center justify-between">
+                                    <span th:text="${meseroFijo.name}">Nombre Mesero</span>
+                                    <span
+                                        class="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-[#0c6780] text-white">Tu
+                                        Sesión</span>
+                                </div>
+                            </div>
+
+                            <!-- Si es Administrador: selector libre de cualquier mesero -->
+                            <div th:unless="${meseroFijo != null}">
+                                <select id="meseroId" th:field="*{meseroId}" required
+                                    class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all cursor-pointer">
+                                    <option value="">-- Seleccionar Mesero --</option>
+                                    <option th:each="mesero : ${meseros}" th:value="${mesero.id}"
+                                        th:text="${mesero.name}"></option>
+                                </select>
+                            </div>
+
+                            <span class="text-[10px] text-slate-400 mt-1 block">Atención registrada para control de
+                                propinas y turno</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Fila 2: Selector de Platillos con Búsqueda -->
+                    <div class="space-y-3 pt-2 border-t border-slate-100">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <i data-lucide="utensils" class="size-3.5 text-slate-400"></i>
+                                <span>Platillos de la Carta</span>
+                                <span class="text-rose-500">*</span>
+                            </label>
+
+                            <!-- Input Búsqueda en Carta -->
+                            <div class="relative w-full sm:w-72">
+                                <i data-lucide="search"
+                                    class="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                                <input type="text" x-model="platilloSearch" placeholder="Filtrar por platillo..."
+                                    class="w-full pl-9 pr-3.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                            </div>
+                        </div>
+
+                        <!-- Grid de Platillos Disponibles -->
+                        <div
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 max-h-[460px] overflow-y-auto p-1">
+                            <div th:each="platillo : ${platillos}" th:data-platillo-name="${platillo.name}"
+                                th:data-price="${platillo.price}" x-data="{ checked: false }"
+                                x-show="!platilloSearch || $el.dataset.platilloName.toLowerCase().includes(platilloSearch.toLowerCase())"
+                                x-transition
+                                class="platillo-card p-3.5 rounded-2xl border transition-all duration-150 flex flex-col justify-between"
+                                :class="checked ? 'bg-sky-50/70 border-[#0c6780]/50 shadow-xs' : 'bg-white border-slate-200/80 hover:border-slate-300'">
+
+                                <div class="flex items-start gap-3">
+                                    <input type="checkbox" name="platillosSeleccionados" th:value="${platillo.id}"
+                                        th:id="'platillo_' + ${platillo.id}" x-model="checked" @change="updateSummary()"
+                                        class="platillo-checkbox mt-1 size-4.5 rounded-md accent-[#0c6780] cursor-pointer">
+
+                                    <label th:for="'platillo_' + ${platillo.id}"
+                                        class="flex-1 cursor-pointer select-none">
+                                        <div class="flex items-center justify-between gap-1">
+                                            <strong class="text-xs font-bold text-slate-800 leading-tight"
+                                                th:text="${platillo.name}">Platillo</strong>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="text-xs font-extrabold text-[#0c6780] font-jakarta"
+                                                th:text="'$' + ${#numbers.formatDecimal(platillo.price, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+                                            <span th:if="${platillo.disponible}"
+                                                class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold">
+                                                Disponible
+                                            </span>
+                                            <span th:unless="${platillo.disponible}"
+                                                class="text-[10px] px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 font-semibold"
+                                                title="Faltan ingredientes en inventario">
+                                                Agotado
+                                            </span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Selector de Cantidad (Visible solo al seleccionar) -->
+                                <div x-show="checked" x-cloak
+                                    class="mt-3 pt-2.5 border-t border-sky-100 flex items-center justify-between">
+                                    <span class="text-[11px] font-bold text-slate-500">Cantidad:</span>
+                                    <div
+                                        class="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-0.5 shadow-2xs">
+                                        <button type="button" @click="decrement($el)"
+                                            class="size-6 rounded-lg text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold text-sm cursor-pointer">
+                                            -
+                                        </button>
+                                        <input type="number" th:name="'cantidad_' + ${platillo.id}" value="1" min="1"
+                                            readonly
+                                            class="platillo-qty w-8 text-center text-xs font-bold text-slate-800 border-none p-0 focus:outline-none">
+                                        <button type="button" @click="increment($el)"
+                                            class="size-6 rounded-lg text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold text-sm cursor-pointer">
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Botón de Envío y Confirmación -->
+                    <div
+                        class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-xs text-slate-500 flex items-center gap-2">
+                            <i data-lucide="info" class="size-4 text-sky-600 shrink-0"></i>
+                            <span>La comanda pasará a estado pendiente para cobro en caja o mesa.</span>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-sm shadow-md transition-all cursor-pointer">
+                            <i data-lucide="check" class="size-4.5 stroke-[2.5]"></i>
+                            <span>Confirmar y Enviar Comanda</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+             3. PEDIDOS RECIENTES
+             ══════════════════════════════════════════════════════════ -->
+            <div id="pedidos-recientes" class="space-y-4 pt-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold font-jakarta text-slate-800">Historial Reciente de Comandas</h2>
+                        <p class="text-xs text-slate-500">Últimos pedidos registrados en el turno activo</p>
+                    </div>
+                </div>
+
+                <!-- Grid de Pedidos Recientes -->
+                <div th:if="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+                    <div th:each="pedido : ${pedidosRecientes}"
+                        class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-150 p-5 flex flex-col justify-between">
+
+                        <div>
+                            <!-- Encabezado de la comanda -->
+                            <div class="flex items-start justify-between pb-3 border-b border-slate-100 mb-3">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <strong class="text-sm font-bold font-jakarta text-slate-800">
+                                            Pedido <span class="text-sky-700"
+                                                th:text="'#' + (${pedido.id != null and pedido.id.length() >= 6 ? pedido.id.substring(0,6) : pedido.id})">#000</span>
+                                        </strong>
+                                    </div>
+                                    <span class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                                        <i data-lucide="clock" class="size-3"></i>
+                                        <span
+                                            th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}">--:--</span>
+                                    </span>
+                                </div>
+
+                                <!-- Chip de Estado de Pago -->
+                                <span th:if="${pedido.pagado}"
+                                    class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    Pagado
+                                </span>
+                                <span th:unless="${pedido.pagado}"
+                                    class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Pendiente
+                                </span>
+                            </div>
+
+                            <!-- Info Mesa / Mesero -->
+                            <div class="grid grid-cols-2 gap-2 text-xs mb-3 pb-3 border-b border-slate-100">
+                                <div>
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Mesa</span>
+                                    <strong class="text-slate-800" th:text="'Mesa ' + ${pedido.mesaNum}">Mesa</strong>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Mesero</span>
+                                    <strong class="text-slate-800 truncate block"
+                                        th:text="${pedido.meseroName}">Mesero</strong>
+                                </div>
+                            </div>
+
+                            <!-- Detalle de Items -->
+                            <div class="bg-slate-50/80 rounded-xl p-3 space-y-1.5 mb-4 text-xs">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                                    Platillos (<span
+                                        th:text="${pedido.items != null ? pedido.items.size() : 0}"></span>)
+                                </span>
+                                <div th:each="item : ${pedido.items}"
+                                    class="flex items-center justify-between text-slate-700">
+                                    <span class="truncate pr-2 font-medium"
+                                        th:text="${item.name + ' ×' + item.cant}">Platillo</span>
+                                    <span class="font-bold text-slate-900 shrink-0"
+                                        th:text="'$' + ${#numbers.formatDecimal((item.unidades != null ? item.unidades : 1) * (item.price != null ? item.price : 0.0), 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total y Acciones -->
+                        <div>
+                            <div class="flex items-baseline justify-between pt-1 mb-3">
+                                <span class="text-xs font-bold text-slate-500">Total Comanda:</span>
+                                <span class="text-lg font-black font-jakarta text-[#0c6780]"
+                                    th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+                                <a th:href="@{'/pedidos/detalle/' + ${pedido.id}}" target="_blank"
+                                    class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#0c6780] border border-sky-200/80 text-xs font-bold transition-colors cursor-pointer"
+                                    title="Ver a detalle e imprimir ticket de comanda">
+                                    <i data-lucide="receipt" class="size-3.5"></i>
+                                    <span>Detalle</span>
+                                </a>
+                                <a th:unless="${pedido.pagado}" th:href="@{'/pedidos/editar/' + ${pedido.id}}"
+                                    class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer">
+                                    <i data-lucide="edit-3" class="size-3.5"></i>
+                                    <span>Editar</span>
+                                </a>
+                                <a th:unless="${pedido.pagado}" th:href="@{'/pedidos/eliminar/' + ${pedido.id}}"
+                                    onclick="return confirm('¿Confirmas cancelar y eliminar este pedido?');"
+                                    class="flex items-center justify-center size-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors cursor-pointer"
+                                    title="Eliminar Pedido">
+                                    <i data-lucide="trash-2" class="size-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Estado Vacío -->
+                <div th:if="${pedidosRecientes == null or pedidosRecientes.isEmpty()}"
+                    class="p-12 text-center rounded-xl bg-white border border-slate-200/80 shadow-xs">
+                    <div
+                        class="size-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="shopping-bag" class="size-7 stroke-[1.5]"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-700">No hay comandas recientes</h3>
+                    <p class="text-xs text-slate-400 mt-1">Registra la primera comanda usando el formulario superior.
+                    </p>
+                </div>
+
+            </div>
+
         </div>
 
-        <p style="margin-top:15px; font-style:italic; color:#555;">El total se calculará automáticamente al procesar el pedido.</p>
-
-        <button type="submit" class="btn-submit">Crear Pedido</button>
-    </form>
-
-    <h2>Últimos Pedidos</h2>
-
-    <div th:if="${pedidosRecientes != null and !pedidosRecientes.isEmpty()}">
-        <div th:each="pedido : ${pedidosRecientes}" class="pedido-card">
-            <h3>Pedido #<span th:text="${pedido.id.substring(0,8)}"></span></h3>
-            <p><strong>Mesa:</strong> <span th:text="${pedido.mesaNum}"></span></p>
-            <p><strong>Mesero:</strong> <span th:text="${pedido.meseroName}"></span></p>
-            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></span></p>
-            <p><strong>Total:</strong> <span th:text="${'$' + #numbers.formatDecimal(pedido.total, 1, 2)}"></span></p>
-
-            <h4>Items:</h4>
-            <ul class="item-list">
-                <li th:each="item : ${pedido.items}">
-                    <span th:text="${item.name}"></span> - Cantidad:
-                    <span th:text="${item.cant}"></span> - <span th:text="${'$' + #numbers.formatDecimal(item.price, 1, 2)}"></span>
-                </li>
-            </ul>
-
-            <div style="margin-top:10px;">
-                <a th:href="@{'/pedidos/editar/' + ${pedido.id}}">Editar</a> |
-                <a th:href="@{'/pedidos/eliminar/' + ${pedido.id}}" class="btn-eliminar">Eliminar</a>
-
-            </div>
-        </div>
-    </div>
-
-    <div th:if="${pedidosRecientes == null or pedidosRecientes.isEmpty()}"
-         style="background:#eef6ff; padding:12px; border-radius:6px; color:#555; text-align:center;">
-        No hay pedidos recientes.
-    </div>
-</div>
-
-<script th:src="@{/js/pedidojs.js}"></script>
-
-<script th:src="@{/js/confirmacionpedido.js}"></script>
-<div th:replace="chat :: chat"></div>
+    </th:block>
 
 </body>
+
 </html>
-
-

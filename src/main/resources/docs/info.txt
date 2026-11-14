@@ -1,0 +1,22 @@
+SR KITCHEN - INFORMACIÓN GENERAL DEL RESTAURANTE
+
+Nombre: SR Kitchen
+Concepto: Restaurante & Bar de experiencia gastronómica de alta calidad.
+Dirección: Calle Principal 123, Zona Rosa.
+Horarios de Atención:
+- Lunes a Jueves: 12:00 PM a 10:00 PM
+- Viernes y Sábados: 12:00 PM a 11:30 PM
+- Domingos y Festivos: 12:00 PM a 9:00 PM
+
+Menú y Especialidades:
+- Hamburguesa Clásica Artesanal: carne de res seleccionada, queso cheddar madurado, tocineta crujiente y papas rústicas ($25.000).
+- Pizza Margarita Artesanal: masa madre fermentada 48h, salsa pomodoro italiana, mozzarella fresca y albahaca ($32.000).
+- Costillas BBQ: cocidas a fuego lento durante 8 horas, glaseadas con salsa BBQ casera ($42.000).
+- Acompañamientos: Papas a la francesa, Ensalada César fresca.
+- Bebidas: Limonada natural, jugos tropicales, cervezas artesanales y cócteles.
+
+Servicios:
+- Reservas de mesas y atención personalizada por meseros asignados.
+- Métodos de pago: Efectivo, Tarjeta Débito y Tarjeta Crédito.
+- Facturación electrónica y tickets de compra impresos.
+- Asistencia virtual inteligente para consultar platillos, mesas disponibles y estado de órdenes.

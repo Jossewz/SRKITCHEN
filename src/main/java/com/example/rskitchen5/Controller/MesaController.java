@@ -7,10 +7,13 @@ import com.example.rskitchen5.Model.ItemPedido;
 import com.example.rskitchen5.Model.Mesa;
 import com.example.rskitchen5.Model.Pedido;
 import com.example.rskitchen5.Repository.*;
+import com.example.rskitchen5.Security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -24,11 +27,11 @@ public class MesaController {
     private final PedidoRep pedidoRep;
     private final UserRep userRep;
     private final PlatilloRep platilloRep;
-    private FacturaRep facturaRep;
+    private final FacturaRep facturaRep;
 
     @Autowired
     public MesaController(MesaRep mesaRepository, PedidoRep pedidoRep,
-                          UserRep userRep, PlatilloRep platilloRep, FacturaRep facturaRep) {
+            UserRep userRep, PlatilloRep platilloRep, FacturaRep facturaRep) {
         this.mesaRepository = mesaRepository;
         this.pedidoRep = pedidoRep;
         this.userRep = userRep;
@@ -38,7 +41,11 @@ public class MesaController {
 
     @GetMapping("")
     public String mostrarVistaMesa(Model model) {
-        List<Mesa> mesas = mesaRepository.findAll();
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        List<Mesa> mesas = (restaurantId != null)
+                ? mesaRepository.findByRestaurantId(restaurantId)
+                : Collections.emptyList();
+
         Map<String, String> nombresMeseros = new HashMap<>();
         Map<String, List<PedidoDetalleDTO>> pedidosPorMesa = new HashMap<>();
 
@@ -68,12 +75,18 @@ public class MesaController {
     }
 
     @PostMapping("/crear")
-    public String crearMesa(@ModelAttribute Mesa mesa, Model model) {
+    public String crearMesa(@ModelAttribute Mesa mesa, RedirectAttributes redirect) {
         try {
+            Long restaurantId = TenantContext.getCurrentRestaurantId();
+            if (restaurantId == null) {
+                redirect.addFlashAttribute("mensajeError", "No se puede crear mesa sin un restaurante activo");
+                return "redirect:/mesa";
+            }
+            mesa.setRestaurantId(restaurantId);
             mesaRepository.save(mesa);
-            model.addAttribute("mensajeExito", "Mesa creada exitosamente");
+            redirect.addFlashAttribute("mensajeExito", "Mesa creada exitosamente");
         } catch (Exception e) {
-            model.addAttribute("mensajeError", "Error al crear la mesa: " + e.getMessage());
+            redirect.addFlashAttribute("mensajeError", "Error al crear la mesa: " + e.getMessage());
         }
         return "redirect:/mesa";
     }
@@ -116,17 +129,14 @@ public class MesaController {
         }
 
         List<ItemPedidoDetalleDTO> itemsDTO = new ArrayList<>();
-        for (ItemPedido item : pedido.getItems()) {
-            ItemPedidoDetalleDTO itemDTO = new ItemPedidoDetalleDTO();
-            itemDTO.setCantidad(item.getCant());
-            itemDTO.setPrecio(item.getPrice());
-
-            platilloRep.findById(item.getProductId())
-                    .ifPresent(platillo -> {
-                        itemDTO.setNombrePlatillo(platillo.getName());
-                    });
-
-            itemsDTO.add(itemDTO);
+        if (pedido.getItems() != null) {
+            for (ItemPedido item : pedido.getItems()) {
+                ItemPedidoDetalleDTO itemDTO = new ItemPedidoDetalleDTO();
+                itemDTO.setCantidad(item.getCant());
+                itemDTO.setPrecio(item.getPrice());
+                itemDTO.setNombrePlatillo(item.getName());
+                itemsDTO.add(itemDTO);
+            }
         }
         dto.setItems(itemsDTO);
 
@@ -134,33 +144,39 @@ public class MesaController {
     }
 
     @PostMapping("/{id}/generar-factura")
-    public String generarFactura(@PathVariable String id, Model model) {
+    @Transactional
+    public String generarFactura(@PathVariable String id, RedirectAttributes redirect) {
         Optional<Mesa> optionalMesa = mesaRepository.findById(id);
 
         if (optionalMesa.isEmpty()) {
-            model.addAttribute("mensajeError", "Mesa no encontrada");
+            redirect.addFlashAttribute("mensajeError", "Mesa no encontrada");
             return "redirect:/mesa";
         }
 
         Mesa mesa = optionalMesa.get();
 
         if (mesa.getPedidosId() == null || mesa.getPedidosId().isEmpty()) {
-            model.addAttribute("mensajeError", "La mesa no tiene pedidos para facturar");
+            redirect.addFlashAttribute("mensajeError", "La mesa no tiene pedidos para facturar");
             return "redirect:/mesa";
         }
 
-        String pedidoId = mesa.getPedidosId().get(0);
-        Optional<Pedido> optionalPedido = pedidoRep.findById(pedidoId);
+        List<ItemPedido> allItems = new ArrayList<>();
+        double totalMesa = 0.0;
+        String mainPedidoId = mesa.getPedidosId().get(0);
 
-        if (optionalPedido.isEmpty()) {
-            model.addAttribute("mensajeError", "Pedido no encontrado");
-            return "redirect:/mesa";
+        for (String pedidoId : mesa.getPedidosId()) {
+            Optional<Pedido> optionalPedido = pedidoRep.findById(pedidoId);
+            if (optionalPedido.isPresent()) {
+                Pedido pedido = optionalPedido.get();
+                if (pedido.getItems() != null) {
+                    allItems.addAll(pedido.getItems());
+                }
+                totalMesa += pedido.getTotal();
+            }
         }
-
-        Pedido pedido = optionalPedido.get();
 
         Factura factura = new Factura();
-        factura.setPedidoId(pedido.getId());
+        factura.setPedidoId(mainPedidoId);
         factura.setMesaNum(String.valueOf(mesa.getNum()));
 
         if (mesa.getMeseroId() != null) {
@@ -169,8 +185,9 @@ public class MesaController {
         }
 
         factura.setFecha(LocalDateTime.now());
-        factura.setItems(pedido.getItems());
-        factura.setTotal(pedido.getTotal());
+        factura.setItems(allItems);
+        factura.setTotal(totalMesa);
+        factura.setRestaurantId(mesa.getRestaurantId());
 
         facturaRep.save(factura);
 
@@ -179,7 +196,7 @@ public class MesaController {
         mesa.setPedidosId(new ArrayList<>());
         mesaRepository.save(mesa);
 
-        model.addAttribute("mensajeExito", "Factura generada y mesa liberada con éxito");
+        redirect.addFlashAttribute("mensajeExito", "Factura generada y mesa liberada con éxito");
 
         return "redirect:/mesa";
     }

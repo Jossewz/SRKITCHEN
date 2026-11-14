@@ -1,40 +1,41 @@
 package com.example.rskitchen5.Model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "pedido")
+@Entity
+@Table(name = "pedidos")
 public class Pedido {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private int mesaNum;
     private String meseroName;
     private String mesaId;
     private String meseroId;
 
-    @Field("fecha")
-    private LocalDateTime fecha; // Usar Date en lugar de LocalDateTime
+    private LocalDateTime fecha;
 
-    private List<ItemPedido> items;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ItemPedido> items = new ArrayList<>();
+
     private double total;
     private boolean pagado;
-
-    // Constructor y getters/setters...
+    private Long restaurantId;
 
     public Pedido() {
-
+        this.fecha = LocalDateTime.now();
     }
 
-    public Pedido(LocalDateTime fecha, String id, List<ItemPedido> items, int mesaNum, String mesaId, String meseroId, boolean pagado, double total, String meseroName) {
-        this.fecha = fecha;
+    public Pedido(LocalDateTime fecha, Long id, List<ItemPedido> items, int mesaNum, String mesaId, String meseroId,
+            boolean pagado, double total, String meseroName) {
+        this.fecha = fecha != null ? fecha : LocalDateTime.now();
         this.id = id;
-        this.items = items;
+        this.setItems(items);
         this.mesaNum = mesaNum;
         this.mesaId = mesaId;
         this.meseroId = meseroId;
@@ -52,19 +53,38 @@ public class Pedido {
     }
 
     public String getId() {
-        return id;
+        return id != null ? String.valueOf(id) : null;
     }
 
     public void setId(String id) {
+        if (id != null && !id.trim().isEmpty()) {
+            try {
+                this.id = Long.parseLong(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+    }
+
+    public Long getIdLong() {
+        return id;
+    }
+
+    public void setIdLong(Long id) {
         this.id = id;
     }
 
     public List<ItemPedido> getItems() {
-        return items;
+        return items != null ? items : new ArrayList<>();
     }
 
     public void setItems(List<ItemPedido> items) {
-        this.items = items;
+        this.items.clear();
+        if (items != null) {
+            for (ItemPedido item : items) {
+                item.setPedido(this);
+                this.items.add(item);
+            }
+        }
     }
 
     public String getMesaId() {
@@ -103,6 +123,10 @@ public class Pedido {
         return pagado;
     }
 
+    public boolean getPagado() {
+        return pagado;
+    }
+
     public void setPagado(boolean pagado) {
         this.pagado = pagado;
     }
@@ -113,5 +137,13 @@ public class Pedido {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

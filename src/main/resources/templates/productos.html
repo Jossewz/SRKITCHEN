@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'productos', 'Inventario')}">
+
+<head>
+    <title>Inventario – SR Kitchen</title>
+</head>
+
+<body>
+
+<th:block th:fragment="content">
+    
+    <div class="space-y-6"
+         x-data="{
+             search: '',
+             showCreateModal: false,
+             showEditModal: false,
+             editProducto: {
+                 id: '',
+                 name: '',
+                 uMedida: '',
+                 stock: '',
+                 activo: true
+             },
+             openEdit(id, name, uMedida, stock, activo) {
+                 this.editProducto.id = id || '';
+                 this.editProducto.name = name || '';
+                 this.editProducto.uMedida = uMedida || '';
+                 this.editProducto.stock = stock || '';
+                 this.editProducto.activo = (activo === true || activo === 'true');
+                 this.showEditModal = true;
+             }
+         }">
+
+        <!-- ══════════════════════════════════════════════════════════
+             1. CABECERA
+             ══════════════════════════════════════════════════════════ -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <div>
+                <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Inventario y Materias Primas</h1>
+                <p class="text-xs sm:text-sm text-slate-500">Supervisa existencias, unidades disponibles y reposición de la cocina</p>
+            </div>
+            
+            <button type="button"
+                    @click="showCreateModal = true"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0c6780] hover:bg-[#095166] text-white font-bold text-xs sm:text-sm shadow-sm transition-all cursor-pointer shrink-0">
+                <i data-lucide="plus" class="size-4.5 stroke-[2.5]"></i>
+                <span>Nuevo Producto / Insumo</span>
+            </button>
+        </div>
+
+        <!-- NOTIFICACIÓN DE INVENTARIO PARA ADMINISTRADORES -->
+        <div x-data="{ visible: true }" 
+             x-show="visible" 
+             x-transition
+             class="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-teal-50 to-emerald-50 border border-[#0c6780]/20 shadow-xs flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-xl bg-[#0c6780] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <i data-lucide="boxes" class="size-5"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <span>Panel de Gestión de Inventario</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0c6780]/10 text-[#0c6780]">Modo Administrador</span>
+                    </h4>
+                    <p class="text-xs text-slate-600 mt-0.5">
+                        <span th:if="${criticosCount != null and criticosCount > 0}">
+                            <strong class="text-rose-600 font-bold" th:text="${criticosCount}">0</strong> insumo(s) tienen stock bajo (5 o menos unidades) y requieren reabastecimiento.
+                        </span>
+                        <span th:unless="${criticosCount != null and criticosCount > 0}">
+                            Todos los insumos del restaurante se encuentran en niveles estables de abastecimiento.
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <button type="button" 
+                    @click="visible = false" 
+                    class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-white/60 transition-colors cursor-pointer shrink-0" 
+                    title="Cerrar notificación">
+                <i data-lucide="x" class="size-4"></i>
+            </button>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             2. BUSCADOR
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3">
+            <div class="relative flex-1">
+                <i data-lucide="search" class="size-4.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text"
+                       x-model="search"
+                       placeholder="Buscar por nombre de ingrediente, unidad o código..."
+                       class="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                <button type="button"
+                        x-show="search.length > 0"
+                        @click="search = ''"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
+                    <i data-lucide="x" class="size-3.5"></i>
+                </button>
+            </div>
+            <span class="text-xs font-semibold text-slate-400 px-2 hidden sm:inline"
+                  th:text="${productos != null ? productos.size() + ' artículos' : '0'}">0</span>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             3. TABLA DE PRODUCTOS (ESTILO SIGA)
+             ══════════════════════════════════════════════════════════ -->
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-5">Insumo / Producto</th>
+                            <th class="py-3.5 px-4">Referencia ID</th>
+                            <th class="py-3.5 px-4 text-center">U. Medida</th>
+                            <th class="py-3.5 px-4 text-center">Nivel de Stock</th>
+                            <th class="py-3.5 px-4 text-center">Estado</th>
+                            <th class="py-3.5 px-5 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr th:if="${productos == null or productos.isEmpty()}">
+                            <td colspan="6" class="py-12 text-center text-slate-400">
+                                <div class="size-12 rounded-2xl bg-slate-50 text-slate-300 flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="boxes" class="size-6 stroke-[1.5]"></i>
+                                </div>
+                                <p class="text-xs font-semibold">No hay insumos registrados en inventario</p>
+                                <button type="button"
+                                        @click="showCreateModal = true"
+                                        class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0c6780] text-white text-xs font-bold cursor-pointer hover:bg-[#095166] transition-colors">
+                                    <i data-lucide="plus" class="size-3.5"></i>
+                                    <span>Registrar Primer Insumo</span>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr th:each="producto : ${productos}" 
+                            th:data-producto-name="${producto.name}"
+                            th:data-producto-umedida="${producto.uMedida != null ? producto.uMedida : (producto.cant != null ? producto.cant : '')}"
+                            x-show="!search || $el.dataset.productoName.toLowerCase().includes(search.toLowerCase()) || $el.dataset.productoUmedida.toLowerCase().includes(search.toLowerCase())"
+                            class="hover:bg-slate-50/60 transition-colors"
+                            th:classappend="${!producto.activo} ? 'bg-slate-50/60 opacity-70' : ''">
+                            
+                            <td class="py-3.5 px-5">
+                                <strong class="text-xs font-bold text-slate-800" th:text="${producto.name}">Producto</strong>
+                            </td>
+                            
+                            <td class="py-3.5 px-4 font-mono text-[11px] text-slate-400" 
+                                th:text="${producto.id != null and producto.id.length() >= 8 ? producto.id.substring(0,8) : producto.id}">ID</td>
+                            
+                            <td class="py-3.5 px-4 text-center font-bold text-slate-700">
+                                <span class="inline-block px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold"
+                                      th:text="${producto.uMedida != null and !producto.uMedida.isEmpty() ? producto.uMedida : (producto.cant != null and !producto.cant.isEmpty() ? producto.cant : '-')}">Unidad</span>
+                            </td>
+                            
+                            <td class="py-3.5 px-4 text-center">
+                                <span th:if="${producto.stock > 10}" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                    <span th:text="${producto.stock} + ' disp.'">10 disp.</span>
+                                </span>
+                                <span th:if="${producto.stock <= 10 and producto.stock > 0}" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    <span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                    <span th:text="${producto.stock} + ' disp.'">5 disp.</span>
+                                </span>
+                                <span th:if="${producto.stock <= 0}" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <span class="size-1.5 rounded-full bg-rose-500"></span>
+                                    Sin Stock
+                                </span>
+                            </td>
+
+                            <td class="py-3.5 px-4 text-center">
+                                <span th:if="${producto.activo}" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                    <span class="size-1.5 rounded-full bg-teal-500"></span>
+                                    Activo
+                                </span>
+                                <span th:unless="${producto.activo}" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                    <span class="size-1.5 rounded-full bg-slate-400"></span>
+                                    Desactivado
+                                </span>
+                            </td>
+
+                            <td class="py-3.5 px-5 text-right">
+                                <div class="inline-flex items-center gap-1">
+                                    <!-- Editar -->
+                                    <button type="button"
+                                            @click="openEdit($el.dataset.id, $el.dataset.name, $el.dataset.umedida, $el.dataset.stock, $el.dataset.activo)"
+                                            th:data-id="${producto.id}"
+                                            th:data-name="${producto.name}"
+                                            th:data-umedida="${producto.uMedida != null ? producto.uMedida : (producto.cant != null ? producto.cant : '')}"
+                                            th:data-stock="${producto.stock}"
+                                            th:data-activo="${producto.activo}"
+                                            class="size-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer" 
+                                            title="Editar Insumo">
+                                        <i data-lucide="edit-3" class="size-3.5"></i>
+                                    </button>
+                                    
+                                    <!-- Desactivar / Activar Toggle -->
+                                    <form th:action="@{'/producto/' + ${producto.id} + '/toggle-estado'}" method="post" class="inline m-0">
+                                        <button type="submit" 
+                                                th:title="${producto.activo ? 'Desactivar Insumo' : 'Activar Insumo'}"
+                                                th:attr="onclick='return confirm(\'¿Confirmas ' + (${producto.activo} ? 'desactivar' : 'activar') + ' este producto?\');'"
+                                                class="size-8 rounded-xl flex items-center justify-center transition-colors cursor-pointer"
+                                                th:classappend="${producto.activo ? 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'}">
+                                            <i th:attr="data-lucide=${producto.activo ? 'pause-circle' : 'play-circle'}" class="size-3.5"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Eliminar -->
+                                    <a th:href="@{'/producto/eliminar/' + ${producto.id}}" 
+                                       onclick="return confirm('¿Confirmas eliminar este producto del inventario?');" 
+                                       class="size-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                                       title="Eliminar Insumo">
+                                        <i data-lucide="trash-2" class="size-3.5"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             4. MODAL: NUEVO PRODUCTO / INSUMO
+             ══════════════════════════════════════════════════════════ -->
+        <div x-show="showCreateModal" 
+             x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+             @keydown.escape.window="showCreateModal = false">
+            
+            <div @click.outside="showCreateModal = false"
+                 x-show="showCreateModal"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+                
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center">
+                            <i data-lucide="boxes" class="size-5 stroke-[2]"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-800">Nuevo Insumo</h2>
+                            <p class="text-xs text-slate-400">Control de materias primas de cocina</p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            @click="showCreateModal = false"
+                            class="size-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+                        <i data-lucide="x" class="size-4"></i>
+                    </button>
+                </div>
+
+                <form th:action="@{/producto/guardar}" 
+                      method="post" 
+                      class="space-y-4">
+                    
+                    <input type="hidden" name="activo" value="true" />
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Nombre del Insumo / Producto <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="name" 
+                               required 
+                               placeholder="Ej. Ajo, Aceite de Oliva, Tomates, Sal..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Cantidad / U. Medida <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="uMedida" 
+                                required 
+                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all cursor-pointer">
+                            <option value="" disabled selected>Selecciona una unidad de medida...</option>
+                            <option value="g (gramo)">g (gramo)</option>
+                            <option value="kg (kilogramo)">kg (kilogramo)</option>
+                            <option value="mg (miligramo)">mg (miligramo)</option>
+                            <option value="lb (libra)">lb (libra)</option>
+                            <option value="oz (onza)">oz (onza)</option>
+                            <option value="L (litro)">L (litro)</option>
+                            <option value="mL (mililitro)">mL (mililitro)</option>
+                            <option value="gal (galón)">gal (galón)</option>
+                            <option value="fl oz (onza líquida)">fl oz (onza líquida)</option>
+                            <option value="Cartón">Cartón</option>
+                            <option value="Sobre">Sobre</option>
+                            <option value="Porción">Porción</option>
+                            <option value="Unidad">Unidad</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Stock Disponible en Almacén <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="number" 
+                               name="stock" 
+                               required 
+                               min="0"
+                               placeholder="50"
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                        <button type="button" 
+                                @click="showCreateModal = false"
+                                class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                        <button type="submit" 
+                                class="px-5 py-2 rounded-xl bg-[#0c6780] hover:bg-[#095166] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer">
+                            Guardar Insumo
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             5. MODAL: EDITAR PRODUCTO
+             ══════════════════════════════════════════════════════════ -->
+        <div x-show="showEditModal" 
+             x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+             @keydown.escape.window="showEditModal = false">
+            
+            <div @click.outside="showEditModal = false"
+                 x-show="showEditModal"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+                
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                            <i data-lucide="edit-3" class="size-5 stroke-[2]"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold font-jakarta text-slate-800">Editar Insumo</h2>
+                            <p class="text-xs text-slate-400">Modifica existencias y unidad de medida</p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            @click="showEditModal = false"
+                            class="size-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+                        <i data-lucide="x" class="size-4"></i>
+                    </button>
+                </div>
+
+                <form th:action="@{/producto/actualizar}" 
+                      method="post" 
+                      class="space-y-4">
+                    
+                    <input type="hidden" name="id" :value="editProducto.id" />
+                    <input type="hidden" name="activo" :value="editProducto.activo" />
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Nombre del Insumo / Producto <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="name" 
+                               x-model="editProducto.name"
+                               required 
+                               placeholder="Ej. Ajo, Aceite de Oliva, Tomates, Sal..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Cantidad / U. Medida <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="uMedida" 
+                                x-model="editProducto.uMedida"
+                                required 
+                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all cursor-pointer">
+                            <option value="" disabled>Selecciona una unidad de medida...</option>
+                            <option value="g (gramo)">g (gramo)</option>
+                            <option value="kg (kilogramo)">kg (kilogramo)</option>
+                            <option value="mg (miligramo)">mg (miligramo)</option>
+                            <option value="lb (libra)">lb (libra)</option>
+                            <option value="oz (onza)">oz (onza)</option>
+                            <option value="L (litro)">L (litro)</option>
+                            <option value="mL (mililitro)">mL (mililitro)</option>
+                            <option value="gal (galón)">gal (galón)</option>
+                            <option value="fl oz (onza líquida)">fl oz (onza líquida)</option>
+                            <option value="Cartón">Cartón</option>
+                            <option value="Sobre">Sobre</option>
+                            <option value="Porción">Porción</option>
+                            <option value="Unidad">Unidad</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Stock Disponible en Almacén <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="number" 
+                               name="stock" 
+                               x-model="editProducto.stock"
+                               required 
+                               min="0"
+                               placeholder="50"
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                        <button type="button" 
+                                @click="showEditModal = false"
+                                class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                        <button type="submit" 
+                                class="px-5 py-2 rounded-xl bg-[#0c6780] hover:bg-[#095166] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer">
+                            Actualizar Insumo
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</th:block>
+
+</body>
+</html>

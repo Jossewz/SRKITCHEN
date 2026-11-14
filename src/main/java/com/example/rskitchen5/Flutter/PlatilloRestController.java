@@ -2,8 +2,12 @@ package com.example.rskitchen5.Flutter;
 
 import com.example.rskitchen5.Model.Platillo;
 import com.example.rskitchen5.Repository.PlatilloRep;
+import com.example.rskitchen5.Security.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @RestController
@@ -15,22 +19,46 @@ public class PlatilloRestController {
 
     @GetMapping
     public List<Platillo> getAll() {
-        return rep.findAll();
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        if (restaurantId == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No se identificó el restaurante en la sesión");
+        }
+        return rep.findByRestaurantId(restaurantId);
     }
 
     @PostMapping
     public Platillo create(@RequestBody Platillo p) {
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        if (restaurantId == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No se identificó el restaurante en el token JWT");
+        }
+        p.setRestaurantId(restaurantId);
         return rep.save(p);
     }
 
     @PutMapping("/{id}")
-    public Platillo update(@PathVariable String id, @RequestBody Platillo p) {
-        p.setId(id);
-        return rep.save(p);
+    public Platillo update(@PathVariable Long id, @RequestBody Platillo p) {
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        if (restaurantId == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sesión inválida");
+        }
+        Platillo existing = rep.findByIdAndRestaurantId(id, restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Platillo no encontrado en este restaurante"));
+
+        existing.setName(p.getName());
+        existing.setPrice(p.getPrice());
+        existing.setCant(p.getCant());
+        return rep.save(existing);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        rep.deleteById(id);
+    public void delete(@PathVariable Long id) {
+        Long restaurantId = TenantContext.getCurrentRestaurantId();
+        if (restaurantId == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sesión inválida");
+        }
+        Platillo existing = rep.findByIdAndRestaurantId(id, restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Platillo no encontrado en este restaurante"));
+        rep.delete(existing);
     }
 }

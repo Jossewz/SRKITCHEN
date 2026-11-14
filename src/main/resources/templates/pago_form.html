@@ -1,57 +1,144 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html(~{::content}, 'facturas', 'Registro de Pago')}">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Pago de Factura</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        form {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            width: 300px;
-        }
-        h2 { text-align: center; margin-bottom: 20px; }
-        label { display: block; margin-top: 10px; }
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 10px;
-            background: #4caf50;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover { background: #43a047; }
-    </style>
+    <title>Registrar Pago – SR Kitchen</title>
 </head>
+
 <body>
-<form th:action="@{/pagos/procesar}" method="post">
-    <h2>Registrar Pago</h2>
-    <input type="hidden" name="facturaId" th:value="${factura.id}" />
 
-    <label>Método de pago:</label>
-    <input type="radio" name="metodo" value="Efectivo" required> Efectivo<br>
-    <input type="radio" name="metodo" value="Tarjeta débito"> Tarjeta débito<br>
-    <input type="radio" name="metodo" value="Tarjeta crédito"> Tarjeta crédito<br>
+<th:block th:fragment="content">
+    
+    <div class="max-w-2xl mx-auto space-y-6">
 
-    <label>Monto:</label>
-    <input type="number" step="0.01" name="monto" th:value="${factura.total}" required>
+        <!-- Cabecera de Navegación -->
+        <div class="flex items-center justify-between pb-2 border-b border-slate-200/80">
+            <div>
+                <h1 class="text-2xl font-extrabold font-jakarta text-slate-800 tracking-tight">Cobro en Caja</h1>
+                <p class="text-xs text-slate-500">Registra el medio de pago y cierra la liquidación del cliente</p>
+            </div>
+            
+            <a href="/factura"
+               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                <i data-lucide="arrow-left" class="size-4"></i>
+                <span>Volver a Facturas</span>
+            </a>
+        </div>
 
-    <label>¿Imprimir copia?</label>
-    <input type="checkbox" name="imprimirCopia"><br>
+        <!-- Tarjeta de Factura a Cobrar -->
+        <div class="bg-gradient-to-br from-[#0c6780] to-[#095166] text-white p-6 rounded-xl shadow-lg border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-semibold text-sky-200 uppercase tracking-wider block">Cuenta a Liquidar</span>
+                <h2 class="text-xl font-bold font-jakarta mt-0.5">
+                    <span th:text="'Mesa ' + ${factura.mesaNum}">Mesa 1</span> &bull; 
+                    <span class="text-sky-200 text-base" th:text="'Folio #' + (${factura.id != null and factura.id.length() >= 8 ? factura.id.substring(0,8) : factura.id})">#000</span>
+                </h2>
+                <div class="text-xs text-sky-100/90 mt-1 flex items-center gap-2">
+                    <span th:text="'Mesero: ' + ${factura.meseroName}">Mesero</span>
+                    <span>&bull;</span>
+                    <span th:text="${factura.fecha != null ? #temporals.format(factura.fecha, 'dd/MM/yyyy HH:mm') : ''}">Fecha</span>
+                </div>
+            </div>
 
-    <button type="submit">Confirmar Pago</button>
-</form>
+            <div class="text-left sm:text-right">
+                <span class="text-xs font-semibold text-sky-200 uppercase tracking-wider block">Total a Pagar</span>
+                <span class="text-3xl font-black font-jakarta tracking-tight"
+                      th:text="'$' + ${#numbers.formatDecimal(factura.total, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
+            </div>
+        </div>
+
+        <!-- Formulario de Cobro -->
+        <div class="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">
+            <form id="pagoForm" th:action="@{/pagos/procesar}" method="post" class="space-y-6"
+                  x-data="{ metodoSeleccionado: 'Efectivo' }">
+                
+                <input type="hidden" name="facturaId" th:value="${factura.id}" />
+
+                <!-- Métodos de Pago en Tarjetas Interactivas -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-2">
+                        Método de Pago <span class="text-rose-500">*</span>
+                    </label>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        
+                        <!-- Efectivo -->
+                        <label class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                               :class="metodoSeleccionado === 'Efectivo' ? 'bg-sky-50/80 border-[#0c6780] text-[#0c6780] shadow-xs' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-700'">
+                            <input type="radio" name="metodo" value="Efectivo" x-model="metodoSeleccionado" required class="sr-only">
+                            <i data-lucide="banknote" class="size-6 stroke-[1.75]"></i>
+                            <span class="text-xs font-bold">Efectivo</span>
+                        </label>
+
+                        <!-- Tarjeta Débito -->
+                        <label class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                               :class="metodoSeleccionado === 'Tarjeta débito' ? 'bg-sky-50/80 border-[#0c6780] text-[#0c6780] shadow-xs' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-700'">
+                            <input type="radio" name="metodo" value="Tarjeta débito" x-model="metodoSeleccionado" class="sr-only">
+                            <i data-lucide="credit-card" class="size-6 stroke-[1.75]"></i>
+                            <span class="text-xs font-bold">Tarjeta Débito</span>
+                        </label>
+
+                        <!-- Tarjeta Crédito -->
+                        <label class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                               :class="metodoSeleccionado === 'Tarjeta crédito' ? 'bg-sky-50/80 border-[#0c6780] text-[#0c6780] shadow-xs' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-700'">
+                            <input type="radio" name="metodo" value="Tarjeta crédito" x-model="metodoSeleccionado" class="sr-only">
+                            <i data-lucide="wallet" class="size-6 stroke-[1.75]"></i>
+                            <span class="text-xs font-bold">Tarjeta Crédito</span>
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- Monto a Pagar -->
+                <div>
+                    <label for="monto" class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Monto Recibido ($) <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400">$</span>
+                        <input id="monto" 
+                               type="number" 
+                               step="0.01" 
+                               name="monto" 
+                               th:value="${factura.total}" 
+                               required 
+                               class="w-full pl-8 pr-4 py-2.5 text-base font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0c6780]/30 focus:border-[#0c6780] transition-all">
+                    </div>
+                </div>
+
+                <!-- Imprimir Copia Checkbox -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                    <input id="imprimirCopia" 
+                           type="checkbox" 
+                           name="imprimirCopia" 
+                           class="size-4.5 rounded-md accent-[#0c6780] cursor-pointer">
+                    <label for="imprimirCopia" class="text-xs font-semibold text-slate-700 cursor-pointer select-none">
+                        Imprimir copia del comprobante fiscal al finalizar
+                    </label>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+                    <button type="submit" 
+                            class="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition-all cursor-pointer">
+                        <i data-lucide="check-circle-2" class="size-4.5 stroke-[2.5]"></i>
+                        <span>Confirmar y Liquidar Cuenta</span>
+                    </button>
+                    <a href="/factura" 
+                       class="w-full sm:w-auto flex items-center justify-center py-3 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm transition-colors cursor-pointer">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</th:block>
+
 </body>
 </html>
