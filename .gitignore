@@ -37,3 +37,5 @@ screenshot*.png
 *.screenshot.png
 .playwright-mcp/
 scratch/
+__pycache__/
+*.pyc

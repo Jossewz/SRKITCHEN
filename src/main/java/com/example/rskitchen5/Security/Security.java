@@ -92,7 +92,9 @@ public class Security {
                                 "/producto",
                                 "/producto/**",
                                 "/productos",
-                                "/productos/**"
+                                "/productos/**",
+                                "/prediccion",
+                                "/prediccion/**"
                         ).hasAnyAuthority("ROLE_ADMIN", "ROLE_CREATOR")
                         // Protegidos para ADMIN, MESEROS y CREATOR
                         .requestMatchers(

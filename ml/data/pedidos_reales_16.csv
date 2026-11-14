@@ -1,0 +1,17 @@
+numeroPedido,mesaNum,platillo,precio,cantidad,CreacionPedido,estado,canal,sede
+PED-R01,2,Hamburguesa rsKitchen,28000,2,2026-11-01 13:15:00,pagado,mesa,Principal
+PED-R02,5,Corte de Carne,48000,2,2026-11-02 20:10:00,pagado,mesa,Principal
+PED-R03,7,Ensalada Cesar,24000,1,2026-11-03 14:00:00,pagado,mesa,Principal
+PED-R04,10,Corte de Carne,58000,2,2026-11-04 19:45:00,pagado,mesa,Principal
+PED-R05,3,Pasta Carbonara,32000,2,2026-11-05 13:30:00,pagado,mesa,Principal
+PED-R06,1,Pizza Margarita,34000,2,2026-11-05 20:30:00,pagado,mesa,Centro
+PED-R07,3,Pasta Carbonara,32000,1,2026-11-06 14:15:00,pagado,mesa,Centro
+PED-R08,1,Corte de Carne,45000,2,2026-11-06 21:00:00,pagado,mesa,Principal
+PED-R09,1,Hamburguesa rsKitchen,28000,3,2026-11-07 13:45:00,pagado,mesa,Principal
+PED-R10,4,Pizza Margarita,34000,2,2026-11-07 20:00:00,pagado,mesa,Principal
+PED-R11,8,Sopa del Dia,16000,2,2026-11-08 14:10:00,pagado,mesa,Principal
+PED-R12,12,Corte de Carne,52000,2,2026-11-08 20:45:00,pagado,mesa,Principal
+PED-R13,6,Pizza Margarita,34000,1,2026-11-09 13:30:00,pagado,mesa,Centro
+PED-R14,3,Hamburguesa rsKitchen,28000,2,2026-11-09 19:30:00,pagado,mesa,Principal
+PED-R15,6,Pasta Carbonara,32000,1,2026-11-10 13:00:00,pagado,mesa,Principal
+PED-R16,9,Corte de Carne,45000,1,2026-11-10 20:15:00,pagado,mesa,Principal
